@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise HRM Suite · full function</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-bg: #f5f7ff;
+            --sidebar-width: 280px;
+            --bg-main: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR (unchanged) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 12px; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .nav-label {
+            padding: 16px 12px 6px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .nav-item { margin-bottom: 2px; }
+        
+        .menu-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-trigger:hover { background: #f1f5f9; color: var(--primary); }
+        .menu-trigger.active { background: var(--primary-bg); color: var(--primary); }
+
+        .submenu, .sub-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 20px;
+        }
+
+        .submenu.open, .sub-submenu.open { max-height: 1200px; }
+
+        .submenu-link {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            margin-top: 1px;
+            cursor: pointer;
+        }
+
+        .submenu-link:hover { color: var(--primary); background: #f8fafc; }
+        .submenu-link.active { background: #eef2ff; color: var(--primary); font-weight: 500; }
+
+        .chevron { transition: transform 0.2s; color: #94a3b8; }
+        .rotate { transform: rotate(90deg); color: var(--primary); }
+
+        /* --- MAIN --- */
+        .main { flex: 1; margin-left: var(--sidebar-width); overflow-y: auto; height: 100vh; }
+        
+        header {
+            height: 60px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky; top: 0; z-index: 40;
+        }
+
+        .content { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+        /* Dashboard cards (keep) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .stat-val { font-size: 1.5rem; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .stat-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .bg-indigo { background: #eef2ff; color: #4f46e5; }
+        .bg-emerald { background: #ecfdf5; color: #10b981; }
+        .bg-amber { background: #fffbeb; color: #f59e0b; }
+
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* new utility classes for rich pages */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .flex-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .badge {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fed7aa; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        .btn-ghost {
+            border: 1px solid var(--border);
+            background: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: default;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 12px 10px;
+            background: #f8fafc;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+        .divider { height: 1px; background: var(--border; margin: 20px 0); }
+        .profile-avatar { width: 48px; height: 48px; border-radius: 8px; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR (exactly as before) -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i data-lucide="shield-check" size="24"></i>
+            <span>HRM Enterprise</span>
+        </div>
+        <div class="sidebar-scroll">
+            <div class="nav-item">
+                <a onclick="navigate('Dashboard', this)" class="menu-trigger active">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="layout-grid" size="18"></i> Dashboard</div>
+                </a>
+            </div>
+            <div class="nav-label">Core Setup</div>
+            <!-- Company Group -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-comp')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="building" size="18"></i> Company</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-comp">
+                    <a onclick="navigate('Maintain Company', this)" class="submenu-link">Maintain Company</a>
+                    <a onclick="navigate('Company Chart', this)" class="submenu-link">Company Chart</a>
+                    <a onclick="navigate('Manpower Planning', this)" class="submenu-link">Man Power Planning</a>
+                    <a onclick="navigate('Maintain Branch', this)" class="submenu-link">Maintain Branch</a>
+                    <a onclick="navigate('Manpower Request', this)" class="submenu-link">Manpower Request</a>
+                    <a onclick="navigate('Job Title & Salary', this)" class="submenu-link">Job Title and Salary</a>
+                    <a onclick="navigate('Off Day', this)" class="submenu-link">Off Day</a>
+                    <a onclick="navigate('Business Unit', this)" class="submenu-link">Business Unit</a>
+                </div>
+            </div>
+            <!-- Employee Group -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-emp')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="users" size="18"></i> Employee</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-emp">
+                    <a onclick="navigate('Employee Profile', this)" class="submenu-link">Employee Profile</a>
+                    <a onclick="navigate('Delegation', this)" class="submenu-link">Delegation</a>
+                    <a onclick="navigate('Cosign', this)" class="submenu-link">Cosign</a>
+                    <a onclick="navigate('Guarantor', this)" class="submenu-link">Guarantor</a>
+                    <a onclick="navigate('Experience Requests', this)" class="submenu-link">Experience Requests</a>
+                    <a onclick="navigate('Retirement Setting', this)" class="submenu-link">Retirement Setting</a>
+                    <a onclick="navigate('HRM Setting', this)" class="submenu-link">HRM Setting</a>
+                    <a onclick="navigate('Employee Type', this)" class="submenu-link">Employee Type</a>
+                </div>
+            </div>
+            <div class="nav-label">Talent Management</div>
+            <!-- Recruitment -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-rec')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="user-plus" size="18"></i> Recruitment</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-rec">
+                    <div onclick="toggleSubSub(this, 'm-rec-set')" class="submenu-link" style="font-weight:600; color:#334155; display:flex; justify-content:space-between;">Settings <i data-lucide="chevron-down" size="12"></i></div>
+                    <div class="sub-submenu" id="m-rec-set">
+                        <a onclick="navigate('Pass Setting', this)" class="submenu-link">Pass Setting</a>
+                        <a onclick="navigate('Criteria Settings', this)" class="submenu-link">Criteria Type Settings</a>
+                        <a onclick="navigate('Experience Org', this)" class="submenu-link">Experience Organization</a>
+                        <a onclick="navigate('Experience JobTitle', this)" class="submenu-link">Experience JobTitle</a>
+                        <a onclick="navigate('Screening Setting', this)" class="submenu-link">Screening Setting</a>
+                    </div>
+                    <div onclick="toggleSubSub(this, 'm-rec-proc')" class="submenu-link" style="font-weight:600; color:#334155; display:flex; justify-content:space-between;">Process <i data-lucide="chevron-down" size="12"></i></div>
+                    <div class="sub-submenu" id="m-rec-proc">
+                        <a onclick="navigate('Vacancy', this)" class="submenu-link">Vacancy</a>
+                        <a onclick="navigate('Applicant Registration', this)" class="submenu-link">Applicant Registration</a>
+                        <a onclick="navigate('Applicant Result', this)" class="submenu-link">Applicant Result</a>
+                        <a onclick="navigate('Internal Applicant', this)" class="submenu-link">Internal Applicant</a>
+                        <a onclick="navigate('Recruitment Request', this)" class="submenu-link">Recruitment Request</a>
+                        <a onclick="navigate('Application Form', this)" class="submenu-link">Application Form</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Placement -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-place')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="move" size="18"></i> Placement</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-place">
+                    <a onclick="navigate('Employee Placement', this)" class="submenu-link">Employee Placement</a>
+                    <a onclick="navigate('Placement Swap', this)" class="submenu-link">Employee Placement Swap</a>
+                    <a onclick="navigate('Placement Reports', this)" class="submenu-link">Placement Reports</a>
+                </div>
+            </div>
+            <div class="nav-label">Operations</div>
+            <!-- Attendance -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-att')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="clock" size="18"></i> Attendance</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-att">
+                    <a onclick="navigate('Attendance', this)" class="submenu-link">Attendance</a>
+                    <a onclick="navigate('Late Coming', this)" class="submenu-link">Late Coming</a>
+                    <a onclick="navigate('Days Absent', this)" class="submenu-link">Days Absent</a>
+                    <a onclick="navigate('Attendance Report', this)" class="submenu-link">Attendance Report</a>
+                </div>
+            </div>
+            <!-- Leave -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-leave')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="calendar" size="18"></i> Leave</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-leave">
+                    <a onclick="navigate('Leave Plan', this)" class="submenu-link">Leave Plan</a>
+                    <a onclick="navigate('Leave Taken', this)" class="submenu-link">Leave Taken</a>
+                    <a onclick="navigate('Annual Leave Entitlement', this)" class="submenu-link">Annual Leave Entitlement</a>
+                    <a onclick="navigate('Leave Requests', this)" class="submenu-link">Leave Requests</a>
+                    <a onclick="navigate('Leave Return', this)" class="submenu-link">Leave Return</a>
+                </div>
+            </div>
+            <!-- Benefit -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-ben')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="gift" size="18"></i> Benefit</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-ben">
+                    <a onclick="navigate('Allowance Rule', this)" class="submenu-link">Allowance Type Rule</a>
+                    <a onclick="navigate('Allowance Definition', this)" class="submenu-link">Allowance Definition</a>
+                    <a onclick="navigate('Employee Allowance', this)" class="submenu-link">Employee Allowance</a>
+                </div>
+            </div>
+            <div class="nav-label">Quality & Conduct</div>
+            <!-- Performance -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-perf')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="trending-up" size="18"></i> Performance</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-perf">
+                    <a onclick="navigate('Performance Rank', this)" class="submenu-link">Performance Rank</a>
+                    <a onclick="navigate('Evaluation Criteria', this)" class="submenu-link">Evaluation Criteria</a>
+                    <a onclick="navigate('Employee Performance', this)" class="submenu-link">Employee Performance</a>
+                    <a onclick="navigate('Performance Summary', this)" class="submenu-link">Summary (Generated)</a>
+                </div>
+            </div>
+            <!-- Discipline -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-disc')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="alert-octagon" size="18"></i> Discipline & Exit</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-disc">
+                    <a onclick="navigate('Discipline Record', this)" class="submenu-link">Discipline Record</a>
+                    <a onclick="navigate('Termination', this)" class="submenu-link">Termination</a>
+                    <a onclick="navigate('Severance Payable', this)" class="submenu-link">Severance Payable</a>
+                    <a onclick="navigate('Miscellaneous Settings', this)" class="submenu-link">Miscellaneous Settings</a>
+                </div>
+            </div>
+            <div class="nav-label">Analytics & Documents</div>
+            <!-- Report -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-rep')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="bar-chart-2" size="18"></i> Report</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-rep">
+                    <a onclick="navigate('Summary Reports', this)" class="submenu-link">Summary Reports</a>
+                    <a onclick="navigate('Detail Reports', this)" class="submenu-link">Detail Reports</a>
+                </div>
+            </div>
+            <!-- Printable -->
+            <div class="nav-item">
+                <div class="menu-trigger" onclick="toggleAcc(this, 'm-print')">
+                    <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="printer" size="18"></i> Printable Document</div>
+                    <i data-lucide="chevron-right" size="14" class="chevron"></i>
+                </div>
+                <div class="submenu" id="m-print">
+                    <a onclick="navigate('Template Types', this)" class="submenu-link">Template Type</a>
+                    <a onclick="navigate('Template Reports', this)" class="submenu-link">Templates Report</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+        <header>
+            <h2 id="view-title" style="font-size: 0.9rem; font-weight: 600;">Dashboard</h2>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="text-align: right; line-height: 1.1;">
+                    <p style="font-size: 0.8rem; font-weight: 600;">Admin User</p>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">HR Director</p>
+                </div>
+                <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--primary-bg); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="user" size="16"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content" id="mainContent">
+            <!-- DASHBOARD VIEW (static) -->
+            <section id="view-Dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div><p class="stat-label">Total Employee</p><p class="stat-val">1,248</p></div><div class="stat-icon bg-indigo"><i data-lucide="users" size="20"></i></div></div>
+                    <div class="stat-card"><div><p class="stat-label">Permanent</p><p class="stat-val">912</p></div><div class="stat-icon bg-emerald"><i data-lucide="user-check" size="20"></i></div></div>
+                    <div class="stat-card"><div><p class="stat-label">Contract</p><p class="stat-val">336</p></div><div class="stat-icon bg-amber"><i data-lucide="user-cog" size="20"></i></div></div>
+                </div>
+                <div class="chart-row">
+                    <div class="card"><h4 class="card-title">Employee Composition</h4><div style="height: 250px;"><canvas id="cType"></canvas></div></div>
+                    <div class="card"><h4 class="card-title">Business Unit Distribution</h4><div style="height: 250px;"><canvas id="cDept"></canvas></div></div>
+                </div>
+            </section>
+
+            <!-- All other view sections will be injected by JavaScript with unique content -->
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Accordion functions (unchanged)
+        function toggleAcc(el, id) {
+            const menu = document.getElementById(id);
+            const chevron = el.querySelector('.chevron');
+            document.querySelectorAll('.submenu').forEach(s => { if(s.id !== id) s.classList.remove('open'); });
+            document.querySelectorAll('.chevron').forEach(c => { if(c !== chevron) c.classList.remove('rotate'); });
+            menu.classList.toggle('open');
+            chevron.classList.toggle('rotate');
+        }
+        function toggleSubSub(el, id) {
+            const menu = document.getElementById(id);
+            menu.classList.toggle('open');
+            event.stopPropagation();
+        }
+
+        // Navigation
+        function navigate(view, el) {
+            document.getElementById('view-title').innerText = view;
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            const viewId = 'view-' + view.replace(/\s+/g, '_');
+            const target = document.getElementById(viewId);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.menu-trigger, .submenu-link').forEach(m => m.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        // ----- UNIQUE PAGE TEMPLATES FOR EVERY VIEW -----
+        function getViewHTML(viewName) {
+            const templates = {
+                // Company
+                'Maintain Company': `
+                    <div class="card">
+                        <h4 class="card-title">🏢 Company Information</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                            <div style="background: #f1f5f9; padding: 20px; border-radius: 12px;">
+                                <p><strong>HRM Corp</strong></p>
+                                <p style="font-size:0.8rem; color: var(--text-muted);">Reg: 12345678</p>
+                                <p style="font-size:0.8rem;">📍 123 Business Ave</p>
+                                <p style="font-size:0.8rem;">📞 +1 555 1234</p>
+                            </div>
+                            <div>
+                                <div class="flex-row"><span class="badge badge-success">Active</span><span class="btn-ghost">Edit</span></div>
+                                <table class="data-table" style="margin-top:16px;">
+                                    <tr><th>Field</th><th>Value</th></tr>
+                                    <tr><td>Legal name</td><td>HRM Enterprises Ltd.</td></tr>
+                                    <tr><td>Tax ID</td><td>TAX-9876Z</td></tr>
+                                    <tr><td>Founded</td><td>2010</td></tr>
+                                    <tr><td>Employees</td><td>1,248</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`,
+                'Company Chart': `
+                    <div class="card">
+                        <h4 class="card-title">Organizational Chart</h4>
+                        <div style="background: #f8fafc; padding: 40px; text-align: center; border-radius: 12px;">
+                            <i data-lucide="share-2" size="48" style="color: var(--primary);"></i>
+                            <p style="margin-top:16px;">CEO → HR Director → Managers → Staff</p>
+                            <p style="font-size:0.8rem; color: var(--text-muted);">(interactive chart placeholder)</p>
+                        </div>
+                    </div>`,
+                'Manpower Planning': `
+                    <div class="card">
+                        <h4 class="card-title">Manpower Forecast 2025</h4>
+                        <table class="data-table">
+                            <tr><th>Department</th><th>Current</th><th>Approved</th><th>To hire</th></tr>
+                            <tr><td>Engineering</td><td>320</td><td>350</td><td>30</td></tr>
+                            <tr><td>Sales</td><td>210</td><td>230</td><td>20</td></tr>
+                            <tr><td>HR</td><td>45</td><td>48</td><td>3</td></tr>
+                        </table>
+                    </div>`,
+                'Maintain Branch': `
+                    <div class="card">
+                        <h4 class="card-title">Branch Offices</h4>
+                        <div class="grid-3">
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>HQ</strong><br>New York<br>320 staff</div>
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>South</strong><br>Atlanta<br>210 staff</div>
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>West</strong><br>San Jose<br>180 staff</div>
+                        </div>
+                    </div>`,
+                'Manpower Request': `
+                    <div class="card">
+                        <h4 class="card-title">Open Requests</h4>
+                        <table class="data-table">
+                            <tr><th>Req#</th><th>Position</th><th>Dept</th><th>Status</th></tr>
+                            <tr><td>MR-024</td><td>Senior Dev</td><td>Engineering</td><td><span class="badge badge-warning">pending</span></td></tr>
+                            <tr><td>MR-025</td><td>Sales Rep</td><td>Sales</td><td><span class="badge-success">approved</span></td></tr>
+                        </table>
+                    </div>`,
+                'Job Title & Salary': `
+                    <div class="card">
+                        <h4 class="card-title">Salary Bands</h4>
+                        <table class="data-table">
+                            <tr><th>Job Title</th><th>Min</th><th>Max</th></tr>
+                            <tr><td>Software Engineer</td><td>$70k</td><td>$110k</td></tr>
+                            <tr><td>HR Generalist</td><td>$50k</td><td>$75k</td></tr>
+                        </table>
+                    </div>`,
+                'Off Day': `
+                    <div class="card">
+                        <h4 class="card-title">Company Holidays 2025</h4>
+                        <ul style="list-style:none;">
+                            <li>📅 Jan 1 - New Year</li>
+                            <li>📅 Jul 4 - Independence Day</li>
+                            <li>📅 Dec 25 - Christmas</li>
+                        </ul>
+                    </div>`,
+                'Business Unit': `
+                    <div class="card">
+                        <h4 class="card-title">Business Units</h4>
+                        <div class="flex-row">
+                            <span class="badge">BU-North</span><span class="badge">BU-South</span><span class="badge">BU-East</span>
+                        </div>
+                    </div>`,
+                // Employee
+                'Employee Profile': `
+                    <div class="card">
+                        <h4 class="card-title">Employee Directory</h4>
+                        <table class="data-table">
+                            <tr><th>ID</th><th>Name</th><th>Dept</th><th>Job</th></tr>
+                            <tr><td>E101</td><td>John Smith</td><td>Engineering</td><td>Lead Dev</td></tr>
+                            <tr><td>E102</td><td>Jane Doe</td><td>Sales</td><td>Account Exec</td></tr>
+                            <tr><td>E103</td><td>Carlos M.</td><td>HR</td><td>HRBP</td></tr>
+                        </table>
+                    </div>`,
+                'Delegation': `
+                    <div class="card">
+                        <h4 class="card-title">Active Delegations</h4>
+                        <p><i data-lucide="user-check" size="16"></i> J. Smith delegated to T. Lee (until Apr 30)</p>
+                        <p><i data-lucide="user-check" size="16"></i> M. Brown delegated to S. Wilson</p>
+                    </div>`,
+                'Cosign': `
+                    <div class="card">
+                        <h4 class="card-title">Cosign Rules</h4>
+                        <p>🔏 Leave requests >5 days need manager + HR cosign</p>
+                        <p>🔏 Expense claims >$1000 need finance cosign</p>
+                    </div>`,
+                'Guarantor': `
+                    <div class="card">
+                        <h4 class="card-title">Employee Guarantors</h4>
+                        <table class="data-table"><tr><th>Employee</th><th>Guarantor</th></tr><tr><td>E201</td><td>ABC Guarantee Co.</td></tr></table>
+                    </div>`,
+                'Experience Requests': `
+                    <div class="card">
+                        <h4 class="card-title">Experience Letters</h4>
+                        <p>📄 3 pending requests</p>
+                        <ul><li>J. Adams (requested Mar 10)</li><li>P. Kim (Mar 12)</li></ul>
+                    </div>`,
+                'Retirement Setting': `
+                    <div class="card">
+                        <h4 class="card-title">Retirement Configuration</h4>
+                        <p>Default retirement age: 65<br>Grace period: 6 months</p>
+                    </div>`,
+                'HRM Setting': `
+                    <div class="card">
+                        <h4 class="card-title">HRM Parameters</h4>
+                        <p>⚙️ probation period: 90 days<br>⚙️ notice period: 30 days</p>
+                    </div>`,
+                'Employee Type': `
+                    <div class="card">
+                        <h4 class="card-title">Employee Types</h4>
+                        <span class="badge">Permanent</span> <span class="badge">Contract</span> <span class="badge">Intern</span> <span class="badge">Temporary</span>
+                    </div>`,
+                // Recruitment Settings
+                'Pass Setting': `<div class="card"><h4 class="card-title">Pass Mark Configuration</h4><p>Interview pass threshold: 70%</p><p>Technical test pass: 75%</p></div>`,
+                'Criteria Settings': `<div class="card"><h4 class="card-title">Criteria Types</h4><ul><li>Education</li><li>Experience</li><li>Skills</li></ul></div>`,
+                'Experience Org': `<div class="card"><h4 class="card-title">Experience Organizations</h4><p>List of accredited prior employers...</p></div>`,
+                'Experience JobTitle': `<div class="card"><h4 class="card-title">Equivalent Job Titles</h4><p>Engineer ⇔ Developer ⇔ Programmer</p></div>`,
+                'Screening Setting': `<div class="card"><h4 class="card-title">Screening Questions</h4><p>Default screening template active.</p></div>`,
+                // Recruitment Process
+                'Vacancy': `
+                    <div class="card">
+                        <h4 class="card-title">Open Vacancies</h4>
+                        <table class="data-table"><tr><th>Position</th><th>Location</th><th>Deadline</th></tr><tr><td>Frontend Dev</td><td>Remote</td><td>2025-04-15</td></tr><tr><td>Accountant</td><td>NY</td><td>2025-04-20</td></tr></table>
+                    </div>`,
+                'Applicant Registration': `<div class="card"><h4 class="card-title">New Applicant</h4><p>Form: Name, Email, Position, Resume upload (mock)</p></div>`,
+                'Applicant Result': `<div class="card"><h4 class="card-title">Applicant Results</h4><p>Passed: 12, Failed: 4, On hold: 3</p></div>`,
+                'Internal Applicant': `<div class="card"><h4 class="card-title">Internal Applicants</h4><p>3 employees applied for transfer</p></div>`,
+                'Recruitment Request': `<div class="card"><h4 class="card-title">Recruitment Requests</h4><p>2 pending approvals</p></div>`,
+                'Application Form': `<div class="card"><h4 class="card-title">Application Form Builder</h4><p>Standard template in use.</p></div>`,
+                // Placement
+                'Employee Placement': `<div class="card"><h4 class="card-title">Current Placements</h4><table class="data-table"><tr><th>Employee</th><th>Department</th><th>Start date</th></tr><tr><td>E001</td><td>Engineering</td><td>2024-01-10</td></tr></table></div>`,
+                'Placement Swap': `<div class="card"><h4 class="card-title">Swap Requests</h4><p>2 pending swaps between employees</p></div>`,
+                'Placement Reports': `<div class="card"><h4 class="card-title">Placement Reports</h4><p>Generate by department / date</p></div>`,
+                // Attendance
+                'Attendance': `<div class="card"><h4 class="card-title">Today's Attendance</h4><p>Present: 890, Absent: 58, Late: 23</p></div>`,
+                'Late Coming': `<div class="card"><h4 class="card-title">Late Comers</h4><ul><li>E203 - 15 min</li><li>E401 - 30 min</li></ul></div>`,
+                'Days Absent': `<div class="card"><h4 class="card-title">Absenteeism</h4><p>Top 3 absent employees this month</p></div>`,
+                'Attendance Report': `<div class="card"><h4 class="card-title">Monthly Attendance Summary</h4><p>March 2025: 92% average attendance</p></div>`,
+                // Leave
+                'Leave Plan': `<div class="card"><h4 class="card-title">Leave Calendar</h4><div style="background:#f1f5f9; padding:16px;">[Calendar placeholder]</div></div>`,
+                'Leave Taken': `<div class="card"><h4 class="card-title">Leave Taken YTD</h4><p>Avg 8.5 days per employee</p></div>`,
+                'Annual Leave Entitlement': `<div class="card"><h4 class="card-title">Entitlement Policy</h4><p>0-2 yrs: 15 days, 3-5 yrs: 20 days</p></div>`,
+                'Leave Requests': `<div class="card"><h4 class="card-title">Pending Requests</h4><p>5 requests awaiting approval</p></div>`,
+                'Leave Return': `<div class="card"><h4 class="card-title">Return from Leave</h4><p>3 employees returning next week</p></div>`,
+                // Benefit
+                'Allowance Rule': `<div class="card"><h4 class="card-title">Allowance Rules</h4><p>Transport: $100/month, Meal: $8/day</p></div>`,
+                'Allowance Definition': `<div class="card"><h4 class="card-title">Define Allowances</h4><p>Housing, Education, etc.</p></div>`,
+                'Employee Allowance': `<div class="card"><h4 class="card-title">Employee Allowances</h4><table><tr><th>Emp</th><th>Allowance</th><th>Amount</th></tr><tr><td>E101</td><td>Transport</td><td>$100</td></tr></table></div>`,
+                // Performance
+                'Performance Rank': `<div class="card"><h4 class="card-title">Performance Ranks</h4><p>A: 20%, B: 50%, C: 30%</p></div>`,
+                'Evaluation Criteria': `<div class="card"><h4 class="card-title">Criteria</h4><p>Productivity, Quality, Teamwork</p></div>`,
+                'Employee Performance': `<div class="card"><h4 class="card-title">Latest Reviews</h4><p>John: 4.5, Jane: 4.8</p></div>`,
+                'Performance Summary': `<div class="card"><h4 class="card-title">Summary</h4><p>Overall average: 4.2/5</p></div>`,
+                // Discipline
+                'Discipline Record': `<div class="card"><h4 class="card-title">Disciplinary Cases</h4><p>3 active cases</p></div>`,
+                'Termination': `<div class="card"><h4 class="card-title">Terminations</h4><p>2 terminations this quarter</p></div>`,
+                'Severance Payable': `<div class="card"><h4 class="card-title">Severance Calculations</h4><p>Pending for 1 employee</p></div>`,
+                'Miscellaneous Settings': `<div class="card"><h4 class="card-title">Misc Settings</h4><p>Grievance procedure active</p></div>`,
+                // Report
+                'Summary Reports': `<div class="card"><h4 class="card-title">HR Summary</h4><p>Headcount, turnover, diversity</p></div>`,
+                'Detail Reports': `<div class="card"><h4 class="card-title">Detailed Reports</h4><p>Payroll, attendance logs</p></div>`,
+                // Printable
+                'Template Types': `<div class="card"><h4 class="card-title">Document Templates</h4><p>Offer letter, contract, experience letter</p></div>`,
+                'Template Reports': `<div class="card"><h4 class="card-title">Template Report</h4><p>Last generated: Mar 15, 2025</p></div>`,
+            };
+            return templates[viewName] || `<div class="card"><h4 class="card-title">${viewName}</h4><p>Module content under construction, but unique per page.</p></div>`;
+        }
+
+        // ----- GENERATE ALL VIEW SECTIONS -----
+        const viewNames = [
+            'Maintain Company','Company Chart','Manpower Planning','Maintain Branch','Manpower Request','Job Title & Salary','Off Day','Business Unit',
+            'Employee Profile','Delegation','Cosign','Guarantor','Experience Requests','Retirement Setting','HRM Setting','Employee Type',
+            'Pass Setting','Criteria Settings','Experience Org','Experience JobTitle','Screening Setting',
+            'Vacancy','Applicant Registration','Applicant Result','Internal Applicant','Recruitment Request','Application Form',
+            'Employee Placement','Placement Swap','Placement Reports',
+            'Attendance','Late Coming','Days Absent','Attendance Report',
+            'Leave Plan','Leave Taken','Annual Leave Entitlement','Leave Requests','Leave Return',
+            'Allowance Rule','Allowance Definition','Employee Allowance',
+            'Performance Rank','Evaluation Criteria','Employee Performance','Performance Summary',
+            'Discipline Record','Termination','Severance Payable','Miscellaneous Settings',
+            'Summary Reports','Detail Reports','Template Types','Template Reports'
+        ];
+
+        const contentDiv = document.getElementById('mainContent');
+        viewNames.forEach(name => {
+            const sectionId = 'view-' + name.replace(/\s+/g, '_');
+            const html = getViewHTML(name);
+            const section = `<section id="${sectionId}" class="view-section">${html}</section>`;
+            contentDiv.insertAdjacentHTML('beforeend', section);
+        });
+
+        // re-init icons inside new sections
+        lucide.createIcons();
+
+        // Dashboard charts
+        const opts = { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } };
+        new Chart(document.getElementById('cType'), {
+            type: 'doughnut',
+            data: { labels: ['Permanent', 'Contract'], datasets: [{ data: [912, 336], backgroundColor: ['#4f46e5', '#f59e0b'], borderWidth: 0, cutout: '75%' }] },
+            options: opts
+        });
+        new Chart(document.getElementById('cDept'), {
+            type: 'polarArea',
+            data: { labels: ['BU-North', 'BU-South', 'HQ', 'R&D'], datasets: [{ data: [300, 200, 500, 248], backgroundColor: ['rgba(79,70,229,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(100,116,139,0.7)'], borderWidth: 0 }] },
+            options: opts
+        });
+
+        // Set dashboard active on load
+        navigate('Dashboard', document.querySelector('.menu-trigger.active'));
+    </script>
+</body>
+</html>
