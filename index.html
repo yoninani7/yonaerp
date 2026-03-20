@@ -390,7 +390,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="sub-link" onclick="goPage('departments',this)"><span class="sub-dot"></span>Departments</div>
         <div class="sub-link" onclick="goPage('job-positions',this)"><span class="sub-dot"></span>Job Positions</div>
         <div class="sub-link" onclick="goPage('branch-offices',this)"><span class="sub-dot"></span>Branch Offices</div>
-        <div class="sub-link" onclick="goPage('manpower-planning',this)"><span class="sub-dot"></span>Manpower Planning</div>
+        <div class="sub-link" onclick="goPage('manpower-planning',this)"><span class="sub-dot"></span>Manpower Mapping</div>
       </div>
     </div>
 
@@ -409,8 +409,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
       </div>
     </div>
 
-    <!-- ── RECRUITMENT section ── -->
-    <div class="nav-label">Recruitment</div>
+    <!-- ── RECRUITMENT section ── --> 
     <div class="nav-group">
       <div class="nav-trigger" onclick="toggleNav(this,'m-rec')">
         <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="user-plus" size="15"></i></div>Talent Acquisition</div>
@@ -425,8 +424,8 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
       </div>
     </div>
 
-    <!-- ── TIME & ATTENDANCE section ── -->
-    <div class="nav-label">Time & Attendance</div>
+    <!-- ── Operations section ── -->
+    <div class="nav-label">Operations</div>
     <div class="nav-group">
       <div class="nav-trigger" onclick="toggleNav(this,'m-att')">
         <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="clock" size="15"></i></div>Attendance</div>
@@ -456,8 +455,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
       </div>
     </div>
 
-    <!-- ── PAYROLL & BENEFITS section ── -->
-    <div class="nav-label">Payroll & Benefits</div>
+    <!-- ── PAYROLL & BENEFITS section ── --> 
     <div class="nav-group">
       <div class="nav-trigger" onclick="toggleNav(this,'m-pay')">
         <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="banknote" size="15"></i></div>Payroll</div>
@@ -483,10 +481,23 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="sub-link" onclick="goPage('insurance',this)"><span class="sub-dot"></span>Insurance Plans</div>
         <div class="sub-link" onclick="goPage('retirement-fund',this)"><span class="sub-dot"></span>Retirement Fund</div>
       </div>
+       <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-comp')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="shield-alert" size="15"></i></div>Compliance & Exit</div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-comp">
+        <div class="sub-link" onclick="goPage('disciplinary-actions',this)"><span class="sub-dot"></span>Disciplinary Actions</div>
+        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span>Grievance Management</div>
+        <div class="sub-link" onclick="goPage('termination',this)"><span class="sub-dot"></span>Separation & Exit</div>
+        <div class="sub-link" onclick="goPage('severance',this)"><span class="sub-dot"></span>Severance Calculator</div>
+        <div class="sub-link" onclick="goPage('exit-clearance',this)"><span class="sub-dot"></span>Exit Clearance</div>
+      </div>
+    </div>
     </div>
 
     <!-- ── TRAINING & PERFORMANCE section ── -->
-    <div class="nav-label">Training & Performance</div>
+    <div class="nav-label">GROWTH & DATA</div>
     <div class="nav-group">
       <div class="nav-trigger" onclick="toggleNav(this,'m-train')">
         <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="graduation-cap" size="15"></i></div>Training & Dev</div>
@@ -528,19 +539,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="sub-link" onclick="goPage('salary-revisions',this)"><span class="sub-dot"></span>Salary Revisions</div>
       </div>
     </div>
-    <div class="nav-group">
-      <div class="nav-trigger" onclick="toggleNav(this,'m-comp')">
-        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="shield-alert" size="15"></i></div>Compliance & Exit</div>
-        <i data-lucide="chevron-right" size="13" class="chevron"></i>
-      </div>
-      <div class="submenu" id="m-comp">
-        <div class="sub-link" onclick="goPage('disciplinary-actions',this)"><span class="sub-dot"></span>Disciplinary Actions</div>
-        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span>Grievance Management</div>
-        <div class="sub-link" onclick="goPage('termination',this)"><span class="sub-dot"></span>Separation & Exit</div>
-        <div class="sub-link" onclick="goPage('severance',this)"><span class="sub-dot"></span>Severance Calculator</div>
-        <div class="sub-link" onclick="goPage('exit-clearance',this)"><span class="sub-dot"></span>Exit Clearance</div>
-      </div>
-    </div>
+   
 
     <!-- ── ANALYTICS & SYSTEM section ── -->
     <div class="nav-label">Analytics & System</div>
@@ -742,7 +741,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 ══════════════════════════════ -->
 <div class="page" id="p-manpower-planning">
   <div class="page-header">
-    <div><div class="page-title">Manpower Planning</div><div class="page-sub">Workforce forecast and gap analysis</div></div>
+    <div><div class="page-title">Manpower Mapping</div><div class="page-sub">Workforce forecast and gap analysis</div></div>
     <button class="btn btn-primary"><i data-lucide="plus" size="13"></i>New Plan</button>
   </div>
   <div class="stats-row stats-3 mb-4">
