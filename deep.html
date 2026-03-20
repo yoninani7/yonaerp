@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise HRM Suite · full function</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-bg: #f5f7ff;
+            --sidebar-width: 280px;
+            --bg-main: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR (unchanged) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 12px; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .nav-label {
+            padding: 16px 12px 6px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .nav-item { margin-bottom: 2px; }
+        
+        .menu-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-trigger:hover { background: #f1f5f9; color: var(--primary); }
+        .menu-trigger.active { background: var(--primary-bg); color: var(--primary); }
+
+        .submenu, .sub-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 20px;
+        }
+
+        .submenu.open, .sub-submenu.open { max-height: 1200px; }
+
+        .submenu-link {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            margin-top: 1px;
+            cursor: pointer;
+        }
+
+        .submenu-link:hover { color: var(--primary); background: #f8fafc; }
+        .submenu-link.active { background: #eef2ff; color: var(--primary); font-weight: 500; }
+
+        .chevron { transition: transform 0.2s; color: #94a3b8; }
+        .rotate { transform: rotate(90deg); color: var(--primary); }
+
+        /* --- MAIN --- */
+        .main { flex: 1; margin-left: var(--sidebar-width); overflow-y: auto; height: 100vh; }
+        
+        header {
+            height: 60px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky; top: 0; z-index: 40;
+        }
+
+        .content { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+        /* Dashboard cards (keep) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .stat-val { font-size: 1.5rem; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .stat-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .bg-indigo { background: #eef2ff; color: #4f46e5; }
+        .bg-emerald { background: #ecfdf5; color: #10b981; }
+        .bg-amber { background: #fffbeb; color: #f59e0b; }
+
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* new utility classes for rich pages */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .flex-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .badge {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fed7aa; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        .btn-ghost {
+            border: 1px solid var(--border);
+            background: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: default;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 12px 10px;
+            background: #f8fafc;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+        .divider { height: 1px; background: var(--border); margin: 20px 0; }
+        .profile-avatar { width: 48px; height: 48px; border-radius: 8px; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR (exactly as before) -->
+   <aside class="sidebar">
+    <div class="sidebar-brand">
+        <i data-lucide="shield-check" size="24"></i>
+        <span>HRM Enterprise</span>
+    </div>
+    <div class="sidebar-scroll">
+        <!-- DASHBOARD -->
+        <div class="nav-item">
+            <a onclick="navigate('Dashboard', this)" class="menu-trigger active">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="layout-grid" size="18"></i> Dashboard</div>
+            </a>
+        </div>
+
+        <div class="nav-label">Organization & Staffing</div>
+        <!-- Company Group -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-comp')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="building" size="18"></i> Company Structure</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-comp">
+                <a onclick="navigate('Maintain Company', this)" class="submenu-link">Maintain Company</a>
+                <a onclick="navigate('Company Chart', this)" class="submenu-link">Org Chart</a>
+                <a onclick="navigate('Maintain Branch', this)" class="submenu-link">Branch Management</a>
+                <a onclick="navigate('Manpower Planning', this)" class="submenu-link">Manpower Planning</a>
+                <a onclick="navigate('Manpower Request', this)" class="submenu-link">Manpower Request</a>  
+            </div>
+        </div>
+        <!-- Employee Group -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-emp')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="users" size="18"></i> Employee Management</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-emp">
+                <a onclick="navigate('Employee Profile', this)" class="submenu-link">Employee Directory</a> 
+                <a onclick="navigate('Employee Type', this)" class="submenu-link">Employment Types</a>
+                <a onclick="navigate('Cosign', this)" class="submenu-link">Cosigners</a>
+                <a onclick="navigate('Guarantor', this)" class="submenu-link">Guarantors</a>
+                <a onclick="navigate('Experience Requests', this)" class="submenu-link">Work Experience</a>
+                <a onclick="navigate('Asset Assignment', this)" class="submenu-link">Assigned Assets</a>
+            </div>
+        </div>
+
+        <div class="nav-label">Talent & Growth</div>
+        <!-- Recruitment -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-rec')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="user-plus" size="18"></i> Recruitment</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-rec">
+                <a onclick="navigate('Vacancy', this)" class="submenu-link">Vacancies</a>
+                <a onclick="navigate('Applicant Registration', this)" class="submenu-link">Candidates</a>
+                <a onclick="navigate('Applicant Result', this)" class="submenu-link">Interview Results</a>
+                <a onclick="navigate('Onboarding', this)" class="submenu-link">Onboarding Checklist</a>
+            </div>
+        </div>
+        <!-- Training -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-train')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="graduation-cap" size="18"></i> Training & Dev</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-train">
+                <a onclick="navigate('Training Needs', this)" class="submenu-link">Training Needs</a>
+                <a onclick="navigate('Course Setup', this)" class="submenu-link">Course Catalog</a>
+                <a onclick="navigate('Training Schedule', this)" class="submenu-link">Training Schedule</a>
+                <a onclick="navigate('Certifications', this)" class="submenu-link">Certifications</a>
+            </div>
+        </div>
+
+        <div class="nav-label">Time & Compensation</div>
+        <!-- Attendance -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-att')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="clock" size="18"></i> Attendance</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-att">
+                <a onclick="navigate('Shift Management', this)" class="submenu-link">Shift Management</a>
+                <a onclick="navigate('Biometric Logs', this)" class="submenu-link">Biometric Data</a>
+                <a onclick="navigate('Overtime Request', this)" class="submenu-link">Overtime Requests</a>
+                <a onclick="navigate('Attendance Summary', this)" class="submenu-link">Monthly Summary</a>
+            </div>
+        </div>
+        <!-- Leave -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-leave')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="calendar" size="18"></i> Leave Management</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-leave">
+                <a onclick="navigate('Leave Plan', this)" class="submenu-link">Leave Planning</a>
+                <a onclick="navigate('Leave Requests', this)" class="submenu-link">Leave Requests</a>
+                <a onclick="navigate('Annual Entitlement', this)" class="submenu-link">Leave Entitlement</a>
+                <a onclick="navigate('Leave Return', this)" class="submenu-link">Leave Return</a>
+            </div>
+        </div>
+        <!-- Payroll -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-pay')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="banknote" size="18"></i> Payroll</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-pay">
+                <a onclick="navigate('Salary Processing', this)" class="submenu-link">Salary Processing</a>
+                <a onclick="navigate('Allowance Definition', this)" class="submenu-link">Allowances</a>
+                <a onclick="navigate('Deductions', this)" class="submenu-link">Deductions/Taxes</a>
+                <a onclick="navigate('Loans', this)" class="submenu-link">Employee Loans</a>
+                <a onclick="navigate('Payslips', this)" class="submenu-link">Generate Payslips</a>
+            </div>
+        </div>
+
+        <div class="nav-label">Performance & Movement</div>
+        <!-- Movement -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-move')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="shuffle" size="18"></i> Transfers</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-move">
+                <a onclick="navigate('Promotion', this)" class="submenu-link">Promotion</a>
+                <a onclick="navigate('Transfer', this)" class="submenu-link">Location Transfer</a>
+                <a onclick="navigate('Placement Swap', this)" class="submenu-link">Job Swap</a>
+            </div>
+        </div>
+        <!-- Performance -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-perf')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="trending-up" size="18"></i> Performance</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-perf">
+                <a onclick="navigate('Evaluation Criteria', this)" class="submenu-link">KPI/Evaluation Criteria</a>
+                <a onclick="navigate('Employee Performance', this)" class="submenu-link">Performance Reviews</a>
+                <a onclick="navigate('Succession Planning', this)" class="submenu-link">Succession Planning</a>
+            </div>
+        </div>
+
+        <div class="nav-label">Compliance & Exit</div>
+        <!-- Discipline -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-disc')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="alert-octagon" size="18"></i> Discipline & Exit</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-disc">
+                <a onclick="navigate('Discipline Record', this)" class="submenu-link">Disciplinary Actions</a>
+                <a onclick="navigate('Termination', this)" class="submenu-link">Separation/Termination</a>
+                <a onclick="navigate('Severance Payable', this)" class="submenu-link">Severance Calculation</a>
+                <a onclick="navigate('Clearance', this)" class="submenu-link">Exit Clearance</a>
+            </div>
+        </div>
+
+        <div class="nav-label">Intelligence & Admin</div>
+        <!-- Reports -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-rep')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="bar-chart-2" size="18"></i> Analytics</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-rep">
+                <a onclick="navigate('Summary Reports', this)" class="submenu-link">Executive Dashboard</a>
+                <a onclick="navigate('Statutory Reports', this)" class="submenu-link">Tax/Legal Reports</a>
+                <a onclick="navigate('Audit Logs', this)" class="submenu-link">System Audit Logs</a>
+            </div>
+        </div>
+        <!-- Settings -->
+        <div class="nav-item">
+            <div class="menu-trigger" onclick="toggleAcc(this, 'm-set')">
+                <div style="display:flex; align-items:center; gap:10px;"><i data-lucide="settings" size="18"></i> System Admin</div>
+                <i data-lucide="chevron-right" size="14" class="chevron"></i>
+            </div>
+            <div class="submenu" id="m-set">
+                <a onclick="navigate('User Roles', this)" class="submenu-link">User Roles & Permissions</a> 
+                <a onclick="navigate('HRM Setting', this)" class="submenu-link">Global Settings</a>
+            </div>
+        </div>
+    </div>
+</aside>
+
+    <!-- MAIN AREA -->
+    <main class="main">
+        <header>
+            <h2 id="view-title" style="font-size: 0.9rem; font-weight: 600;">Dashboard</h2>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="text-align: right; line-height: 1.1;">
+                    <p style="font-size: 0.8rem; font-weight: 600;">Admin User</p>
+                    <p style="font-size: 0.7rem; color: var(--text-muted);">HR Director</p>
+                </div>
+                <div style="width: 32px; height: 32px; border-radius: 6px; background: var(--primary-bg); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="user" size="16"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content" id="mainContent">
+            <!-- DASHBOARD VIEW (static) -->
+            <section id="view-Dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div><p class="stat-label">Total Employee</p><p class="stat-val">1,248</p></div><div class="stat-icon bg-indigo"><i data-lucide="users" size="20"></i></div></div>
+                    <div class="stat-card"><div><p class="stat-label">Permanent</p><p class="stat-val">912</p></div><div class="stat-icon bg-emerald"><i data-lucide="user-check" size="20"></i></div></div>
+                    <div class="stat-card"><div><p class="stat-label">Contract</p><p class="stat-val">336</p></div><div class="stat-icon bg-amber"><i data-lucide="user-cog" size="20"></i></div></div>
+                </div>
+                <div class="chart-row">
+                    <div class="card"><h4 class="card-title">Employee Composition</h4><div style="height: 250px;"><canvas id="cType"></canvas></div></div>
+                    <div class="card"><h4 class="card-title">Business Unit Distribution</h4><div style="height: 250px;"><canvas id="cDept"></canvas></div></div>
+                </div>
+            </section>
+
+            <!-- All other view sections will be injected by JavaScript with unique content -->
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Accordion functions (unchanged)
+        function toggleAcc(el, id) {
+            const menu = document.getElementById(id);
+            const chevron = el.querySelector('.chevron');
+            document.querySelectorAll('.submenu').forEach(s => { if(s.id !== id) s.classList.remove('open'); });
+            document.querySelectorAll('.chevron').forEach(c => { if(c !== chevron) c.classList.remove('rotate'); });
+            menu.classList.toggle('open');
+            chevron.classList.toggle('rotate');
+        }
+        function toggleSubSub(el, id) {
+            const menu = document.getElementById(id);
+            menu.classList.toggle('open');
+            event.stopPropagation();
+        }
+
+        // Navigation
+        function navigate(view, el) {
+            document.getElementById('view-title').innerText = view;
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            const viewId = 'view-' + view.replace(/\s+/g, '_');
+            const target = document.getElementById(viewId);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.menu-trigger, .submenu-link').forEach(m => m.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        // ----- UNIQUE PAGE TEMPLATES FOR EVERY VIEW -----
+        function getViewHTML(viewName) {
+            const templates = {
+                // Company
+                'Maintain Company': `
+                    <div class="card">
+                        <h4 class="card-title">🏢 Company Information</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                            <div style="background: #f1f5f9; padding: 20px; border-radius: 12px;">
+                                <p><strong>HRM Corp</strong></p>
+                                <p style="font-size:0.8rem; color: var(--text-muted);">Reg: 12345678</p>
+                                <p style="font-size:0.8rem;">📍 123 Business Ave</p>
+                                <p style="font-size:0.8rem;">📞 +1 555 1234</p>
+                            </div>
+                            <div>
+                                <div class="flex-row"><span class="badge badge-success">Active</span><span class="btn-ghost">Edit</span></div>
+                                <table class="data-table" style="margin-top:16px;">
+                                    <tr><th>Field</th><th>Value</th></tr>
+                                    <tr><td>Legal name</td><td>HRM Enterprises Ltd.</td></tr>
+                                    <tr><td>Tax ID</td><td>TAX-9876Z</td></tr>
+                                    <tr><td>Founded</td><td>2010</td></tr>
+                                    <tr><td>Employees</td><td>1,248</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`,
+                'Company Chart': `
+                    <div class="card">
+                        <h4 class="card-title">Organizational Chart</h4>
+                        <div style="background: #f8fafc; padding: 40px; text-align: center; border-radius: 12px;">
+                            <i data-lucide="share-2" size="48" style="color: var(--primary);"></i>
+                            <p style="margin-top:16px;">CEO → HR Director → Managers → Staff</p>
+                            <p style="font-size:0.8rem; color: var(--text-muted);">(interactive chart placeholder)</p>
+                        </div>
+                    </div>`,
+                'Manpower Planning': `
+                    <div class="card">
+                        <h4 class="card-title">Manpower Forecast 2025</h4>
+                        <table class="data-table">
+                            <tr><th>Department</th><th>Current</th><th>Approved</th><th>To hire</th></tr>
+                            <tr><td>Engineering</td><td>320</td><td>350</td><td>30</td></tr>
+                            <tr><td>Sales</td><td>210</td><td>230</td><td>20</td></tr>
+                            <tr><td>HR</td><td>45</td><td>48</td><td>3</td></tr>
+                        </table>
+                    </div>`,
+                'Maintain Branch': `
+                    <div class="card">
+                        <h4 class="card-title">Branch Offices</h4>
+                        <div class="grid-3">
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>HQ</strong><br>New York<br>320 staff</div>
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>South</strong><br>Atlanta<br>210 staff</div>
+                            <div style="border:1px solid var(--border); border-radius:8px; padding:16px;"><strong>West</strong><br>San Jose<br>180 staff</div>
+                        </div>
+                    </div>`,
+                'Manpower Request': `
+                    <div class="card">
+                        <h4 class="card-title">Open Requests</h4>
+                        <table class="data-table">
+                            <tr><th>Req#</th><th>Position</th><th>Dept</th><th>Status</th></tr>
+                            <tr><td>MR-024</td><td>Senior Dev</td><td>Engineering</td><td><span class="badge badge-warning">pending</span></td></tr>
+                            <tr><td>MR-025</td><td>Sales Rep</td><td>Sales</td><td><span class="badge-success">approved</span></td></tr>
+                        </table>
+                    </div>`,
+                  
+                 'User Roles': `
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">Access Control Management</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Define what users can see and do within the system.</p>
+            </div>
+            <button class="btn-ghost" style="background: var(--primary); color: white; border: none; padding: 10px 20px;">+ Create New Role</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 32px;">
+            <!-- Role List -->
+            <div style="border-right: 1px solid var(--border); padding-right: 20px;">
+                <p style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px;">System Roles</p>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="padding: 12px; background: var(--primary-bg); color: var(--primary); border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+                        Super Admin <i data-lucide="check-circle-2" size="14"></i>
+                    </div>
+                    <div style="padding: 12px; border-radius: 8px; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" class="submenu-link">
+                        HR Manager
+                    </div>
+                    <div style="padding: 12px; border-radius: 8px; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" class="submenu-link">
+                        Finance Officer
+                    </div>
+                    <div style="padding: 12px; border-radius: 8px; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" class="submenu-link">
+                        Department Head
+                    </div>
+                    <div style="padding: 12px; border-radius: 8px; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" class="submenu-link">
+                        Standard Employee
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permissions Matrix -->
+            <div>
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h5 style="font-size: 0.9rem; font-weight: 600;">Role Permissions: <span style="color: var(--primary);">Super Admin</span></h5>
+                    <div class="flex-row">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Last updated: March 15, 2026</span>
+                        <button class="btn-ghost">Save Changes</button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 250px;">Module / Feature</th>
+                            <th style="text-align: center;">View</th>
+                            <th style="text-align: center;">Create</th>
+                            <th style="text-align: center;">Edit</th>
+                            <th style="text-align: center;">Delete</th>
+                            <th style="text-align: center;">Approve</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">Employee Directory</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Payroll Processing</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Recruitment & Vacancy</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox"></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Leave Approvals</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox"></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">System Settings</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Audit Logs</td>
+                            <td style="text-align: center;"><input type="checkbox" checked></td>
+                            <td style="text-align: center;">-</td>
+                            <td style="text-align: center;">-</td>
+                            <td style="text-align: center;">-</td>
+                            <td style="text-align: center;">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+`,
+'Maintain Company': `
+    <div class="card">
+        <!-- Header Section -->
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom: 4px;">🏢 Company Profile</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Master record for organizational identity and global compliance.</p>
+            </div>
+            <div class="flex-row">
+                <span class="badge badge-success" style="padding: 6px 12px; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="shield-check" size="14"></i> Verified Entity
+                </span>
+                <button class="btn-ghost" style="background: var(--primary); color: white; border: none; padding: 10px 18px; display: flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 8px;">
+                    <i data-lucide="edit-3" size="14"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Branding & Quick Contact Grid -->
+        <div class="grid-3" style="margin-bottom: 32px;">
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 64px; height: 64px; background: white; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary); font-size: 1.2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    HE
+                </div>
+                <div>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Visual Identity</p>
+                    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">HRM Enterprises Ltd</p>
+                    <a href="#" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; font-weight: 500;">Update Branding</a>
+                </div>
+            </div>
+            
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                <p style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Corporate Contact</p>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <p style="font-size: 0.85rem; font-weight: 500;"><i data-lucide="mail" size="12" style="margin-right: 6px; color: var(--text-muted);"></i> corporate@hrm.com</p>
+                    <p style="font-size: 0.85rem; font-weight: 500;"><i data-lucide="phone" size="12" style="margin-right: 6px; color: var(--text-muted);"></i> +1 (555) 012-3456</p>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                <p style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Global Headquarters</p>
+                <p style="font-size: 0.85rem; font-weight: 500; display: flex; align-items: flex-start; gap: 6px;">
+                    <i data-lucide="map-pin" size="14" style="color: var(--text-muted); margin-top: 2px;"></i>
+                    <span>123 Business Avenue, Suite 500<br><span style="color: var(--text-muted); font-weight: 400;">New York, NY 10001, USA</span></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Detailed Information Sections -->
+        <div class="grid-2">
+            <!-- Legal & Fiscal Section -->
+            <div style="border: 1px solid var(--border); border-radius: 12px; padding: 24px; background: white;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                    <div style="background: #eef2ff; padding: 8px; border-radius: 8px; color: var(--primary);">
+                        <i data-lucide="file-text" size="18"></i>
+                    </div>
+                    <h5 style="font-size: 0.95rem; font-weight: 600;">Legal & Fiscal Registration</h5>
+                </div>
+                <table class="data-table">
+                    <tr><td style="color: var(--text-muted);">Official Legal Name</td><td style="text-align:right; font-weight:600;">HRM Enterprises Ltd.</td></tr>
+                    <tr><td style="color: var(--text-muted);">Registration Number</td><td style="text-align:right; font-weight:600;">2010-US-98745</td></tr>
+                    <tr><td style="color: var(--text-muted);">Tax ID / VAT Number</td><td style="text-align:right; font-weight:600;"><span class="badge">VAT-12345678</span></td></tr>
+                    <tr><td style="color: var(--text-muted);">Incorporation Date</td><td style="text-align:right; font-weight:600;">Oct 12, 2010</td></tr>
+                    <tr><td style="color: var(--text-muted);">Business Entity Type</td><td style="text-align:right; font-weight:600;">Private Limited</td></tr>
+                    <tr><td style="color: var(--text-muted);">Status</td><td style="text-align:right;"><span class="badge badge-success">Active</span></td></tr>
+                </table>
+            </div>
+
+            <!-- Operational Details Section -->
+            <div style="border: 1px solid var(--border); border-radius: 12px; padding: 24px; background: white;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                    <div style="background: #ecfdf5; padding: 8px; border-radius: 8px; color: #10b981;">
+                        <i data-lucide="activity" size="18"></i>
+                    </div>
+                    <h5 style="font-size: 0.95rem; font-weight: 600;">Operational Attributes</h5>
+                </div>
+                <table class="data-table">
+                    <tr><td style="color: var(--text-muted);">Primary Industry</td><td style="text-align:right; font-weight:600;">Technology & Software</td></tr>
+                    <tr><td style="color: var(--text-muted);">Fiscal Year Cycle</td><td style="text-align:right; font-weight:600;">Jan 01 - Dec 31</td></tr>
+                    <tr><td style="color: var(--text-muted);">Functional Currency</td><td style="text-align:right; font-weight:600;">USD ($)</td></tr>
+                    <tr><td style="color: var(--text-muted);">Default Language</td><td style="text-align:right; font-weight:600;">English (US)</td></tr>
+                    <tr><td style="color: var(--text-muted);">Employee Scale</td><td style="text-align:right; font-weight:600;">Enterprise (1000+)</td></tr>
+                    <tr><td style="color: var(--text-muted);">Active Branches</td><td style="text-align:right; font-weight:600;">12 Global Units</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- System Footer -->
+        <div style="margin-top: 32px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted);">
+            <div>
+                <i data-lucide="info" size="12" style="vertical-align: middle; margin-right: 4px;"></i>
+                System Reference ID: <strong style="color: var(--text-main);">ORG-GLOBAL-882-X</strong>
+            </div>
+            <div>
+                Last Master Audit: <span style="font-weight: 600; color: var(--text-main);">March 14, 2026</span> by <span style="color: var(--primary);">System Admin</span>
+            </div>
+        </div>
+    </div>
+`,
+'Company Chart': `
+    <style>
+        /* Org Chart Specific Styles */
+        .oc-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+            overflow-x: auto;
+            min-width: 800px;
+        }
+
+        .oc-level {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            position: relative;
+            width: 100%;
+        }
+
+        /* The Vertical Connector Line */
+        .oc-line {
+            width: 2px;
+            height: 30px;
+            background: var(--border);
+            margin: 0 auto;
+        }
+
+        /* Horizontal Connector Line for siblings */
+        .oc-siblings-line {
+            position: absolute;
+            top: 0;
+            height: 2px;
+            background: var(--border);
+            /* Calculated based on children width */
+        }
+
+        .oc-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            position: relative;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .oc-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+        }
+
+       
+
+        .oc-name { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .oc-role { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em; }
+        
+        /* Level Specific Colors */
+        .l-exec { border-top: 4px solid #4f46e5; }
+        .l-vps { border-top: 4px solid #10b981; }
+        .l-mgr { border-top: 4px solid #f59e0b; }
+
+        .oc-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+    </style>
+
+    <div class="card">
+        <div class="oc-toolbar">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">Organizational Hierarchy</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Real-time visualization of reporting lines and structure.</p>
+            </div>
+            <div class="flex-row"> 
+                <button class="btn-ghost" style="display:flex; align-items:center; gap:6px;"><i data-lucide="download" size="14"></i> Export PDF</button>
+            </div>
+        </div>
+
+        <div class="oc-container">
+            
+            <!-- LEVEL 1: CEO -->
+            <div class="oc-level">
+                <div class="oc-card l-exec"> 
+                    <div class="oc-name">Sarah Jenkins</div>
+                    <div class="oc-role">Chief Executive Officer</div> 
+                </div>
+            </div>
+
+            <div class="oc-line"></div>
+
+            <!-- LEVEL 2: C-SUITE -->
+            <div style="position: relative; width: 100%;">
+                <!-- Horizontal Connector Line -->
+                <div style="position: absolute; top: 0; left: 16.5%; right: 16.5%; height: 2px; background: var(--border);"></div>
+                
+                <div class="oc-level" style="padding-top: 0;">
+                    <!-- Each child branch -->
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="width: 2px; height: 20px; background: var(--border);"></div>
+                        <div class="oc-card l-vps"> 
+                            <div class="oc-name">Michael Chen</div>
+                            <div class="oc-role">Chief Operating Officer</div> 
+                        </div>
+                        <div class="oc-line"></div>
+                        <!-- Level 3 under COO -->
+                        <div class="oc-level" style="gap:20px;">
+                             <div class="oc-card l-mgr" style="width: 180px;">
+                                <div class="oc-name">James Wilson</div>
+                                <div class="oc-role">VP of Sales</div>
+                             </div>
+                             <div class="oc-card l-mgr" style="width: 180px;">
+                                <div class="oc-name">Linda Wu</div>
+                                <div class="oc-role">VP of Supply Chain</div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="width: 2px; height: 20px; background: var(--border);"></div>
+                        <div class="oc-card l-vps"> 
+                            <div class="oc-name">David Park</div>
+                            <div class="oc-role">Chief Technology Officer</div> 
+                        </div>
+                        <div class="oc-line"></div>
+                        <div class="oc-card l-mgr" style="width: 180px;">
+                            <div class="oc-name">Kevin Smith</div>
+                            <div class="oc-role">Engineering Director</div>
+                        </div>
+                    </div> 
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="width: 2px; height: 20px; background: var(--border);"></div>
+                        <div class="oc-card l-vps"> 
+                            <div class="oc-name">Elena Rodriguez</div>
+                            <div class="oc-role">Chief HR Officer</div> 
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; display: flex; gap: 20px; justify-content: center;">
+            <div style="display:flex; align-items:center; gap:8px; font-size: 0.7rem; color: var(--text-muted);">
+                <div style="width:10px; height:10px; background:#4f46e5; border-radius:2px;"></div> Executive Level
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size: 0.7rem; color: var(--text-muted);">
+                <div style="width:10px; height:10px; background:#10b981; border-radius:2px;"></div> Department Heads
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size: 0.7rem; color: var(--text-muted);">
+                <div style="width:10px; height:10px; background:#f59e0b; border-radius:2px;"></div> Management
+            </div>
+        </div>
+    </div>
+`,
+                // Employee
+                'Employee Profile': `
+                    <div class="card">
+                        <h4 class="card-title">Employee Directory</h4>
+                        <table class="data-table">
+                            <tr><th>ID</th><th>Name</th><th>Dept</th><th>Job</th></tr>
+                            <tr><td>E101</td><td>John Smith</td><td>Engineering</td><td>Lead Dev</td></tr>
+                            <tr><td>E102</td><td>Jane Doe</td><td>Sales</td><td>Account Exec</td></tr>
+                            <tr><td>E103</td><td>Carlos M.</td><td>HR</td><td>HRBP</td></tr>
+                        </table>
+                    </div>`,
+               
+                'Cosign': `
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">✍️ Cosignatory Management</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Manage secondary authorization requirements for sensitive HR & Financial workflows.</p>
+            </div>
+            <button class="btn-ghost" style="background: var(--primary); color: white; border: none; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="plus" size="14"></i> Add Cosign Rule
+            </button>
+        </div>
+
+         
+
+        <h5 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">Awaiting Secondary Signature</h5>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Request Type</th>
+                    <th>Primary Signer</th>
+                    <th>Designated Cosigner</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:30px; height:30px; font-size:0.7rem;">JD</div>
+                            <div><p style="font-weight:600; font-size:0.8rem;">John Doe</p></div>
+                        </div>
+                    </td>
+                    <td><span class="badge">Staff Loan</span></td>
+                    <td style="font-size:0.75rem;">M. Smith (Manager)</td>
+                    <td style="font-size:0.75rem; color: var(--primary); font-weight:600;">L. Vance (Finance)</td>
+                    <td><span class="badge badge-warning">Waiting for Cosign</span></td>
+                    <td><button class="btn-ghost" style="padding:4px 8px; font-size:0.7rem;">Send Reminder</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:30px; height:30px; font-size:0.7rem;">AK</div>
+                            <div><p style="font-weight:600; font-size:0.8rem;">Alice Kim</p></div>
+                        </div>
+                    </td>
+                    <td><span class="badge">Asset Request</span></td>
+                    <td style="font-size:0.75rem;">P. Chen (IT Head)</td>
+                    <td style="font-size:0.75rem; color: var(--primary); font-weight:600;">S. Jenkins (CEO)</td>
+                    <td><span class="badge badge-warning">Waiting for Cosign</span></td>
+                    <td><button class="btn-ghost" style="padding:4px 8px; font-size:0.7rem;">Send Reminder</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+`,
+
+                 'Guarantor': `
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">🛡️ Employee Guarantors</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Verification and tracking of external guarantors for high-responsibility roles.</p>
+            </div>
+            <div class="flex-row"> 
+                <button class="btn-ghost" style="background: var(--primary); color: white; border: none; padding: 10px 18px;">+ New Verification</button>
+            </div>
+        </div>
+ 
+
+        <h5 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">Verification History</h5>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Guarantor Name</th>
+                    <th>Occupation</th>
+                    <th>Guaranteed Employee</th>
+                    <th>Date Verified</th>
+                    <th>Risk Level</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-size:0.8rem; font-weight:600;">Prof. Alan Turing</td>
+                    <td style="font-size:0.75rem;">University Dean</td>
+                    <td style="font-size:0.75rem; color: var(--primary);">Chris Evans</td>
+                    <td style="font-size:0.75rem;">Jan 12, 2026</td>
+                    <td><span class="badge" style="background:#dcfce7; color:#166534;">Low Risk</span></td>
+                    <td><span class="badge badge-success">Approved</span></td>
+                </tr>
+                 <tr>
+                    <td style="font-size:0.8rem; font-weight:600;">Maria Garcia</td>
+                    <td style="font-size:0.75rem;">Notary Public</td>
+                    <td style="font-size:0.75rem; color: var(--primary);">Sandra Bullock</td>
+                    <td style="font-size:0.75rem;">Mar 02, 2026</td>
+                    <td><span class="badge" style="background:#fef9c3; color:#854d0e;">Medium Risk</span></td>
+                    <td><span class="badge badge-warning">Renewal Due</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+`,
+'Salary Processing': `
+    <div class="card">
+        <!-- Payroll Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">💰 Salary Processing Control</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Current Period: <strong style="color:var(--text-main);">March 01 - March 31, 2026</strong></p>
+            </div>
+            <div class="flex-row">
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-right:12px;">
+                    <span class="badge badge-warning" style="padding:4px 12px;">Calculations in Progress</span>
+                    <p style="font-size:0.7rem; color:var(--text-muted);">Last Sync: 2 hours ago</p>
+                </div>
+                <button class="btn-ghost" style="background: var(--primary); color: white; border: none; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="play" size="14"></i> Run Payroll
+                </button>
+            </div>
+        </div>
+
+        <!-- Financial Summary Bar -->
+        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 32px;">
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: 12px;">
+                <p style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Gross Pay</p>
+                <p style="font-size: 1.2rem; font-weight: 700; color: var(--text-main);">$428,500.00</p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: 12px;">
+                <p style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Deductions</p>
+                <p style="font-size: 1.2rem; font-weight: 700; color: #e11d48;">($92,400.00)</p>
+            </div>
+            <div style="background: var(--primary-bg); border: 1px solid #e0e7ff; padding: 16px; border-radius: 12px;">
+                <p style="font-size: 0.65rem; color: var(--primary); font-weight: 700; text-transform: uppercase;">Net Payable</p>
+                <p style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">$336,100.00</p>
+            </div>
+            <div style="background: #ecfdf5; border: 1px solid #d1fae5; padding: 16px; border-radius: 12px;">
+                <p style="font-size: 0.65rem; color: #059669; font-weight: 700; text-transform: uppercase;">Employees Paid</p>
+                <p style="font-size: 1.2rem; font-weight: 700; color: #059669;">1,248 / 1,248</p>
+            </div>
+        </div>
+
+        <!-- Processing Steps & Alerts -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px; margin-bottom:32px;">
+            <div style="border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+                <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 16px;">Payroll Completion Status</h5>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                    <div style="flex:1; height:8px; background:#f1f5f9; border-radius:4px; overflow:hidden;">
+                        <div style="width:75%; height:100%; background:var(--primary);"></div>
+                    </div>
+                    <span style="font-size:0.8rem; font-weight:700;">75%</span>
+                </div>
+                <div class="flex-row" style="justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:#059669;">
+                        <i data-lucide="check-circle" size="14"></i> Data Import
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:#059669;">
+                        <i data-lucide="check-circle" size="14"></i> Tax Calculation
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--primary); font-weight:600;">
+                        <i data-lucide="loader" size="14"></i> Approval Workflow
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text-muted);">
+                        <i data-lucide="circle" size="14"></i> Disbursement
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 20px;">
+                <h5 style="font-size: 0.85rem; font-weight: 600; color:#92400e; margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="alert-triangle" size="16"></i> Attention Required
+                </h5>
+                <ul style="font-size: 0.75rem; color: #92400e; padding-left: 20px; line-height: 1.6;">
+                    <li>12 Employees missing tax identifiers</li>
+                    <li>3 Overtime requests pending approval</li>
+                    <li>Payroll variance > 5% vs. Last Month</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Employee Breakdown Table -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+             <h5 style="font-size: 0.9rem; font-weight: 600;">Payroll Register Breakdown</h5>
+             <div class="flex-row">
+                <input type="text" placeholder="Filter by Department..." style="padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.75rem;">
+                <button class="btn-ghost" style="font-size:0.75rem;"><i data-lucide="filter" size="12"></i> More Filters</button>
+             </div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Basic Salary</th>
+                    <th>Allowances</th>
+                    <th>Deductions</th>
+                    <th>Tax (PAYE)</th>
+                    <th style="text-align:right;">Net Payable</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:32px; height:32px; font-size:0.7rem;">JD</div>
+                            <div>
+                                <p style="font-weight:600; font-size:0.8rem; margin:0;">John Doe</p>
+                                <p style="font-size:0.65rem; color:var(--text-muted); margin:0;">Software Engineer</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:0.8rem;">$5,000.00</td>
+                    <td style="font-size:0.8rem; color:#059669;">+$450.00</td>
+                    <td style="font-size:0.8rem; color:#e11d48;">-$200.00</td>
+                    <td style="font-size:0.8rem;">$850.00</td>
+                    <td style="font-size:0.85rem; font-weight:700; text-align:right;">$4,400.00</td>
+                    <td><span class="badge badge-success">Calculated</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:32px; height:32px; font-size:0.7rem;">AS</div>
+                            <div>
+                                <p style="font-weight:600; font-size:0.8rem; margin:0;">Anna Smith</p>
+                                <p style="font-size:0.65rem; color:var(--text-muted); margin:0;">HR Manager</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-size:0.8rem;">$6,200.00</td>
+                    <td style="font-size:0.8rem; color:#059669;">+$800.00</td>
+                    <td style="font-size:0.8rem; color:#e11d48;">-$150.00</td>
+                    <td style="font-size:0.8rem;">$1,100.00</td>
+                    <td style="font-size:0.85rem; font-weight:700; text-align:right;">$5,750.00</td>
+                    <td><span class="badge badge-success">Calculated</span></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="background:#f8fafc; font-weight:700;">
+                    <td colspan="5" style="text-align:right;">Page Total:</td>
+                    <td style="text-align:right; color:var(--primary); font-size:0.9rem;">$10,150.00</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+`,
+                'Experience Requests': `
+                    <div class="card">
+                        <h4 class="card-title">Experience Letters</h4>
+                        <p>📄 3 pending requests</p>
+                        <ul><li>J. Adams (requested Mar 10)</li><li>P. Kim (Mar 12)</li></ul>
+                    </div>`,
+                'Retirement Setting': `
+                    <div class="card">
+                        <h4 class="card-title">Retirement Configuration</h4>
+                        <p>Default retirement age: 65<br>Grace period: 6 months</p>
+                    </div>`,
+                'HRM Setting': `
+                    <div class="card">
+                        <h4 class="card-title">HRM Parameters</h4>
+                        <p>⚙️ probation period: 90 days<br>⚙️ notice period: 30 days</p>
+                    </div>`,
+                'Employee Type': `
+                    <div class="card">
+                        <h4 class="card-title">Employee Types</h4>
+                        <span class="badge">Permanent</span> <span class="badge">Contract</span> <span class="badge">Intern</span> <span class="badge">Temporary</span>
+                    </div>`,
+                // Recruitment Settings
+                'Criteria Settings': `<div class="card"><h4 class="card-title">Criteria Types</h4><ul><li>Education</li><li>Experience</li><li>Skills</li></ul></div>`,
+                'Experience Org': `<div class="card"><h4 class="card-title">Experience Organizations</h4><p>List of accredited prior employers...</p></div>`,
+                'Experience JobTitle': `<div class="card"><h4 class="card-title">Equivalent Job Titles</h4><p>Engineer ⇔ Developer ⇔ Programmer</p></div>`,
+                'Screening Setting': `<div class="card"><h4 class="card-title">Screening Questions</h4><p>Default screening template active.</p></div>`,
+                // Recruitment Process
+                'Vacancy': `
+                    <div class="card">
+                        <h4 class="card-title">Open Vacancies</h4>
+                        <table class="data-table"><tr><th>Position</th><th>Location</th><th>Deadline</th></tr><tr><td>Frontend Dev</td><td>Remote</td><td>2025-04-15</td></tr><tr><td>Accountant</td><td>NY</td><td>2025-04-20</td></tr></table>
+                    </div>`,
+                'Applicant Registration': `<div class="card"><h4 class="card-title">New Applicant</h4><p>Form: Name, Email, Position, Resume upload (mock)</p></div>`,
+                'Applicant Result': `<div class="card"><h4 class="card-title">Applicant Results</h4><p>Passed: 12, Failed: 4, On hold: 3</p></div>`,
+                'Internal Applicant': `<div class="card"><h4 class="card-title">Internal Applicants</h4><p>3 employees applied for transfer</p></div>`,
+                'Recruitment Request': `<div class="card"><h4 class="card-title">Recruitment Requests</h4><p>2 pending approvals</p></div>`,
+                'Application Form': `<div class="card"><h4 class="card-title">Application Form Builder</h4><p>Standard template in use.</p></div>`,
+                // Placement
+                'Employee Placement': `<div class="card"><h4 class="card-title">Current Placements</h4><table class="data-table"><tr><th>Employee</th><th>Department</th><th>Start date</th></tr><tr><td>E001</td><td>Engineering</td><td>2024-01-10</td></tr></table></div>`,
+                'Placement Swap': `<div class="card"><h4 class="card-title">Swap Requests</h4><p>2 pending swaps between employees</p></div>`,
+                'Placement Reports': `<div class="card"><h4 class="card-title">Placement Reports</h4><p>Generate by department / date</p></div>`,
+                 // Leave
+                'Leave Plan': `<div class="card"><h4 class="card-title">Leave Calendar</h4><div style="background:#f1f5f9; padding:16px;">[Calendar placeholder]</div></div>`,
+                'Leave Taken': `<div class="card"><h4 class="card-title">Leave Taken YTD</h4><p>Avg 8.5 days per employee</p></div>`,
+                'Annual Leave Entitlement': `<div class="card"><h4 class="card-title">Entitlement Policy</h4><p>0-2 yrs: 15 days, 3-5 yrs: 20 days</p></div>`,
+                'Leave Requests': `<div class="card"><h4 class="card-title">Pending Requests</h4><p>5 requests awaiting approval</p></div>`,
+                'Leave Return': `<div class="card"><h4 class="card-title">Return from Leave</h4><p>3 employees returning next week</p></div>`,
+                // Benefit
+                'Allowance Rule': `<div class="card"><h4 class="card-title">Allowance Rules</h4><p>Transport: $100/month, Meal: $8/day</p></div>`,
+                'Allowance Definition': `<div class="card"><h4 class="card-title">Define Allowances</h4><p>Housing, Education, etc.</p></div>`,
+                'Employee Allowance': `<div class="card"><h4 class="card-title">Employee Allowances</h4><table><tr><th>Emp</th><th>Allowance</th><th>Amount</th></tr><tr><td>E101</td><td>Transport</td><td>$100</td></tr></table></div>`,
+                // Performance
+                'Performance Rank': `<div class="card"><h4 class="card-title">Performance Ranks</h4><p>A: 20%, B: 50%, C: 30%</p></div>`,
+                'Evaluation Criteria': `<div class="card"><h4 class="card-title">Criteria</h4><p>Productivity, Quality, Teamwork</p></div>`,
+                'Employee Performance': `<div class="card"><h4 class="card-title">Latest Reviews</h4><p>John: 4.5, Jane: 4.8</p></div>`,
+                'Performance Summary': `<div class="card"><h4 class="card-title">Summary</h4><p>Overall average: 4.2/5</p></div>`,
+                // Discipline
+                'Discipline Record': `<div class="card"><h4 class="card-title">Disciplinary Cases</h4><p>3 active cases</p></div>`,
+              'Termination': `
+    <div class="card">
+        <!-- Header Section -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
+            <div>
+                <h4 class="card-title" style="margin-bottom:4px;">🚪 Separation & Offboarding</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Manage employee exits, notice periods, and final settlement workflows.</p>
+            </div>
+            <button class="btn-ghost" style="background: #e11d48; color: white; border: none; padding: 10px 18px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="user-minus" size="14"></i> Initiate Separation
+            </button>
+        </div>
+
+        <!-- Offboarding Analytics -->
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 32px;">
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Turnover Rate (YTD)</p>
+                    <p class="stat-val">4.2%</p>
+                </div>
+                <div class="stat-icon" style="background: #fff1f2; color: #e11d48;"><i data-lucide="trending-up" size="20"></i></div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Pending Clearances</p>
+                    <p class="stat-val">8</p>
+                </div>
+                <div class="stat-icon" style="background: #fffbeb; color: #d97706;"><i data-lucide="clipboard-check" size="20"></i></div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Exits This Month</p>
+                    <p class="stat-val">12</p>
+                </div>
+                <div class="stat-icon bg-indigo"><i data-lucide="log-out" size="20"></i></div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 32px; grid-template-columns: 1fr 1.5fr;">
+            <!-- Exit Reasons Distribution -->
+            <div style="border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+                <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 16px;">Separation Types</h5>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px;">
+                            <span>Voluntary (Resignation)</span>
+                            <span style="font-weight:600;">70%</span>
+                        </div>
+                        <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                            <div style="width:70%; height:100%; background:var(--primary);"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px;">
+                            <span>Involuntary (Termination)</span>
+                            <span style="font-weight:600;">20%</span>
+                        </div>
+                        <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                            <div style="width:20%; height:100%; background:#e11d48;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px;">
+                            <span>Retirement / Others</span>
+                            <span style="font-weight:600;">10%</span>
+                        </div>
+                        <div style="height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                            <div style="width:10%; height:100%; background:#64748b;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Alert -->
+            <div style="background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;">
+                <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 12px; display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="alert-circle" size="16" style="color:var(--primary);"></i> Offboarding Compliance Checklist
+                </h5>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> 30-Day Notice Period
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> IT Asset Recovery
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> Final Dues Calculation
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> Exit Interview
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> Legal Waiver Signed
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                        <i data-lucide="check" size="12" style="color:#10b981;"></i> Revoke System Access
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exit Register -->
+        <h5 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 16px;">Active Offboarding Pipeline</h5>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Separation Type</th>
+                    <th>Notice Date</th>
+                    <th>Last Working Day</th>
+                    <th>Clearance Status</th>
+                    <th>Final Settlement</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:32px; height:32px; font-size:0.7rem; background:#fee2e2; color:#e11d48;">MK</div>
+                            <div>
+                                <p style="font-weight:600; font-size:0.8rem; margin:0;">Michael Kory</p>
+                                <p style="font-size:0.65rem; color:var(--text-muted); margin:0;">Senior Accountant</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge" style="background:#f1f5f9; color:var(--text-main);">Resignation</span></td>
+                    <td style="font-size:0.8rem;">Mar 01, 2026</td>
+                    <td style="font-size:0.8rem; font-weight:600;">Mar 31, 2026</td>
+                    <td>
+                        <div style="display:flex; gap:4px;">
+                            <span title="IT" style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+                            <span title="Finance" style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+                            <span title="Library/Admin" style="width:8px; height:8px; border-radius:50%; background:#cbd5e1;"></span>
+                        </div>
+                    </td>
+                    <td style="font-size:0.8rem; font-weight:700;">$4,250.00</td>
+                    <td><button class="btn-ghost" style="font-size:0.7rem;">Process Exit</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="profile-avatar" style="width:32px; height:32px; font-size:0.7rem; background:#fee2e2; color:#e11d48;">SA</div>
+                            <div>
+                                <p style="font-weight:600; font-size:0.8rem; margin:0;">Sarah Adams</p>
+                                <p style="font-size:0.65rem; color:var(--text-muted); margin:0;">Sales Lead</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-danger">Involuntary</span></td>
+                    <td style="font-size:0.8rem;">Mar 15, 2026</td>
+                    <td style="font-size:0.8rem; font-weight:600;">Mar 16, 2026</td>
+                    <td>
+                        <div style="display:flex; gap:4px;">
+                            <span title="IT" style="width:8px; height:8px; border-radius:50%; background:#ef4444;"></span>
+                            <span title="Finance" style="width:8px; height:8px; border-radius:50%; background:#cbd5e1;"></span>
+                            <span title="Library/Admin" style="width:8px; height:8px; border-radius:50%; background:#cbd5e1;"></span>
+                        </div>
+                    </td>
+                    <td style="font-size:0.8rem; font-weight:700; color:#e11d48;">Pending Calc</td>
+                    <td><button class="btn-ghost" style="font-size:0.7rem;">View Case</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+`,'Severance Payable': `<div class="card"><h4 class="card-title">Severance Calculations</h4><p>Pending for 1 employee</p></div>`,
+                'Miscellaneous Settings': `<div class="card"><h4 class="card-title">Misc Settings</h4><p>Grievance procedure active</p></div>`,
+                // Report
+                'Summary Reports': `<div class="card"><h4 class="card-title">HR Summary</h4><p>Headcount, turnover, diversity</p></div>`,
+                'Detail Reports': `<div class="card"><h4 class="card-title">Detailed Reports</h4><p>Payroll, attendance logs</p></div>`,
+             };
+            return templates[viewName] || `<div class="card"><h4 class="card-title">${viewName}</h4><p>Module content under construction, but unique per page.</p></div>`;
+        }
+
+        // ----- GENERATE ALL VIEW SECTIONS -----
+        const viewNames = [
+            'Maintain Company','Company Chart','Manpower Planning','Maintain Branch','Manpower Request' ,'Salary Processing',
+            'Employee Profile' ,'Cosign','Guarantor','Experience Requests','Retirement Setting','HRM Setting','Employee Type' ,'Criteria Settings','Experience Org','Experience JobTitle','Screening Setting',
+            'Vacancy','Applicant Registration','Applicant Result','Internal Applicant','Recruitment Request','Application Form',
+            'Employee Placement','Placement Swap','Placement Reports', 'User Roles',
+             
+            'Leave Plan','Leave Taken','Annual Leave Entitlement','Leave Requests','Leave Return',
+            'Allowance Rule','Allowance Definition','Employee Allowance',
+            'Performance Rank','Evaluation Criteria','Employee Performance','Performance Summary',
+            'Discipline Record','Termination','Severance Payable','Miscellaneous Settings',
+            'Summary Reports','Detail Reports' 
+        ];
+
+        const contentDiv = document.getElementById('mainContent');
+        viewNames.forEach(name => {
+            const sectionId = 'view-' + name.replace(/\s+/g, '_');
+            const html = getViewHTML(name);
+            const section = `<section id="${sectionId}" class="view-section">${html}</section>`;
+            contentDiv.insertAdjacentHTML('beforeend', section);
+        });
+
+        // re-init icons inside new sections
+        lucide.createIcons();
+
+        // Dashboard charts
+        const opts = { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } };
+        new Chart(document.getElementById('cType'), {
+            type: 'doughnut',
+            data: { labels: ['Permanent', 'Contract'], datasets: [{ data: [912, 336], backgroundColor: ['#4f46e5', '#f59e0b'], borderWidth: 0, cutout: '75%' }] },
+            options: opts
+        });
+        new Chart(document.getElementById('cDept'), {
+            type: 'polarArea',
+            data: { labels: ['BU-North', 'BU-South', 'HQ', 'R&D'], datasets: [{ data: [300, 200, 500, 248], backgroundColor: ['rgba(79,70,229,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(100,116,139,0.7)'], borderWidth: 0 }] },
+            options: opts
+        });
+
+        // Set dashboard active on load
+        navigate('Dashboard', document.querySelector('.menu-trigger.active'));
+        
+    </script>
+</body>
+</html>
