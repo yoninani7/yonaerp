@@ -157,12 +157,107 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--radius) var(--radius);}
 .table-wrap::-webkit-scrollbar{height:4px;}
 .table-wrap::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
-table.tbl{width:100%;border-collapse:collapse;min-width:600px;}
-table.tbl th{padding:11px 14px;background:#f8fafc;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;text-align:left;}
-table.tbl td{padding:12px 14px;font-size:.8rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
-table.tbl tr:last-child td{border-bottom:none;}
-table.tbl tr:hover td{background:#fafafa;}
-.tbl-card{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);overflow:hidden;}
+ 
+/* ─── OPTIMIZED DATA TABLE SYSTEM ─── */
+
+.table-wrap {
+    overflow-x: auto;
+    position: relative;
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+table.tbl {
+    width: 100%;
+    border-collapse: separate; /* Required for 'sticky' to work */
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+/* Header Styling */
+table.tbl th {
+    padding: 12px 14px;
+    background: #f8fafc;
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* Cell Styling */
+table.tbl td {
+    padding: 12px 14px;
+    font-size: .8rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+    background-color: var(--surface); /* Ensures cells aren't transparent */
+}
+
+/* Row Hover */
+table.tbl tr:hover td {
+    background-color: #fcfdfe !important;
+}
+
+/* ─── THE STICKY ACTIONS FIX ─── */
+
+/* 1. Force the Actions column to be as narrow as possible (Fixes the "Gaps" issue) */
+table.tbl th:last-child, 
+table.tbl td:last-child {
+    width: 0.1%;
+    white-space: nowrap;
+    position: sticky;
+    right: 0;
+    z-index: 20;
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 8px -4px rgba(0,0,0,0.1); /* Subtle shadow to show depth */
+}
+
+/* 2. Specific background for sticky header */
+table.tbl th:last-child {
+    background: #f8fafc;
+}
+
+/* 3. Specific background for sticky body cells */
+table.tbl td:last-child {
+    background: var(--surface);
+    text-align: center;
+}
+
+/* 4. Ensure sticky cell keeps hover color */
+table.tbl tr:hover td:last-child {
+    background: #fcfdfe !important;
+}
+
+/* ─── SPECIFIC PAGE OVERRIDES ─── */
+
+/* Force the Employee Profile table to stay wide so it actually scrolls */
+#tbl-employees table.tbl {
+    width: max-content;
+    min-width: 100%;
+}
+
+#tbl-employees table.tbl td, 
+#tbl-employees table.tbl th {
+    min-width: 140px; /* Gives columns breathing room */
+}
+
+/* Keep the Employee ID sticky on the left for the directory (Optional but helpful) */
+#tbl-employees table.tbl th:first-child,
+#tbl-employees table.tbl td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 21;
+    border-right: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+#tbl-employees table.tbl td:first-child {
+    background: var(--surface);
+}
 
 /* Pagination bar */
 .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;}
@@ -188,11 +283,33 @@ table.tbl tr:hover td{background:#fafafa;}
 .avatar-lg{width:48px;height:48px;font-size:.85rem;}
 
 /* Search input */
-.search-bar{position:relative;display:inline-flex;}
-.search-bar input{padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;transition:border .15s;}
-.search-bar input:focus{border-color:var(--primary);background:#fff;}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);}
+.search-bar {
+  position: relative;
+  display: inline-flex;
+  align-items: center; /* Ensures vertical alignment */
+}
 
+.search-bar input {
+  padding: 8px 12px 8px 38px; /* Increased left padding from 32px to 38px */
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: .78rem;
+  font-family: inherit;
+  color: var(--text);
+  background: #f8fafc;
+  outline: none;
+  transition: all .15s;
+  width: 100%; /* Ensures it fills container */
+}
+.search-bar input:focus{border-color:var(--primary);background:#fff;}
+.search-icon {
+  position: absolute;
+  left: 12px; /* Adjusted position */
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none; /* Icon won't block clicks */
+}
 /* Native select element */
 .sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;cursor:pointer;}
 .sel:focus{border-color:var(--primary);}
@@ -264,37 +381,128 @@ table.tbl tr:hover td{background:#fafafa;}
 /* [CHANGE 1] ORG CHART — flexible CSS tree system
    Each .oc-branch holds a node + its children row.
    Connector lines are drawn with CSS pseudo-elements. */
-.oc-scroll-wrap{overflow:auto;padding:20px;min-height:260px;}
-/* The inner container can be zoomed by JS via transform:scale() */
-#oc-container{display:inline-block;min-width:max-content;transform-origin:top center;transition:transform .2s;padding-bottom:10px;}
-/* One branch = a node stacked above its children */
-.oc-branch{display:flex;flex-direction:column;align-items:center;}
-/* Vertical line from parent node down to the horizontal connector */
-.oc-v-conn{width:2px;height:22px;background:var(--border);margin:0 auto;}
-/* Row of sibling child columns */
-.oc-children-row{display:flex;position:relative;}
-/* Each child column: padding-top leaves room for the horizontal connector bar */
-.oc-child-col{display:flex;flex-direction:column;align-items:center;padding:0 12px;position:relative;padding-top:22px;}
-/* Horizontal bar spanning between siblings */
-.oc-child-col::before{content:'';position:absolute;top:0;height:2px;background:var(--border);left:0;right:0;}
-/* First child's bar starts at centre */
-.oc-child-col:first-child::before{left:50%;}
-/* Last child's bar ends at centre */
-.oc-child-col:last-child::before{right:50%;}
-/* Single child: no horizontal bar — just drop a vertical line */
-.oc-child-col:only-child::before{display:none;}
-/* Vertical drop from horizontal bar down to the node */
-.oc-child-col::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:22px;background:var(--border);}
+/* ── MODERN ORG CHART DESIGN ── */
 
-/* Org chart node card */
-.oc-node{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center;box-shadow:var(--shadow);min-width:150px;max-width:190px;transition:all .2s;cursor:default;}
-.oc-node:hover{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
-.oc-node.ceo{border-top:3px solid var(--primary);}
-.oc-node.vp{border-top:3px solid #16a34a;}
-.oc-node.mgr{border-top:3px solid var(--warning);}
-.oc-node.staff{border-top:3px solid var(--info);}
-.oc-name{font-size:.8rem;font-weight:700;}
-.oc-role{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+/* ─── IMPROVED ORG CHART SYSTEM ─── */
+.oc-scroll-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 60px;
+    background: #f8fafc;
+    min-height: 600px;
+    display: flex;
+    justify-content: center; /* Centers the chart */
+}
+
+#oc-container {
+    display: flex;
+    justify-content: center;
+    transform-origin: top center;
+    transition: transform 0.2s;
+}
+
+/* Tree Structure Logic */
+.oc-tree, .oc-tree ul, .oc-tree li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.oc-tree {
+    display: flex;
+    justify-content: center;
+}
+
+.oc-tree ul {
+    display: flex;
+    padding-top: 20px;
+}
+
+.oc-tree li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 20px 10px 0 10px;
+}
+
+/* Horizontal Connector Lines */
+.oc-tree li::before, .oc-tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: 20px;
+    border-top: 2px solid #cbd5e1;
+}
+.oc-tree li::after {
+    left: 50%;
+    border-left: 2px solid #cbd5e1;
+}
+
+/* Remove connectors for single child/edges */
+.oc-tree li:only-child::after, .oc-tree li:only-child::before { display: none; }
+.oc-tree li:only-child { padding-top: 0; }
+.oc-tree li:first-child::before, .oc-tree li:last-child::after { border: none; }
+.oc-tree li:last-child::before { border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
+.oc-tree li:first-child::after { border-radius: 5px 0 0 0; }
+
+/* Vertical Downward Line from Parent */
+.oc-tree ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 20px;
+    border-left: 2px solid #cbd5e1;
+}
+
+/* Node Styling */
+.oc-node {
+    width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    z-index: 10;
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.oc-node:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.oc-avatar {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px var(--border);
+}
+
+.oc-name { font-size: 0.85rem; font-weight: 700; color: var(--text); display: block; }
+.oc-role { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-top: 4px; display: block; }
+
+/* Level Colors */
+.oc-node.ceo { border-top: 4px solid #0f172a; }
+.oc-node.vp { border-top: 4px solid var(--primary); }
+.oc-node.mgr { border-top: 4px solid var(--success); }
 
 /* [CHANGE 2] MODAL — reusable overlay + box
    Overlay is hidden by default; JS adds .open to show it */
@@ -352,6 +560,100 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   .grid-4{grid-template-columns:repeat(2,1fr);}
   .grid-3{grid-template-columns:1fr 1fr;}
 }
+/* ── REFINED MASTER PROFILE STYLES ── */
+.profile-card-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+.profile-sidebar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+}
+.profile-avatar-box {
+    width: 80px; height: 80px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    border: 1px solid var(--border);
+}
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: var(--success-bg);
+    color: var(--success);
+    margin-top: 8px;
+}
+.data-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.data-value { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+.data-group { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; }
+.data-group:last-child { border-bottom: none; }
+/* ── HIGH-DENSITY BENTO GRID ── */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: min-content;
+    gap: 12px; /* Tight gap for interlocking look */
+}
+
+.bento-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fafafa;
+}
+
+.bento-header i { color: var(--primary); }
+.bento-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+
+.bento-body { padding: 16px; flex: 1; }
+
+/* Compact Data Rows */
+.d-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--border);
+}
+.d-row:last-child { border-bottom: none; padding-bottom: 0; }
+.d-row:first-child { padding-top: 0; }
+
+.d-label { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
+.d-value { font-size: 0.78rem; font-weight: 700; color: var(--text); text-align: right; }
+
+/* Special Hero Branding */
+.brand-strip {
+    grid-column: span 12;
+    background: var(--primary);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 </style>
 </head>
 <body>
@@ -403,7 +705,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="sub-link" onclick="goPage('employment-types',this)"><span class="sub-dot"></span>Employment Types</div>
         <div class="sub-link" onclick="goPage('probation-tracker',this)"><span class="sub-dot"></span>Probation Tracker</div>
         <div class="sub-link" onclick="goPage('contract-renewals',this)"><span class="sub-dot"></span>Contract Renewals</div>
-        <div class="sub-link" onclick="goPage('document-vault',this)"><span class="sub-dot"></span>Document Vault</div>
+        <div class="sub-link" onclick="goPage('document-vault',this)"><span class="sub-dot"></span>Attachment vault</div>
         <div class="sub-link" onclick="goPage('asset-tracking',this)"><span class="sub-dot"></span>Asset Tracking</div>
       </div>
     </div>
@@ -501,7 +803,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
       </div>
       <div class="submenu" id="m-comp">
         <div class="sub-link" onclick="goPage('disciplinary-actions',this)"><span class="sub-dot"></span>Disciplinary Actions</div>
-        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span>Grievance Management</div>
+        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span>Resignation</div>
         <div class="sub-link" onclick="goPage('termination',this)"><span class="sub-dot"></span>Separation & Exit</div>
         <div class="sub-link" onclick="goPage('severance',this)"><span class="sub-dot"></span>Severance Calculator</div>
         <div class="sub-link" onclick="goPage('exit-clearance',this)"><span class="sub-dot"></span>Exit Clearance</div>
@@ -635,36 +937,105 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 <!-- ══════════════════════════════
      COMPANY PROFILE
 ══════════════════════════════ -->
+<!-- ══════════════════════════════
+     MASTER DATA CONSOLE (NO SPACE)
+══════════════════════════════ -->
 <div class="page" id="p-company-profile">
-  <div class="page-header">
-    <div><div class="page-title">Company Profile</div><div class="page-sub">Master organizational identity and legal information</div></div>
-    <div class="flex-row"><button class="btn btn-primary"><i data-lucide="edit-3" size="13" style="width: 20px;"></i>Edit Profile</button></div>
-  </div>
-  <div class="grid-2">
-    <div class="card"><div class="card-header"><div class="card-title">Legal & Registration</div><span class="badge badge-success">Verified</span></div>
-    <div class="card-body">
-      <div class="info-row"><span class="info-label">Legal Name</span><span class="info-val">HRM Enterprises Ltd.</span></div>
-      <div class="info-row"><span class="info-label">TIN No.</span><span class="info-val">1234567897</span></div>
-      <div class="info-row"><span class="info-label">Establishment date</span><span class="info-val">Oct 12, 2010</span></div>
-      <div class="info-row"><span class="info-label">Entity Type</span><span class="info-val">Private Limited</span></div>
-    </div></div>
-    <div class="card"><div class="card-header"><div class="card-title">Operational Details</div></div>
-    <div class="card-body">
-      <div class="info-row"><span class="info-label">Currency</span><span class="info-val">Ethiopian Birr (ETB)</span></div>
-      <div class="info-row"><span class="info-label">Language</span><span class="info-val">English (US)</span></div>
-      <div class="info-row"><span class="info-label">Branches</span><span class="info-val">12 Global Units</span></div>
-      <div class="info-row"><span class="info-label">Total Staff</span><span class="info-val">1,248 members</span></div>
-    </div></div>
-  </div>
-  <div class="card mt-4"><div class="card-header"><div class="card-title">Contact Information</div></div>
-  <div class="card-body form-grid fg-3">
-    <div class="form-group"><label>Corporate Email</label><input value="corporate@hrm.com" disabled></div>
-    <div class="form-group"><label>Phone</label><input value="(+251)967285600" disabled></div>
-    <div class="form-group"><label>Website</label><input value="https://hrmenterprises.com" disabled></div>
-    <div class="form-group"><label>HQ Address</label><input value="Ras Desta Street, Kirkos Sub-City, Woreda 01" disabled></div>
-    <div class="form-group"><label>City / State</label><input value="Addis Ababa" disabled></div>
-    <div class="form-group"><label>Country</label><input value="Ethiopia" disabled></div>
-  </div></div>
+    
+    <div class="bento-grid">
+        
+        <!-- ROW 1: BRAND STRIP -->
+        <div class="brand-strip">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px;">
+                    <i data-lucide="building-2" size="28"></i>
+                </div>
+                <div>
+                    <h1 style="font-size: 1.2rem; font-weight: 800; line-height: 1;">HRM Enterprises Ltd.</h1>
+                    <p style="font-size: 0.7rem; opacity: 0.8; margin-top: 4px;">Global Personnel & Operations Master Data</p>
+                </div>
+            </div>
+            <div style="text-align: right;"> 
+               
+            <button class="btn btn-primary btn-sm" style="font-size: 16px; " ><i data-lucide="edit-3" size="14"></i> Edit Profile</button>
+        
+            </div>
+        </div>
+        
+       
+
+        <!-- ROW 2: CORE LEGAL (Span 5) -->
+        <div class="bento-card" style="grid-column: span 5;">
+            <div class="bento-header">
+                <i data-lucide="shield-check" size="14"></i>
+                <span class="bento-title">Legal & Statutory Identity</span>
+            </div>
+            <div class="bento-body">
+                <div class="d-row"><span class="d-label">Legal Name</span><span class="d-value">HRM Enterprises PLC</span></div>
+                <div class="d-row"><span class="d-label">Entity Type</span><span class="d-value">Private Limited</span></div>
+                <div class="d-row"><span class="d-label">Trade License</span><span class="d-value">AA/14/667/09</span></div>
+                <div class="d-row"><span class="d-label">TIN Number</span><span class="d-value">0019283746</span></div>
+                <div class="d-row"><span class="d-label">VAT Reg.</span><span class="d-value">9928374-VAT-01</span></div>
+                <div class="d-row"><span class="d-label">Establishment Date</span><span class="d-value">Oct 12, 2010</span></div>
+            </div>
+        </div>
+
+        <!-- ROW 2: SYSTEM LOCALES (Span 4) -->
+        <div class="bento-card" style="grid-column: span 4;">
+            <div class="bento-header">
+                <i data-lucide="settings-2" size="14"></i>
+                <span class="bento-title">System Locales</span>
+            </div>
+            <div class="bento-body">
+                <div class="d-row"><span class="d-label">Reporting Currency</span><span class="d-value">ETB (Birr)</span></div>
+                <div class="d-row"><span class="d-label">Fiscal Year Start</span><span class="d-value">July 1st</span></div>
+                <div class="d-row"><span class="d-label">Timezone</span><span class="d-value">UTC+3 (EAT)</span></div>
+                <div class="d-row"><span class="d-label">Work Week</span><span class="d-value">Mon — Fri</span></div>
+                <div class="d-row"><span class="d-label">Daily Standard</span><span class="d-value">8.00 Hours</span></div>
+                <div class="d-row"><span class="d-label">System Lang</span><span class="d-value">English (US)</span></div>
+            </div>
+        </div>
+
+        <!-- ROW 2: QUICK CONTACT (Span 3) -->
+        <div class="bento-card" style="grid-column: span 3;">
+            <div class="bento-header">
+                <i data-lucide="contact-2" size="14"></i>
+                <span class="bento-title">Communication</span>
+            </div>
+            <div class="bento-body">
+                <div class="d-row"><span class="d-label">Phone</span><span class="d-value">+251 11 667 89</span></div>
+                <div class="d-row"><span class="d-label">Email</span><span class="d-value">corp@hrm.com</span></div>
+                <div class="d-row"><span class="d-label">Web</span><span class="d-value">hrm.com</span></div>
+                <div style="margin-top: 12px; padding: 10px; background: var(--primary-light); border-radius: 6px; border: 1px solid var(--primary);">
+                    <div style="font-size: 0.6rem; color: var(--primary); font-weight: 800;">STATUS</div>
+                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--primary);">Verified Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: ADDRESS (Span 7) -->
+        <div class="bento-card" style="grid-column: span 12;">
+            <div class="bento-header">
+                <i data-lucide="map-pin" size="14"></i>
+                <span class="bento-title">Registered Head Office Address</span>
+            </div>
+            <div class="bento-body">
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <div class="d-label">Street Address</div>
+                        <div class="d-value" style="text-align: left; margin-top: 4px;">Ras Desta Damtew St, Kirkos Sub-City, Woreda 01</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="d-label">City / Country</div>
+                        <div class="d-value" style="text-align: left; margin-top: 4px;">Addis Ababa, Ethiopia</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
+ 
+
+    </div>
 </div>
 
 <!-- ══════════════════════════════
@@ -672,27 +1043,23 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 ══════════════════════════════ -->
 <div class="page" id="p-org-chart">
   <div class="page-header">
-    <div><div class="page-title">Organization Chart</div><div class="page-sub">Live reporting structure and hierarchy</div></div>
+    <div>
+      <div class="page-title">Company Hierarchy</div>
+      <div class="page-sub">Organizational reporting structure and chain of command</div>
+    </div>
     <div class="flex-row">
-      <!-- Zoom controls — call zoomOC() in JS -->
-      <button class="btn btn-secondary btn-sm" onclick="zoomOC(-0.1)"><i data-lucide="minus" size="13"></i></button>
-      <span id="oc-zoom-label" style="font-size:.75rem;color:var(--muted);min-width:40px;text-align:center;">100%</span>
-      <button class="btn btn-secondary btn-sm" onclick="zoomOC(0.1)"><i data-lucide="plus" size="13"></i></button>
-      <button class="btn btn-secondary"><i data-lucide="download" size="13"></i>Export PDF</button>
+      <div style="background:white; border:1px solid var(--border); border-radius:8px; padding:4px; display:flex; align-items:center;">
+          <button class="icon-btn" onclick="zoomOC(-0.1)"><i data-lucide="minus" size="14"></i></button>
+          <span id="oc-zoom-label" style="font-size:.75rem; font-weight:800; width:50px; text-align:center;">100%</span>
+          <button class="icon-btn" onclick="zoomOC(0.1)"><i data-lucide="plus" size="14"></i></button>
+      </div>
+      <button class="btn btn-secondary" onclick="initOrgChart()"><i data-lucide="refresh-cw" size="14"></i> Reload</button>
     </div>
   </div>
-  <div class="card">
-    <!-- Scrollable wrapper enables panning when zoomed out or chart is wide -->
+  
+  <div class="card" style="overflow:hidden;">
     <div class="oc-scroll-wrap">
-      <!-- #oc-container is populated by renderOrgNode() in JS -->
       <div id="oc-container"></div>
-    </div>
-    <!-- Legend -->
-    <div style="display:flex;gap:20px;justify-content:center;padding:12px 20px 16px;border-top:1px solid var(--border);flex-wrap:wrap;">
-      <div class="flex-row" style="gap:6px;font-size:.72rem;color:var(--muted);"><div style="width:10px;height:10px;border-radius:2px;background:#2563eb;"></div>Executive</div>
-      <div class="flex-row" style="gap:6px;font-size:.72rem;color:var(--muted);"><div style="width:10px;height:10px;border-radius:2px;background:#16a34a;"></div>C-Suite</div>
-      <div class="flex-row" style="gap:6px;font-size:.72rem;color:var(--muted);"><div style="width:10px;height:10px;border-radius:2px;background:#d97706;"></div>Management</div>
-      <div class="flex-row" style="gap:6px;font-size:.72rem;color:var(--muted);"><div style="width:10px;height:10px;border-radius:2px;background:#0891b2;"></div>Staff</div>
     </div>
   </div>
 </div>
@@ -784,11 +1151,11 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 </div>
 
 <!-- ══════════════════════════════
-     DOCUMENT VAULT
+     Attachment Vault
 ══════════════════════════════ -->
 <div class="page" id="p-document-vault">
   <div class="page-header">
-    <div><div class="page-title">Document Vault</div><div class="page-sub">Employee document storage and verification</div></div>
+    <div><div class="page-title">Attachment Vault</div><div class="page-sub">Employee document storage and verification</div></div>
     <button class="btn btn-primary"><i data-lucide="upload" size="13"></i>Upload Document</button>
   </div>
   <div id="tbl-documents"></div>
@@ -1700,7 +2067,7 @@ function buildTable(containerId, { columns, rows, perPage = 8 }) {
     container.innerHTML = `
       <div class="tbl-card">
         <div class="filter-bar">
-          <div class="search-bar"><i data-lucide="search" size="13" class="search-icon"></i><input placeholder="Search…" oninput="searchTable('${containerId}',this.value)"></div>
+          <div class="search-bar"><i data-lucide="search" size="13" class="search-icon"></i><input placeholder="Search…"></div>
           <div class="ml-auto flex-row">
             <select class="sel" style="font-size:.72rem;"><option>10 / page</option><option>25 / page</option><option>50 / page</option></select>
             <button class="btn btn-secondary btn-sm"><i data-lucide="download" size="12"></i> Export</button>
@@ -1768,7 +2135,7 @@ const statuses = {
 };
 
 /* Standard row-level action buttons (view / edit / delete) */
-const actions = `<div class="flex-row"><button class="btn btn-xs btn-secondary"><i data-lucide="eye" size="10"></i></button><button class="btn btn-xs btn-secondary"><i data-lucide="edit-2" size="10"></i></button><button class="btn btn-xs" style="background:#fee2e2;color:#dc2626;border:none;padding:3px 8px;border-radius:6px;font-size:.68rem;cursor:pointer;"><i data-lucide="trash-2" size="10"></i></button></div>`;
+const actions = `<div class="flex-row"><Center> <button class="btn btn-xs btn-secondary"><i data-lucide="eye" size="10"></i></button> <button class="btn btn-xs" style="background:#fee2e2;color:#dc2626;border:none;padding:3px 8px;border-radius:6px;font-size:.68rem;cursor:pointer;"><i data-lucide="trash-2" size="10"></i></button></Center></div>`;
 
 /* Generate array of n items using factory fn(index) */
 function gen(n, fn) { return Array.from({ length: n }, (_, i) => fn(i)); }
@@ -1785,81 +2152,77 @@ function fmtMoney(n) { return '$' + n.toLocaleString(undefined, { minimumFractio
 // type values: 'ceo' | 'vp' | 'mgr' | 'staff'
 // ══════════════════════════════════════════
 
-/* Hierarchical org chart data — modify this to reshape the chart */
+// 1. Data Structure
 const orgData = {
-  name: 'Sarah Jenkins', role: 'Chief Executive Officer', type: 'ceo',
-  children: [
-    {
-      name: 'Michael Chen', role: 'Chief Operating Officer', type: 'vp',
-      children: [
-        { name: 'James Wilson', role: 'VP Sales',        type: 'mgr', children: [] },
-        { name: 'Linda Wu',     role: 'VP Supply Chain', type: 'mgr', children: [] }
-      ]
-    },
-    {
-      name: 'David Park', role: 'Chief Technology Officer', type: 'vp',
-      children: [
-        { name: 'Kevin Smith',  role: 'Engineering Director', type: 'mgr', children: [] },
-        { name: 'Priya Sharma', role: 'QA Director',          type: 'mgr', children: [] }
-      ]
-    },
-    {
-      name: 'Elena Rodriguez', role: 'Chief HR Officer', type: 'vp',
-      children: [
-        { name: 'Pat Nguyen', role: 'HR Manager',  type: 'mgr', children: [] },
-        { name: 'Chris Lee',  role: 'L&D Manager', type: 'mgr', children: [] }
-      ]
-    },
-    {
-      name: 'Susan Park', role: 'Chief Financial Officer', type: 'vp',
-      children: [
-        { name: 'Mark Evans',  role: 'Finance Manager',    type: 'mgr', children: [] },
-        { name: 'Mark Evans',  role: 'Finance Manager',    type: 'mgr', children: [] },
-        { name: 'Mark Evans',  role: 'Finance Manager',    type: 'mgr', children: [] },
-        { name: 'Mark Evans',  role: 'Finance Manager',    type: 'mgr', children: [] },
-        { name: 'Tina Brooks', role: 'Accounting Manager', type: 'mgr', children: [] }
-      ]
-    }
-  ]
+    name: 'Yonatan Y.', role: 'CEO / Founder', type: 'ceo',
+    children: [
+        {
+            name: 'Michael Chen', role: 'COO', type: 'vp',
+            children: [
+                { name: 'James Wilson', role: 'Ops Manager', type: 'mgr', children: [] },
+                { name: 'Sarah Miller', role: 'Logistics Lead', type: 'mgr', children: [] }
+            ]
+        },
+        {
+            name: 'David Park', role: 'CTO', type: 'vp',
+            children: [
+                { name: 'Kevin Smith', role: 'Engineering Dir', type: 'mgr', children: [] },
+                { name: 'Alice Wang', role: 'QA Manager', type: 'mgr', children: [] }
+            ]
+        },
+        {
+            name: 'Elena Rod', role: 'CHRO', type: 'vp',
+            children: [
+                { name: 'Pat Nguyen', role: 'HR Manager', type: 'mgr', children: [] }
+            ]
+        }
+    ]
 };
 
-/* Recursively build HTML for one node and all its descendants */
-function renderOrgNode(node) {
-  const hasChildren = node.children && node.children.length > 0;
-  return `
-    <div class="oc-branch">
-      <div class="oc-node ${node.type}">
-        <div class="oc-name">${node.name}</div>
-        <div class="oc-role">${node.role}</div>
-      </div>
-      ${hasChildren ? `
-        <div class="oc-v-conn"></div>
-        <div class="oc-children-row">
-          ${node.children.map(c => `<div class="oc-child-col">${renderOrgNode(c)}</div>`).join('')}
-        </div>` : ''}
-    </div>`;
+// 2. Recursive Rendering Function
+function renderTree(node) {
+    const hasChildren = node.children && node.children.length > 0;
+    const initials = node.name.split(' ').map(n => n[0]).join('');
+
+    return `
+        <li>
+            <div class="oc-node ${node.type}">
+                <div class="oc-avatar">${initials}</div>
+                <span class="oc-name">${node.name}</span>
+                <span class="oc-role">${node.role}</span>
+            </div>
+            ${hasChildren ? `<ul>${node.children.map(child => renderTree(child)).join('')}</ul>` : ''}
+        </li>
+    `;
 }
 
-/* Current zoom scale for the org chart (1.0 = 100%) */
+// 3. Zoom Function
 let ocZoom = 1;
-
-/* Zoom the org chart in or out. delta is +/- 0.1. Clamped 40%–200%. */
 function zoomOC(delta) {
-  ocZoom = Math.max(0.4, Math.min(2.0, ocZoom + delta));
-  const c = document.getElementById('oc-container');
-  if (c) c.style.transform = `scale(${ocZoom})`;
-  const lbl = document.getElementById('oc-zoom-label');
-  if (lbl) lbl.textContent = Math.round(ocZoom * 100) + '%';
+    ocZoom = Math.max(0.4, Math.min(1.5, ocZoom + delta));
+    document.getElementById('oc-container').style.transform = `scale(${ocZoom})`;
+    document.getElementById('oc-zoom-label').textContent = Math.round(ocZoom * 100) + '%';
 }
 
-/* Render the org tree into the DOM container */
+// 4. Initialization (Update your main initPage function to call this)
 function initOrgChart() {
-  const c = document.getElementById('oc-container');
-  if (!c) return;
-  c.innerHTML = renderOrgNode(orgData);
-  lucide.createIcons();
+    const container = document.getElementById('oc-container');
+    if (!container) return;
+    
+    // Wrap the recursive render in a UL tag
+    container.innerHTML = `<ul class="oc-tree">${renderTree(orgData)}</ul>`;
+    
+    // Refresh icons
+    if(window.lucide) lucide.createIcons();
 }
 
+// Make sure your existing initPage handles the call:
+// Find your switch(id) and ensure 'org-chart' looks like this:
+/*
+    case 'org-chart': 
+        initOrgChart(); 
+        break;
+*/
 // ══════════════════════════════════════════
 // [CHANGE 2] DEPARTMENT MODAL
 // ══════════════════════════════════════════
@@ -1902,21 +2265,76 @@ function initPage(id) {
 
     /* Each table case calls buildTable() with column definitions and generated rows */
     case 'departments':
-      buildTable('tbl-departments', { columns: [{key:'code',label:'Code'},{key:'name',label:'Department Name'},{key:'head',label:'Head of Dept'},{key:'emp',label:'Employees'},{key:'loc',label:'Location'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(32, i => ({ code:`D${String(i+1).padStart(3,'0')}`, name:depts[i%depts.length]+' '+(i>=10?String.fromCharCode(65+Math.floor(i/10)):''), head:names[i%names.length], emp:randInt(20,150), loc:['New York','Atlanta','San Jose','Chicago','Boston'][i%5], status:statuses.active })) }); break;
+      buildTable('tbl-departments', { columns: [ {key:'name',label:'Department Name'},{key:'head',label:'Head of Dept'},{key:'emp',label:'Employees'},{key:'loc',label:'Location'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(32, i => ({ code:`D${String(i+1).padStart(3,'0')}`, name:depts[i%depts.length]+' '+(i>=10?String.fromCharCode(65+Math.floor(i/10)):''), head:names[i%names.length], emp:randInt(20,150), loc:['New York','Atlanta','San Jose','Chicago','Boston'][i%5], status:statuses.active })) }); break;
     case 'job-positions':
-      buildTable('tbl-job-positions', { columns:[{key:'code',label:'Code'},{key:'title',label:'Job Title'},{key:'dept',label:'Department'},{key:'grade',label:'Grade'},{key:'min',label:'Min Salary'},{key:'max',label:'Max Salary'},{key:'count',label:'Headcount'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(28, i => ({ code:`JP${String(i+1).padStart(3,'0')}`, title:['Software Engineer','Sales Manager','HR Business Partner','Finance Analyst','Product Manager','UX Designer','DevOps Engineer','Data Scientist','Legal Counsel','Support Lead'][i%10], dept:rand(depts), grade:['L1','L2','L3','L4','M1','M2','S1','S2'][i%8], min:fmtMoney(randInt(40,80)*1000), max:fmtMoney(randInt(80,150)*1000), count:randInt(2,40) })) }); break;
+      buildTable('tbl-job-positions', { columns:[{key:'title',label:'Job Title'},{key:'dept',label:'Department'},{key:'count',label:'Headcount'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(28, i => ({ code:`JP${String(i+1).padStart(3,'0')}`, title:['Software Engineer','Sales Manager','HR Business Partner','Finance Analyst','Product Manager','UX Designer','DevOps Engineer','Data Scientist','Legal Counsel','Support Lead'][i%10], dept:rand(depts), grade:['L1','L2','L3','L4','M1','M2','S1','S2'][i%8], min:fmtMoney(randInt(40,80)*1000), max:fmtMoney(randInt(80,150)*1000), count:randInt(2,40) })) }); break;
     case 'branch-offices':
       buildTable('tbl-branch-offices', { columns:[{key:'code',label:'Code'},{key:'name',label:'Branch Name'},{key:'city',label:'City'},{key:'country',label:'Country'},{key:'manager',label:'Branch Manager'},{key:'emp',label:'Staff'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(12, i => ({ code:`BR${String(i+1).padStart(2,'0')}`, name:['HQ','North','South','East','West','APAC','EMEA','LATAM','Canada','Australia','UK','Singapore'][i]+' Office', city:['New York','Chicago','Atlanta','Boston','San Jose','Singapore','London','São Paulo','Toronto','Sydney','Manchester','Tokyo'][i], country:['USA','USA','USA','USA','USA','Singapore','UK','Brazil','Canada','Australia','UK','Japan'][i], manager:names[i%names.length], emp:randInt(30,320), status:statuses.active })) }); break;
-    case 'employee-directory':
-      buildTable('tbl-employees', { columns:[{key:'id',label:'Emp ID'},{key:'name',label:'Name'},{key:'dept',label:'Department'},{key:'position',label:'Position'},{key:'type',label:'Type'},{key:'email',label:'Email'},{key:'phone',label:'Phone'},{key:'hire',label:'Hire Date'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(60, i => ({ id:`E${String(i+1).padStart(4,'0')}`, name:names[i%names.length], dept:rand(depts), position:['Engineer','Manager','Analyst','Director','Specialist'][i%5], type:i%4===0?'Contract':'Permanent', email:`${names[i%names.length].toLowerCase().replace(' ','.')}@hrm.com`, phone:`+1 555 ${String(randInt(1000,9999))}`, hire:`${['Jan','Feb','Mar','Apr','May','Jun'][i%6]} ${randInt(1,28)}, ${randInt(2018,2025)}`, status:i%8===0?statuses.inactive:statuses.active })) }); break;
-    case 'employment-types':
-      buildTable('tbl-employment-types', { columns:[{key:'code',label:'Code'},{key:'name',label:'Type Name'},{key:'desc',label:'Description'},{key:'benefits',label:'Benefits Eligible'},{key:'count',label:'Employees'},{key:'_',label:'Actions',render:()=>actions}], rows:[{code:'FT',name:'Permanent / Full-Time',desc:'Regular employee with full benefits',benefits:'Yes',count:912},{code:'CT',name:'Fixed-Term Contract',desc:'Time-bound employment agreement',benefits:'Partial',count:248},{code:'PT',name:'Part-Time',desc:'Less than 40 hours per week',benefits:'Partial',count:55},{code:'IN',name:'Internship',desc:'Student or graduate trainee',benefits:'No',count:33},{code:'TM',name:'Temporary / Casual',desc:'Short-term project-based',benefits:'No',count:0}] }); break;
+case 'employee-directory':
+      buildTable('tbl-employees', { 
+        columns: [
+          {key:'id', label:'Emp ID'},
+          {key:'fname', label:'First Name'},
+          {key:'mname', label:'Middle Name'},
+          {key:'lname', label:'Last Name'},
+          {key:'uname', label:'Username'},
+          {key:'gender', label:'Gender'},
+          {key:'dob', label:'Date of Birth'},
+          {key:'hire', label:'Hired Date'},
+          {key:'status', label:'Status'},
+          {key:'marital', label:'Marital Status'},
+          {key:'phone', label:'Phone'},
+          {key:'email', label:'Email'},
+          {key:'dept', label:'Department'},
+          {key:'position', label:'Job Position'},
+          {key:'type', label:'Emp Type'},
+          {key:'probation', label:'Probation Date'},
+          {key:'termDate', label:'Termination Date'},
+          {key:'termReason', label:'Termination Reason'},
+          {key:'bank', label:'Bank Account'},
+          {key:'created', label:'Created At'}, 
+          {key:'_', label:'Actions', render:()=>actions}
+        ], 
+        rows: gen(60, i => {
+          const isActive = i % 8 !== 0;
+          const firstName = names[i % names.length].split(' ')[0];
+          const lastName = names[i % names.length].split(' ')[1];
+          const midName = ['A.', 'M.', 'D.', 'S.', 'K.'][i % 5];
+          
+          return { 
+            id: `E${String(i + 1).padStart(4, '0')}`,
+            fname: firstName,
+            mname: midName,
+            lname: lastName,
+            uname: (firstName[0] + lastName).toLowerCase() + randInt(10, 99),
+            gender: i % 2 === 0 ? 'Male' : 'Female',
+            dob: `19${randInt(70, 99)}-${String(randInt(1, 12)).padStart(2, '0')}-${String(randInt(1, 28)).padStart(2, '0')}`,
+            hire: `202${randInt(0, 5)}-${String(randInt(1, 12)).padStart(2, '0')}-${String(randInt(1, 28)).padStart(2, '0')}`,
+            status: isActive ? statuses.active : statuses.inactive,
+            marital: ['Single', 'Married', 'Divorced', 'Widowed'][i % 4],
+            phone: `+1 555-${randInt(100, 999)}-${randInt(1000, 9999)}`,
+            email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@hrm.com`,
+            dept: rand(depts),
+            position: ['Software Engineer', 'Project Manager', 'HR Specialist', 'Accountant', 'Sales Lead'][i % 5],
+            type: i % 4 === 0 ? 'Contract' : 'Full-Time',
+            probation: `2026-06-${String(randInt(1, 28)).padStart(2, '0')}`,
+            termDate: isActive ? '—' : `2026-02-${String(randInt(1, 28)).padStart(2, '0')}`,
+            termReason: isActive ? '—' : ['Resigned', 'Contract Ended', 'Performance'][i % 3],
+            bank: `BE${randInt(10, 99)} 0000 ${randInt(1000, 9999)} ${randInt(10, 99)}`,
+            created: `2025-01-10 08:30`,
+            updated: `2026-03-20 14:45`
+          };
+        }) 
+      }); 
+      break;
+       case 'employment-types':
+      buildTable('tbl-employment-types', { columns:[{key:'code',label:'Code'},{key:'name',label:'Type Name'},{key:'desc',label:'Description'} ,{key:'count',label:'Employees'},{key:'_',label:'Actions',render:()=>actions}], rows:[{code:'FT',name:'Permanent / Full-Time',desc:'Regular employee with full benefits',benefits:'Yes',count:912},{code:'CT',name:'Fixed-Term Contract',desc:'Time-bound employment agreement',benefits:'Partial',count:248},{code:'PT',name:'Part-Time',desc:'Less than 40 hours per week',benefits:'Partial',count:55},{code:'IN',name:'Internship',desc:'Student or graduate trainee',benefits:'No',count:33},{code:'TM',name:'Temporary / Casual',desc:'Short-term project-based',benefits:'No',count:0}] }); break;
     case 'probation-tracker':
-      buildTable('tbl-probation', { columns:[{key:'id',label:'Emp ID'},{key:'name',label:'Employee'},{key:'dept',label:'Dept'},{key:'start',label:'Probation Start'},{key:'end',label:'Probation End'},{key:'days',label:'Days Left'},{key:'score',label:'Score'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(22, i => ({ id:`E${String(i+100).padStart(4,'0')}`, name:names[i%names.length], dept:rand(depts), start:`Jan ${randInt(5,20)}, 2026`, end:`Apr ${randInt(5,20)}, 2026`, days:randInt(0,50), score:['A','B','B+','B-','C+','A-'][i%6], status:i<8?'<span class="badge badge-warning">Ending Soon</span>':'<span class="badge badge-info">Active</span>' })) }); break;
+      buildTable('tbl-probation', { columns:[{key:'id',label:'Emp ID'},{key:'name',label:'Employee'},{key:'dept',label:'Dept'},{key:'start',label:'Probation Start'},{key:'end',label:'Probation End'},{key:'days',label:'Days Left'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(22, i => ({ id:`E${String(i+100).padStart(4,'0')}`, name:names[i%names.length], dept:rand(depts), start:`Jan ${randInt(5,20)}, 2026`, end:`Apr ${randInt(5,20)}, 2026`, days:randInt(0,50), score:['A','B','B+','B-','C+','A-'][i%6], status:i<8?'<span class="badge badge-warning">Ending Soon</span>':'<span class="badge badge-info">Active</span>' })) }); break;
     case 'contract-renewals':
       buildTable('tbl-contract-renewals', { columns:[{key:'id',label:'Emp ID'},{key:'name',label:'Employee'},{key:'dept',label:'Dept'},{key:'type',label:'Contract Type'},{key:'start',label:'Start'},{key:'expiry',label:'Expiry'},{key:'days',label:'Days to Expiry'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(18, i => ({ id:`E${String(i+50).padStart(4,'0')}`, name:names[i%names.length], dept:rand(depts), type:'Fixed-Term', start:`Apr ${randInt(1,28)}, 2025`, expiry:`Apr ${randInt(1,28)}, 2026`, days:randInt(-5,90), status:i<3?'<span class="badge badge-danger">Critical</span>':i<8?'<span class="badge badge-warning">Due Soon</span>':'<span class="badge badge-success">Active</span>' })) }); break;
     case 'document-vault':
-      buildTable('tbl-documents', { columns:[{key:'id',label:'Doc ID'},{key:'emp',label:'Employee'},{key:'type',label:'Document Type'},{key:'file',label:'Filename'},{key:'uploaded',label:'Uploaded'},{key:'expiry',label:'Expiry'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(35, i => ({ id:`DOC-${String(i+1).padStart(4,'0')}`, emp:names[i%names.length], type:['National ID','Passport','Academic Certificate','Employment Contract','NDA','Tax Form W-4','I-9 Verification'][i%7], file:`doc_${i+1}.pdf`, uploaded:`${['Jan','Feb','Mar'][i%3]} ${randInt(1,28)}, 2026`, expiry:i%3===0?`Dec 31, ${randInt(2026,2030)}`:'No Expiry', status:i%7===0?'<span class="badge badge-warning">Expiring Soon</span>':statuses.active })) }); break;
+      buildTable('tbl-documents', { columns:[{key:'id',label:'Doc ID'},{key:'emp',label:'Employee'},{key:'type',label:'Document Type'},{key:'file',label:'Filename'},{key:'uploaded',label:'Uploaded'} ,{key:'_',label:'Actions',render:()=>actions}], rows: gen(35, i => ({ id:`DOC-${String(i+1).padStart(4,'0')}`, emp:names[i%names.length], type:['National ID','Passport','Academic Certificate','Employment Contract','NDA','Tax Form W-4','I-9 Verification'][i%7], file:`doc_${i+1}.pdf`, uploaded:`${['Jan','Feb','Mar'][i%3]} ${randInt(1,28)}, 2026`, expiry:i%3===0?`Dec 31, ${randInt(2026,2030)}`:'No Expiry', status:i%7===0?'<span class="badge badge-warning">Expiring Soon</span>':statuses.active })) }); break;
     case 'asset-tracking':
       buildTable('tbl-assets', { columns:[{key:'id',label:'Asset ID'},{key:'asset',label:'Asset Name'},{key:'cat',label:'Category'},{key:'serial',label:'Serial No.'},{key:'emp',label:'Assigned To'},{key:'dept',label:'Dept'},{key:'issued',label:'Issued Date'} ,{key:'_',label:'Actions',render:()=>actions}], rows: gen(30, i => ({ id:`AST-${String(i+1).padStart(3,'0')}`, asset:['MacBook Pro 16"','iPhone 14 Pro','Dell Monitor 27"','Office Chair','Access Card','Company Car','iPad Air','Laptop Stand'][i%8], cat:['Hardware','Mobile','Hardware','Furniture','Security','Vehicle','Hardware','Accessories'][i%8], serial:`SN${randInt(100000,999999)}`, emp:names[i%names.length], dept:rand(depts), issued:`${['Jan','Feb','Mar','Dec'][i%4]} ${randInt(1,28)}, ${randInt(2022,2026)}`, value:fmtMoney(randInt(200,4000)) })) }); break;
     case 'job-vacancies':
