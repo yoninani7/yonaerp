@@ -1048,7 +1048,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
       <div class="submenu" id="m-sys">
         <div class="sub-link" onclick="goPage('user-management',this)"><span class="sub-dot"></span>User Management</div>
         <div class="sub-link" onclick="goPage('roles-permissions',this)"><span class="sub-dot"></span>Roles & Permissions</div>
-        <div class="sub-link" onclick="goPage('audit-logs',this)"><span class="sub-dot"></span>Audit Logs</div>
+        <div class="sub-link" onclick="goPage('audit-logs',this)"><span class="sub-dot"></span>Audit Logs</div>  
         <div class="sub-link" onclick="goPage('system-settings',this)"><span class="sub-dot"></span>System Settings</div>
       </div>
     </div>
@@ -1120,10 +1120,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 
 <!-- ══════════════════════════════
      COMPANY PROFILE
-══════════════════════════════ -->
-<!-- ══════════════════════════════
-     MASTER DATA CONSOLE (NO SPACE)
-══════════════════════════════ -->
+══════════════════════════════ --> 
 <div class="page" id="p-company-profile">
     
     <div class="bento-grid">
@@ -1854,102 +1851,148 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   </div>
   <div id="tbl-audit"></div>
 </div>
-
+ 
 <!-- ══════════════════════════════
-     [CHANGE 4] SYSTEM SETTINGS — expanded with
-     Security, Email/SMTP, Integrations, Backup cards
+     SYSTEM SETTINGS (SIMPLIFIED)
 ══════════════════════════════ -->
 <div class="page" id="p-system-settings">
   <div class="page-header">
-    <div><div class="page-title">System Settings</div><div class="page-sub">Global HRM configuration</div></div>
-    <button class="btn btn-primary"><i data-lucide="save" size="13"></i>Save Changes</button>
+    <div>
+      <div class="page-title">System Settings</div>
+      <div class="page-sub">Configure how the YDY platform behaves for your organization</div>
+    </div>
+    <div class="flex-row">
+      <button class="btn btn-primary" onclick="simpleSave()"><i data-lucide="save" size="14"></i> Save Changes</button>
+    </div>
   </div>
 
-  <!-- Row 1: General + HR Policy -->
-  <div class="grid-2 mb-4">
-    <div class="card"><div class="card-header"><div class="card-title">General Settings</div></div><div class="card-body form-grid">
-      <div class="form-group"><label>Company Name</label><input value="HRM Enterprises Ltd."></div>
-      <div class="form-group"><label>Default Currency</label><select><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option><option>ETB (Br)</option></select></div>
-      <div class="form-group"><label>Date Format</label><select><option>MM/DD/YYYY</option><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></div>
-      <div class="form-group"><label>Timezone</label><select><option>UTC-5 (Eastern)</option><option>UTC (GMT)</option><option>UTC+1 (CET)</option><option>UTC+3 (EAT)</option></select></div>
-      <div class="form-group"><label>System Language</label><select><option>English (US)</option><option>English (UK)</option><option>Amharic</option><option>French</option></select></div>
-      <div class="form-group"><label>Fiscal Year Start</label><select><option>January</option><option>April</option><option>July</option><option>October</option></select></div>
-    </div></div>
-    <div class="card"><div class="card-header"><div class="card-title">HR Policy Settings</div></div><div class="card-body form-grid">
-      <div class="form-group"><label>Probation Period (days)</label><input type="number" value="90"></div>
-      <div class="form-group"><label>Notice Period (days)</label><input type="number" value="30"></div>
-      <div class="form-group"><label>Max OT Hours / Week</label><input type="number" value="20"></div>
-      <div class="form-group"><label>Retirement Age</label><input type="number" value="65"></div>
-      <div class="form-group"><label>Working Days / Week</label><select><option>5 Days (Mon–Fri)</option><option>6 Days (Mon–Sat)</option></select></div>
-      <div class="form-group"><label>Default Work Hours / Day</label><input type="number" value="8"></div>
-    </div></div>
+  <!-- Simplified Tab System -->
+  <div class="tabs">
+    <div class="tab active" onclick="setTab(this, 's-app')">Organization</div>
+    <div class="tab" onclick="setTab(this, 's-hr')">HR Policies</div>
+    <div class="tab" onclick="setTab(this, 's-sec')">Security</div>
+    <div class="tab" onclick="setTab(this, 's-notif')">Communications</div>
   </div>
 
-  <!-- Row 2: Payroll + Leave -->
-  <div class="grid-2 mb-4">
-    <div class="card"><div class="card-header"><div class="card-title">Payroll Settings</div></div><div class="card-body form-grid">
-      <div class="form-group"><label>Payroll Cycle</label><select><option>Monthly</option><option>Bi-Weekly</option><option>Weekly</option></select></div>
-      <div class="form-group"><label>Pay Day</label><select><option>Last Working Day</option><option>25th of Month</option><option>1st of Next Month</option></select></div>
-      <div class="form-group"><label>Tax Calculation Method</label><select><option>Progressive</option><option>Flat Rate</option></select></div>
-      <div class="form-group"><label>Social Security Rate (%)</label><input type="number" value="6.2"></div>
-      <div class="form-group"><label>Medicare Rate (%)</label><input type="number" value="1.45"></div>
-      <div class="form-group"><label>Employer Pension Contrib. (%)</label><input type="number" value="4.0"></div>
-    </div></div>
-    <div class="card"><div class="card-header"><div class="card-title">Leave Settings</div></div><div class="card-body form-grid">
-      <div class="form-group"><label>Annual Leave (days/year)</label><input type="number" value="20"></div>
-      <div class="form-group"><label>Sick Leave (days/year)</label><input type="number" value="10"></div>
-      <div class="form-group"><label>Carryover Limit (days)</label><input type="number" value="5"></div>
-      <div class="form-group"><label>Maternity Leave (days)</label><input type="number" value="90"></div>
-      <div class="form-group"><label>Paternity Leave (days)</label><input type="number" value="14"></div>
-      <div class="form-group"><label>Min Advance Notice (days)</label><input type="number" value="3"></div>
-    </div></div>
+  <!-- SECTION: ORGANIZATION -->
+  <div id="s-app" class="settings-content active">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Identity & Branding</div></div>
+        <div class="card-body">
+          <div class="form-group mb-4">
+            <label>Platform Name</label>
+            <input type="text" value="YDY HRM Enterprise">
+          </div>
+          <div class="form-group mb-4">
+            <label>Company Logo</label>
+            <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px dashed var(--border); border-radius:8px; background:#f8fafc;">
+               <div class="brand-icon"><i data-lucide="layers" size="18"></i></div>
+               <button class="btn btn-xs btn-secondary">Upload New</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Regional Defaults</div></div>
+        <div class="card-body">
+          <div class="form-group mb-3">
+            <label>Default Currency</label>
+            <select class="sel"><option>ETB (Birr)</option><option>USD (Dollar)</option></select>
+          </div>
+          <div class="form-group">
+            <label>System Language</label>
+            <select class="sel"><option>English (US)</option><option>Amharic</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Row 3: Security + Email/SMTP -->
-  <div class="grid-2 mb-4">
-    <!-- Security settings with toggle switches for 2FA, IP whitelisting, etc. -->
-    <div class="card"><div class="card-header"><div class="card-title"><i data-lucide="shield" size="14" style="margin-right:6px;color:var(--primary);vertical-align:middle;"></i>Security & Access</div></div><div class="card-body">
-      <div class="form-grid fg-2" style="margin-bottom:16px;">
-        <div class="form-group"><label>Min. Password Length</label><input type="number" value="8"></div>
-        <div class="form-group"><label>Password Expiry (days)</label><input type="number" value="90"></div>
-        <div class="form-group"><label>Session Timeout (minutes)</label><input type="number" value="30"></div>
-        <div class="form-group"><label>Max Failed Login Attempts</label><input type="number" value="5"></div>
+  <!-- SECTION: HR POLICIES (RELATABLE CONTENT) -->
+  <div id="s-hr" class="settings-content" style="display:none;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Default Workforce Rules</div></div>
+      <div class="card-body">
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Daily Work Hours</label>
+            <input type="number" value="8">
+          </div>
+          <div class="form-group">
+            <label>Probation Period (Months)</label>
+            <input type="number" value="3">
+          </div>
+          <div class="form-group">
+            <label>Notice Period (Days)</label>
+            <input type="number" value="30">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="toggle-wrap">
+          <div><div class="toggle-label">Automatic Leave Accrual</div><div class="toggle-sub">Calculate leave balance monthly based on tenure</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-wrap">
+          <div><div class="toggle-label">Strict Attendance</div><div class="toggle-sub">Flag employees as 'Late' after 15 minutes of shift start</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
       </div>
-      <!-- Toggle switches — each is a checkbox styled as a pill toggle -->
-      <div class="toggle-wrap">
-        <div><div class="toggle-label">Two-Factor Authentication (2FA)</div><div class="toggle-sub">Require 2FA for all admin accounts</div></div>
-        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-      </div>
-      <div class="toggle-wrap">
-        <div><div class="toggle-label">Force Password Reset on First Login</div><div class="toggle-sub">New users must change default password</div></div>
-        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-      </div>
-      <div class="toggle-wrap">
-        <div><div class="toggle-label">IP Whitelist Enforcement</div><div class="toggle-sub">Restrict logins to approved IP ranges</div></div>
-        <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
-      </div>
-      <div class="form-group mt-3"><label>Allowed IP Ranges (one per line)</label><textarea placeholder="192.168.1.0/24&#10;10.0.0.0/8" style="min-height:60px;"></textarea></div>
-    </div></div>
-
-    <!-- Email / SMTP configuration for system notifications -->
-    <div class="card"><div class="card-header"><div class="card-title"><i data-lucide="mail" size="14" style="margin-right:6px;color:var(--primary);vertical-align:middle;"></i>Email / SMTP Configuration</div></div><div class="card-body">
-      <div class="form-grid fg-2">
-        <div class="form-group"><label>SMTP Host</label><input value="smtp.gmail.com"></div>
-        <div class="form-group"><label>SMTP Port</label><input type="number" value="587"></div>
-        <div class="form-group"><label>SMTP Username</label><input value="noreply@hrm.com"></div>
-        <div class="form-group"><label>SMTP Password</label><input type="password" value="••••••••••"></div>
-        <div class="form-group"><label>Encryption</label><select><option>TLS (STARTTLS)</option><option>SSL</option><option>None</option></select></div>
-        <div class="form-group"><label>From Name</label><input value="YDY HRM System"></div>
-        <div class="form-group"><label>From Email</label><input value="noreply@hrm.com"></div>
-        <div class="form-group"><label>Reply-To</label><input value="hr@hrm.com"></div>
-      </div>
-      <div class="mt-3"><button class="btn btn-secondary btn-sm"><i data-lucide="send" size="12"></i>Send Test Email</button></div>
-    </div></div>
+    </div>
   </div>
 
-  
+  <!-- SECTION: SECURITY -->
+  <div id="s-sec" class="settings-content" style="display:none;">
+    <div class="card" style="max-width: 600px;">
+      <div class="card-header"><div class="card-title">Access & Privacy</div></div>
+      <div class="card-body">
+        <div class="toggle-wrap">
+          <div><div class="toggle-label">Two-Factor Authentication</div><div class="toggle-sub">Require phone verification for all Managers</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-wrap">
+            <div><div class="toggle-label">Mask Sensitive Data</div><div class="toggle-sub">Hide bank details/salary from non-finance staff</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+        <div class="form-group mt-4">
+          <label>Inactivity Logout</label>
+          <select class="sel"><option>After 15 Minutes</option><option>After 30 Minutes</option><option>After 1 Hour</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: COMMUNICATIONS -->
+  <div id="s-notif" class="settings-content" style="display:none;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Automated Alerts</div></div>
+      <div class="card-body">
+        <div class="grid-2">
+            <div class="flex-col">
+                <div class="toggle-wrap">
+                    <div><div class="toggle-label">New Candidate Email</div><div class="toggle-sub">Alert HR when someone applies</div></div>
+                    <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </div>
+                <div class="toggle-wrap">
+                    <div><div class="toggle-label">Leave Approvals</div><div class="toggle-sub">Notify manager on new leave requests</div></div>
+                    <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="flex-col">
+                <div class="toggle-wrap">
+                    <div><div class="toggle-label">Expiry Alerts</div><div class="toggle-sub">Notify on expiring contracts/IDs</div></div>
+                    <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </div>
+                <div class="toggle-wrap">
+                    <div><div class="toggle-label">System Newsletter</div><div class="toggle-sub">Weekly headcount summary for CEOs</div></div>
+                    <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
   </div><!-- /content-area -->
 </main>
 
@@ -2396,7 +2439,7 @@ function initPage(id) {
       buildTable('tbl-job-positions', { columns:[{key:'title',label:'Job Title'},{key:'dept',label:'Department'},{key:'count',label:'Headcount'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(28, i => ({ code:`JP${String(i+1).padStart(3,'0')}`, title:['Software Engineer','Sales Manager','HR Business Partner','Finance Analyst','Product Manager','UX Designer','DevOps Engineer','Data Scientist','Legal Counsel','Support Lead'][i%10], dept:rand(depts), grade:['L1','L2','L3','L4','M1','M2','S1','S2'][i%8], min:fmtMoney(randInt(40,80)*1000), max:fmtMoney(randInt(80,150)*1000), count:randInt(2,40) })) }); break;
     case 'branch-offices':
       buildTable('tbl-branch-offices', { columns:[{key:'code',label:'Code'},{key:'name',label:'Branch Name'},{key:'city',label:'City'},{key:'country',label:'Country'},{key:'manager',label:'Branch Manager'},{key:'emp',label:'Staff'},{key:'status',label:'Status'},{key:'_',label:'Actions',render:()=>actions}], rows: gen(12, i => ({ code:`BR${String(i+1).padStart(2,'0')}`, name:['HQ','North','South','East','West','APAC','EMEA','LATAM','Canada','Australia','UK','Singapore'][i]+' Office', city:['New York','Chicago','Atlanta','Boston','San Jose','Singapore','London','São Paulo','Toronto','Sydney','Manchester','Tokyo'][i], country:['USA','USA','USA','USA','USA','Singapore','UK','Brazil','Canada','Australia','UK','Japan'][i], manager:names[i%names.length], emp:randInt(30,320), status:statuses.active })) }); break;
-case 'employee-directory':
+    case 'employee-directory':
       buildTable('tbl-employees', { 
         columns: [
           {key:'id', label:'Emp ID'},
@@ -3120,6 +3163,48 @@ function saveReassignment() {
 
     alert(`Reassignment Successful: ${asset} has been transferred to ${newOwner}.`);
     closeReassignModal();
+}
+/**
+ * Simple Tab Switcher for Settings
+ */
+function setTab(el, targetId) {
+  // Remove 'active' from all tabs in this page
+  document.querySelectorAll('#p-system-settings .tab').forEach(t => t.classList.remove('active'));
+  // Add 'active' to clicked tab
+  el.classList.add('active');
+
+  // Hide all settings-content divs
+  document.querySelectorAll('.settings-content').forEach(c => c.style.display = 'none');
+  // Show target
+  document.getElementById(targetId).style.display = 'block';
+
+  // Re-run icons for new content
+  if(window.lucide) lucide.createIcons();
+}
+
+/**
+ * Mock Save Feedback
+ */
+function simpleSave() {
+  const btn = document.querySelector('#p-system-settings .btn-primary');
+  const original = btn.innerHTML;
+  
+  btn.innerHTML = '<i data-lucide="loader-2" class="spin" size="14"></i> Saving...';
+  btn.style.opacity = '0.7';
+  lucide.createIcons();
+
+  setTimeout(() => {
+    btn.innerHTML = '<i data-lucide="check" size="14"></i> All Saved';
+    btn.style.background = 'var(--success)';
+    btn.style.opacity = '1';
+    lucide.createIcons();
+
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.style.background = '';
+      lucide.createIcons();
+    }, 2000);
+  }, 800);
 }
 </script>
 </body>
