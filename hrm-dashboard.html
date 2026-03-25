@@ -61,12 +61,16 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); colo
 .nav-trigger, .dash-link {
   display: flex;
   align-items: center;
-  padding: 10px 14px; /* Increased horizontal padding */
-  margin: 2px 8px;    /* Give items some "breathing room" from the edges */
-  gap: 12px;          /* Clean gap between icon and text */
+  /* Keep padding and margin consistent to prevent jumping */
+  padding: 10px; 
+  margin: 4px 8px;
+  gap: 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.2s, color 0.2s;
+  height: 44px; /* Fixed height prevents vertical jumping */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevents text from leaking out during animation */
 }
 
 .nav-trigger-left {
@@ -77,32 +81,31 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); colo
 }
 
 .nav-icon {
-  width: 32px;        /* Standardized size */
+  width: 32px;
   height: 32px;
-  display: flex;      /* Center the actual icon inside the box */
+  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   background: #f1f5f9;
-  flex-shrink: 0;     /* Prevent icon from squishing */
+  flex-shrink: 0; /* Critical: Prevents icon from squishing */
 }
-
 /* Collapsed (Rail) State Spacing */
 .sidebar.collapsed { width: 78px; } /* Slightly wider for better icon centering */
 
 .sidebar.collapsed .nav-trigger,
-.sidebar.collapsed .dash-link {
-  justify-content: center;
+.sidebar.collapsed .dash-link { 
+  margin: 4px 8px; 
   padding: 10px 0;
-  margin: 4px 0; 
-  gap: 0;
+  justify-content: flex-start; /* Keep icons left-aligned to match the "rail" center */
 }
 
 .sidebar.collapsed .nav-trigger-left { gap: 0; }
 
 .sidebar.collapsed .nav-icon {
-  width: 42px;
-  height: 42px;
+  margin: 0 auto; 
+  width: 32px; /* Keep size consistent with expanded state */
+  height: 32px;
 }
 
 /* Hide text precisely when collapsed */
@@ -228,7 +231,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); colo
 .submenu.open { max-height: 1000px; }
 .sub-link { display: flex; align-items: center; gap: 8px; padding: 7px 10px; color: var(--muted); font-size: .77rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all .15s; margin-bottom: 1px; white-space: nowrap; }
 .sub-link:hover { color: var(--primary); background: #f8fafc; }
-.sub-link.active { color: var(--primary); background: var(--primary-light); font-weight: 600; }
+.sub-link.active { color: var(--primary) !important;; background: var(--primary-light); font-weight: 700; }
 .sub-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
 .sub-link.active .sub-dot { background: var(--primary); }
 .dash-link { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 8px; font-size: .8rem; font-weight: 600; cursor: pointer; color: #334155; transition: all .15s; white-space: nowrap; }
@@ -475,10 +478,10 @@ input[type="checkbox"] { accent-color: var(--primary); width: 15px; height: 15px
   background: var(--primary-light);
 }
 
-.nav-trigger.parent-active .nav-icon {
-  background: var(--primary);
-  color: white;
+.nav-trigger.parent-active .nav-icon { 
+  color: var(--primary)!important;
 }
+
 </style>
 </head>
 <body>
@@ -1444,6 +1447,7 @@ window.addEventListener('resize', () => {
 
 // ══ NAVIGATION ══ 
 function toggleNav(el, id) {
+  // If sidebar is collapsed, expand it first
   if (sidebarCollapsed && !isMobile()) {
     toggleSidebar();
     return;
@@ -1452,55 +1456,53 @@ function toggleNav(el, id) {
   const sub = document.getElementById(id);
   const isOpen = sub.classList.contains('open');
 
-  // Close other menus EXCEPT the one we are clicking
+  // --- THE "TOUCH" CLEANUP ---
+  // When a category is clicked, remove 'parent-active' and 'open' from ALL other headers
+  document.querySelectorAll('.nav-trigger').forEach(t => {
+    if (t !== el) t.classList.remove('open', 'parent-active');
+  });
+  
+  // Close all other submenus
   document.querySelectorAll('.submenu').forEach(s => {
     if (s !== sub) s.classList.remove('open');
   });
-  document.querySelectorAll('.nav-trigger').forEach(t => {
-    if (t !== el) t.classList.remove('open');
-  });
 
-  // Toggle the current one
-  sub.classList.toggle('open', !isOpen);
-  el.classList.toggle('open', !isOpen);
+  // Toggle the one the user just "touched"
+  if (!isOpen) {
+    el.classList.add('open', 'parent-active');
+    sub.classList.add('open');
+  } else {
+    el.classList.remove('open', 'parent-active');
+    sub.classList.remove('open');
+  }
 }
 
 function goPage(id, el) {
-  // 1. Switch the Page visibility
+  // 1. Page Visibility
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('p-' + id);
   if (pg) pg.classList.add('active');
 
-  // 2. Update Breadcrumb Title
+  // 2. Breadcrumb
   document.getElementById('page-title').textContent = el ? el.textContent.trim() : 'Dashboard';
 
-  // 3. Handle Link Highlighting
+  // 3. Sub-link cleanup
   document.querySelectorAll('.sub-link, .dash-link').forEach(l => l.classList.remove('active'));
-  
-  if (el) {
-    el.classList.add('active');
+  if (el) el.classList.add('active');
 
-    // 4. FIND THE PARENT CATEGORY
-    // Check if this link is inside a submenu
-    const parentSubmenu = el.closest('.submenu');
-    
-    if (parentSubmenu) {
-      // Keep the submenu visualy expanded
-      parentSubmenu.classList.add('open');
-      
-      // Find the trigger (the "Category" button) associated with this submenu
-      // We look for the nav-trigger that has the onclick matching this submenu's ID
-      const trigger = document.querySelector(`.nav-trigger[onclick*="${parentSubmenu.id}"]`);
-      if (trigger) {
-        trigger.classList.add('open');
-        // Add a special class for CSS styling if you want the parent to stay green
-        trigger.classList.add('parent-active'); 
-      }
-    } else {
-      // If it's a top-level link (like Dashboard), close other menus
-      document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-      document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open', 'parent-active'));
-    }
+  // 4. --- PARENT HIGHLIGHT LOGIC ---
+  // Remove highlight from ALL category headers first
+  document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('parent-active'));
+
+  const parentSub = el.closest('.submenu');
+  if (parentSub) {
+    // If the link is inside a category, highlight that specific parent
+    const trigger = document.querySelector(`.nav-trigger[onclick*="${parentSub.id}"]`);
+    if (trigger) trigger.classList.add('parent-active');
+  } else {
+    // If clicking "Dashboard" (which has no submenu), close all accordions
+    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+    document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
   }
 
   initPage(id);
