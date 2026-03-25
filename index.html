@@ -21,6 +21,7 @@
   --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
   --shadow-md:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.05);
   --transition:.28s cubic-bezier(.4,0,.2,1);
+  
 }
 
 /* --- THEMED SCROLLBARS (GLOBAL) --- */
@@ -68,10 +69,6 @@
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgb(0, 0, 0);z-index:199;opacity:0;transition:opacity var(--transition)}
-.sidebar-overlay.visible{opacity:1}
-.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:200;transition:width var(--transition),transform var(--transition);overflow:visible}
-.sidebar.collapsed { max-height: 0 !important;}
 .submenu {
   overflow: hidden;
   max-height: 0;
@@ -80,7 +77,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 }
 .submenu.open {
   max-height: 1000px;
-}
+}.sidebar-overlay{display:none;position:fixed;inset:0;background:rgb(0, 0, 0);z-index:199;opacity:0;transition:opacity var(--transition)}
+.sidebar-overlay.visible{opacity:1}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:200;transition:width var(--transition),transform var(--transition);overflow:visible}
+.sidebar.collapsed { max-height: 0 !important;}
+
 
 .sidebar.collapsed .nav-group:hover{ max-height: none !important; display: flex !important;}
 .sidebar.collapsed{width:78px;overflow:visible!important}
@@ -129,7 +130,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .dash-link:hover,.dash-link.active{background:var(--primary-light);color:var(--primary)}
 .sidebar.collapsed .nav-trigger,.sidebar.collapsed .dash-link{margin:4px 8px;padding:10px 0;justify-content:flex-start}
 .sidebar.collapsed .nav-trigger-left{gap:0}
-.sidebar.collapsed .nav-icon{margin:0 auto;width:32px;height:32px}
+.sidebar.collapsed .nav-icon{margin:0 auto;width:32px;height:32px;}
 .sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .nav-label,.sidebar.collapsed span,.sidebar.collapsed .chevron{display:none!important}
 @media(min-width:769px){
   .sidebar.collapsed .nav-group{position:relative}
@@ -341,6 +342,128 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 .vault-slot:hover{transform:scale(1.1);filter:brightness(.9)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin .8s linear infinite}
+
+/* --- PROFESSIONAL COMMAND CENTER STYLES --- */
+.db-hero-banner {
+  background: var(--primary);
+  background: linear-gradient(135deg, #15b201 0%, #0f8a00 100%);
+  border-radius: 20px;
+  padding: 32px;
+  color: white;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(21, 178, 1, 0.3);
+}
+
+/* Subtle background pattern for professional texture */
+.db-hero-banner::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.1;
+  background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.db-hero-content { position: relative; z-index: 1; }
+.db-hero-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+.db-hero-sub { font-size: 0.85rem; opacity: 0.9; font-weight: 500; }
+
+.db-quick-actions {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* The Professional "Glass" Button */
+.btn-glass-pro {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-glass-pro:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Bento Grid System */
+.bento-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.bento-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.bento-item:hover { border-color: var(--primary); }
+
+.stat-v6-label { font-size: 0.7rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-v6-value { font-size: 1.8rem; font-weight: 800; color: var(--text); margin: 4px 0; }
+.stat-v6-trend { font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+
+/* Dashboard Chart Area */
+.chart-main-wrap { grid-column: span 3; padding: 20px;}
+.activity-side-wrap { grid-column: span 1; }
+
+@media (max-width: 1200px) {
+  .bento-container { grid-template-columns: repeat(2, 1fr); }
+  .chart-main-wrap, .activity-side-wrap { grid-column: span 2; }
+}
+
+@media (max-width: 768px) {
+  .db-hero-banner { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .bento-container { grid-template-columns: 1fr; }
+  .chart-main-wrap, .activity-side-wrap { grid-column: span 1; }
+}
+/* Quick Actions Label inside Hero */
+.qa-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  opacity: 0.9;
+  display: block;
+}
+
+/* System Logs Filling the space */
+.log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+/* No Activities Placeholder */
+.no-activity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  gap: 8px;
+  opacity: 0.6;
+  padding: 40px 0;
+}
 </style>
 </head>
 <body>
@@ -534,27 +657,85 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 
 <!-- DASHBOARD -->
 <div class="page active" id="p-dashboard">
-  <div class="brand-strip" style="margin-bottom:20px;">
-    <div style="display:flex;align-items:center;gap:16px;">
-      <div style="background:rgba(255,255,255,.2);padding:10px;border-radius:8px;"><i data-lucide="crown" size="28"></i></div>
-      <div><h1 style="font-size:1.2rem;font-weight:800;line-height:1;">Welcome, YDY</h1><p style="font-size:.7rem;opacity:.8;margin-top:4px;">Here's what's happening today — March 25, 2026</p></div>
+  
+  <!-- BRAND HERO BANNER -->
+  <header class="db-hero-banner">
+    <div class="db-hero-content">
+      <h1 class="db-hero-title">Dashboard Intelligence</h1>
+      <p class="db-hero-sub">Welcome back, YDY. Here is your organization analysis</p>
+    </div>
+    
+    <div>
+      <center><span class="qa-label">Quick Actions</span></center>
+      <div class="db-quick-actions">
+        <button class="btn-glass-pro" onclick="goPage('employee-directory')">
+          <i data-lucide="user-plus" size="16"></i> New Hire
+        </button>
+        <button class="btn-glass-pro" onclick="goPage('leave-requests')">
+          <i data-lucide="calendar" size="16"></i> Leaves
+        </button>
+        <button class="btn-glass-pro" onclick="goPage('hr-analytics')">
+          <i data-lucide="bar-chart-3" size="16"></i> Analytics
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- BENTO GRID -->
+  <div class="bento-container">
+    <!-- Row 1 Stats -->
+    <div class="bento-item"><div class="stat-v6-label">Total Headcount</div><div class="stat-v6-value">1,248</div><div class="stat-v6-trend" style="color:var(--success);"><i data-lucide="trending-up" size="14"></i> +12</div></div>
+    <div class="bento-item"><div class="stat-v6-label">Present Today</div><div class="stat-v6-value">96.2%</div><div class="stat-v6-trend" style="color:var(--primary);"><i data-lucide="check-circle-2" size="14"></i> Stable</div></div>
+    <div class="bento-item"><div class="stat-v6-label">On Leave</div><div class="stat-v6-value">47</div><div class="stat-v6-trend" style="color:var(--warning);"><i data-lucide="clock" size="14"></i> 12 Pending</div></div>
+    <div class="bento-item"><div class="stat-v6-label">Open Roles</div><div class="stat-v6-value">23</div><div class="stat-v6-trend" style="color:var(--info);"><i data-lucide="briefcase" size="14"></i> 4 Critical</div></div>
+
+    <!-- MAIN CHART AREA (Simplified to Bar Chart) -->
+    <div class="bento-item chart-main-wrap">
+       <div class="card-header" style="border:none; padding:0 0 10px 0;">
+      <div>
+      <div class="card-title">Headcount by Department</div>
+      <div class="page-sub">Current active personnel distribution</div>
     </div>
   </div>
-  <div class="stats-row stats-4">
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Total Employees</div><div class="stat-value">1,248</div></div><div class="stat-icon-wrap" style="background:#eff6ff;color:#15b201;"><i data-lucide="users" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">On Leave Today</div><div class="stat-value">47</div></div><div class="stat-icon-wrap" style="background:#fef3c7;color:#d97706;"><i data-lucide="umbrella" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Open Positions</div><div class="stat-value">23</div></div><div class="stat-icon-wrap" style="background:#dcfce7;color:#2563eb;"><i data-lucide="briefcase" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Pending Approvals</div><div class="stat-value">18</div></div><div class="stat-icon-wrap" style="background:#fee2e2;color:#dc2626;"><i data-lucide="clock" size="20"></i></div></div></div>
+  
+  <!-- Reduced height for a more "Executive" look -->
+  <div style="height: 240px; position: relative;"> 
+    <canvas id="chart-headcount-bar"></canvas>
   </div>
-  <div class="stats-row stats-4">
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Net Payroll (Mar)</div><div class="stat-value" style="font-size:1.15rem;">$336,100</div></div><div class="stat-icon-wrap" style="background:#f0fdf4;color:#16a34a;"><i data-lucide="banknote" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Avg Attendance</div><div class="stat-value">96.2%</div></div><div class="stat-icon-wrap" style="background:#f0f9ff;color:#0891b2;"><i data-lucide="check-circle-2" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">New Hires (MTD)</div><div class="stat-value">12</div></div><div class="stat-icon-wrap" style="background:#fdf4ff;color:#9333ea;"><i data-lucide="user-check" size="20"></i></div></div></div>
-    <div class="stat-card"><div class="stat-flex"><div><div class="stat-label">Turnover Rate (YTD)</div><div class="stat-value">4.2%</div></div><div class="stat-icon-wrap" style="background:#fff7ed;color:#ea580c;"><i data-lucide="trending-up" size="20"></i></div></div></div>
-  </div>
-  <div class="dash-chart-row">
-    <div class="card"><div class="card-header"><div class="card-title">Employee Composition</div></div><div class="card-body" style="height:240px;"><canvas id="chart-composition"></canvas></div></div>
-    <div class="card"><div class="card-header"><div class="card-title">Active Headcount by Department</div></div><div class="card-body" style="height:240px;"><canvas id="chart-dept"></canvas></div></div>
+</div>
+
+    <!-- SYSTEM LOGS (Full height, no button) -->
+    <div class="bento-item activity-side-wrap" id="log-panel">
+      <div class="card-header" style="border:none; padding:0 0 20px 0;">
+        <div class="card-title" style="font-size:0.75rem;">System Logs</div>
+      </div>
+      
+      <div class="log-container" id="log-list">
+        <!-- Activities -->
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:8px; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="user-check" size="14"></i></div>
+          <div><div style="font-size:0.75rem; font-weight:700;">Abebe M. Joined</div><div style="font-size:0.65rem; color:var(--muted);">Engineering Dept.</div></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:8px; background:var(--warning-bg); color:var(--warning); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="alert-circle" size="14"></i></div>
+          <div><div style="font-size:0.75rem; font-weight:700;">Contract Expiry</div><div style="font-size:0.65rem; color:var(--muted);">8 Contracts due in 30 days</div></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:8px; background:var(--info-bg); color:var(--info); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="file-text" size="14"></i></div>
+          <div><div style="font-size:0.75rem; font-weight:700;">Payroll Exported</div><div style="font-size:0.65rem; color:var(--muted);">March 2026 Batch A</div></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:8px; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="check-square" size="14"></i></div>
+          <div><div style="font-size:0.75rem; font-weight:700;">Policy Updated</div><div style="font-size:0.65rem; color:var(--muted);">Health & Safety Guidelines</div></div>
+        </div>
+
+        <!-- This div only appears if there are no logs (controlled by JS or hidden manually) -->
+        <div class="no-activity" id="no-activity-msg" style="display:none;">
+          <i data-lucide="database-zap" size="32"></i>
+          <span style="font-size:0.75rem; font-weight:600;">No recent activities</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1543,20 +1724,191 @@ function initVaultMatrix() {
   wrapper.id = 'tbl-vault-matrix-final';
   container.appendChild(wrapper);
   buildTable('tbl-vault-matrix-final', {columns:cols, rows, perPage:12});
-  lucide.createIcons();
+  lucide.createIcons();function initDashboard() {
+  if (inited.has('dashboard-v8-final')) return;
+  inited.add('dashboard-v8-final');
+
+  const canvas = document.getElementById('chart-headcount-bar');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Create a Premium Horizontal Gradient
+  const gradient = ctx.createLinearGradient(0, 0, 450, 0);
+  gradient.addColorStop(0, '#15b201'); // Brand Primary
+  gradient.addColorStop(1, '#a3e635'); // Vibrant Lime
+
+  const dataValues = [490, 320, 210, 145, 88, 45];
+  const labelNames = ['Operations', 'Engineering', 'Sales', 'Marketing', 'Finance', 'HR'];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labelNames,
+      datasets: [{
+        data: dataValues,
+        backgroundColor: gradient,
+        hoverBackgroundColor: '#0f8a00',
+        borderRadius: 20,       // Elegant "Pill" shape
+        borderSkipped: false,  // Rounding on both ends
+        barThickness: 12,      // Slim, modern bar width
+      }]
+    },
+    options: {
+      indexAxis: 'y',          // Flip to Horizontal
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: '700' },
+          bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+          padding: 12,
+          cornerRadius: 10,
+          displayColors: false,
+          callbacks: {
+            label: (context) => ` ${context.raw} Personnel`
+          }
+        }
+      },
+      scales: {
+        // Hide the X-Axis (Bottom) for a clean dashboard look
+        x: {
+          display: false,
+          grid: { display: false }
+        },
+        // Left Axis: Department Names
+        y: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+            color: '#1e293b',
+            padding: 10
+          }
+        },
+        // Right Axis: The "No-Plugin" data labels
+        yRight: {
+          type: 'category',
+          position: 'right',
+          labels: dataValues.map(v => v.toLocaleString()), 
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 11, weight: '700' },
+            color: '#64748b',
+            padding: 10
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: 5,
+          bottom: 5,
+          left: 0,
+          right: 0
+        }
+      }
+    }
+  });
+
+  // Ensure system logs empty state logic stays intact
+  const logList = document.querySelectorAll('#log-list > div:not(.no-activity)');
+  const emptyState = document.getElementById('no-activity-msg');
+  if (logList.length === 0 && emptyState) {
+    emptyState.style.display = 'flex';
+  }
+}
 }
 
 // ── CHARTS ──
 function initDashboard() {
-  if (inited.has('dashboard-charts')) return;
-  inited.add('dashboard-charts');
-  const gridCfg = { color: '#f1f5f9' };
-  const c1 = document.getElementById('chart-composition');
-  if (c1) new Chart(c1, {type:'doughnut',data:{labels:['Permanent','Contract','Part-Time','Intern'],datasets:[{data:[912,248,55,33],backgroundColor:['#15b201','#fff200','#d97706','#ff0000'],borderWidth:0,cutout:'72%'}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
-  const c2 = document.getElementById('chart-dept');
-  if (c2) new Chart(c2, {type:'bar',data:{labels:['Engineering','Sales','HR','Finance','Marketing','Ops'],datasets:[{label:'Headcount',data:[320,210,45,88,95,490],backgroundColor:'#15b201',borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:gridCfg},x:{grid:{display:false}}}}});
-}
+  if (inited.has('dashboard-v8')) return;
+  inited.add('dashboard-v8');
 
+  const canvas = document.getElementById('chart-headcount-bar');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Create a professional horizontal gradient
+  // From Brand Green to a lighter, vibrant lime
+  const gradient = ctx.createLinearGradient(0, 0, 500, 0);
+  gradient.addColorStop(0, '#15b201'); // Darker Green
+  gradient.addColorStop(1, '#84cc16'); // Vibrant Lime
+
+  const dataValues = [490, 320, 210, 145, 88, 45];
+  const labelNames = ['Operations', 'Engineering', 'Sales', 'Marketing', 'Finance', 'HR'];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labelNames,
+      datasets: [{
+        data: dataValues,
+        backgroundColor: gradient,
+        hoverBackgroundColor: '#0f8a00',
+        borderRadius: 20,       // Makes bars look like modern "Pills"
+        borderSkipped: false,  // Rounds both sides
+        barThickness: 15,      // Thinner bars look more professional
+      }]
+    },
+    options: {
+      indexAxis: 'y',          // Horizontal orientation
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+          bodyFont: { family: 'Plus Jakarta Sans' },
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            label: (context) => ` ${context.raw} Active Personnel`
+          }
+        }
+      },
+      scales: {
+        // X-Axis: Hidden completely for the "Modern Progress Bar" look
+        x: {
+          display: false,
+          grid: { display: false }
+        },
+        // Y-Axis Left: Department Names
+        y: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+            color: '#1e293b'
+          }
+        },
+        // Y-Axis Right: The "No-Plugin" Hack to show numbers
+        yRight: {
+          type: 'category',
+          position: 'right',
+          labels: dataValues.map(v => v + ' Pax'), // Display headcount here
+          grid: { display: false },
+          border: { display: false },
+          ticks: {
+            font: { family: 'JetBrains Mono', size: 11, weight: '700' },
+            color: '#64748b',
+            padding: 10
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: 10,
+          bottom: 10,
+          left: 0,
+          right: 10
+        }
+      }
+    }
+  });
+}
 function initAnalytics() {
   if (inited.has('analytics-charts')) return;
   inited.add('analytics-charts');
