@@ -96,6 +96,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* 3. The scrollable area */
 .sidebar.collapsed .sidebar-scroll {
   background: #ffffff !important;
+   overflow-y: auto !important; /* Enable vertical scrolling */
+  overflow-x: hidden !important; /* Hide horizontal scroll */
 }
 
 /* 4. REMOVE the light grey boxes behind the icons */
@@ -385,8 +387,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   align-items: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px -10px rgba(21, 178, 1, 0.3);
-  clip-path: polygon(0 10%, 45% 10%, 45% 0, 55% 0, 55% 10%, 100% 10%, 100% 90%, 55% 90%, 55% 100%, 45% 100%, 45% 90%, 0 90%);
+  box-shadow: 0 10px 30px -10px rgba(21, 178, 1, 0.3); 
 }
 
 /* Subtle background pattern for professional texture */
@@ -432,7 +433,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 /* FIX: Prevent chart from stretching to match activity height */
 .bento-container {
   display: grid;
- grid-template-columns: 1fr 1fr 0.75fr 1.25fr; 
+ grid-template-columns: 1fr 1fr 0.95fr 1.25fr; 
   gap: 20px;
   align-items: start;
 }
@@ -892,23 +893,31 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
     justify-content: center;
   }
 }
-/* Position the logo inside the protruding middle box */
-.db-center-logo {
+/* Centered Hero Image */
+.db-hero-center-img {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 10%; /* This matches the 45% to 55% area of your clip-path */
+  height: 100%; /* Adjust this to make the image larger or smaller */
+  max-height: 140px; 
+  width: auto;
+  pointer-events: none; /* Allows clicking through the image if it overlaps buttons */
+  z-index: 1;
+  opacity: 0.8; /* Subtle transparency looks more professional */
 }
 
-.db-center-logo img {
-  max-height: 45px; /* Adjust this to fit your logo nicely */
-  width: auto;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+/* Hide or shrink image on mobile to prevent overlapping text */
+@media (max-width: 900px) {
+  .db-hero-center-img {
+    opacity: 0.2; /* Fade it out more on tablet */
+    max-height: 80px;
+  }
+}
+@media (max-width: 600px) {
+  .db-hero-center-img {
+    display: none; /* Hide completely on small phones */
+  }
 }
 </style>
 </head>
@@ -1108,11 +1117,14 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 <!-- DASHBOARD --> 
 <div class="page active" id="p-dashboard">
   
-<header class="db-hero-banner" style="padding: 16px 28px; min-height: auto;">
+<header class="db-hero-banner" style="padding: 16px 28px; min-height: auto; position: relative;">
   <div class="db-hero-content">
     <h1 class="db-hero-title" style="font-size: 1.5rem;">Dashboard Intelligence</h1>
     <p class="db-hero-sub">Organization performance is at peak efficiency.</p>
   </div>
+  
+  <!-- CENTER IMAGE -->
+  <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
   
   <!-- COMPACT QUICK ACTIONS STACK -->
   <div class="qa-stack-v2">
