@@ -275,28 +275,158 @@ table.tbl tr:hover td:last-child{background:#fcfdfe!important}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;transition:border .15s}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff}
 .form-group textarea{resize:vertical;min-height:80px}
-.oc-scroll-wrap{width:100%;overflow:auto;padding:60px 20px;background:#f8fafc;min-height:400px;display:flex;justify-content:center;-webkit-overflow-scrolling:touch}
-#oc-container{display:flex;justify-content:center;transform-origin:top center;transition:transform .2s}
-.oc-tree,.oc-tree ul,.oc-tree li{list-style:none;margin:0;padding:0;position:relative}
-.oc-tree{display:flex;justify-content:center}
-.oc-tree ul{display:flex;padding-top:20px;flex-wrap:wrap;justify-content:center}
-.oc-tree li{display:flex;flex-direction:column;align-items:center;position:relative;padding:20px 10px 0}
-.oc-tree li::before,.oc-tree li::after{content:'';position:absolute;top:0;right:50%;width:50%;height:20px;border-top:2px solid #cbd5e1}
-.oc-tree li::after{left:50%;border-left:2px solid #cbd5e1}
-.oc-tree li:only-child::after,.oc-tree li:only-child::before{display:none}
-.oc-tree li:only-child{padding-top:0}
-.oc-tree li:first-child::before,.oc-tree li:last-child::after{border:none}
-.oc-tree li:last-child::before{border-right:2px solid #cbd5e1;border-radius:0 5px 0 0}
-.oc-tree li:first-child::after{border-radius:5px 0 0 0}
-.oc-tree ul::before{content:'';position:absolute;top:0;left:50%;width:0;height:20px;border-left:2px solid #cbd5e1}
-.oc-node{width:160px;background:var(--surface);border:1px solid var(--border);padding:12px;border-radius:12px;box-shadow:var(--shadow);text-align:center;z-index:10;transition:all .2s;cursor:default}
-.oc-node:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 10px 20px rgba(0,0,0,.08)}
-.oc-avatar{width:45px;height:45px;background:var(--primary-light);color:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:800;font-size:.8rem;border:2px solid #fff;box-shadow:0 0 0 1px var(--border)}
-.oc-name{font-size:.78rem;font-weight:700;color:var(--text);display:block}
-.oc-role{font-size:.62rem;color:var(--muted);text-transform:uppercase;font-weight:600;margin-top:4px;display:block}
-.oc-node.ceo{border-top:4px solid #0f172a}
-.oc-node.vp{border-top:4px solid var(--primary)}
-.oc-node.mgr{border-top:4px solid var(--success)}
+/* --- PREMIUM ORG CHART DESIGN --- */
+.oc-blueprint {
+    width: 100%;
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
+    background-size: 30px 30px; /* Blueprint Grid */
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 20px;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+     min-height: 500px;
+    align-items: flex-start; /* Keeps it pinned to top while scaling */
+    padding-top: 40px;
+}
+
+.oc-container {
+    display: inline-block;
+    text-align: center;
+}
+
+/* Connectors */
+.oc-tree ul {
+    padding-top: 40px; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+}
+
+.oc-tree li {
+    list-style-type: none;
+    position: relative;
+    padding: 40px 10px 0 10px;
+}
+
+.oc-tree li::before, .oc-tree li::after {
+    content: '';
+    position: absolute; top: 0; right: 50%;
+    border-top: 2px solid #cbd5e1;
+    width: 50%; height: 40px;
+}
+/* --- THE FIX: Remove top-most connector lines --- */
+
+/* 1. Remove the horizontal lines for the first person only */
+.oc-tree > li::before, 
+.oc-tree > li::after {
+    display: none !important;
+}
+
+/* 2. Remove the top gap above the first person */
+.oc-tree > li {
+    padding-top: 0 !important;
+}
+
+/* 3. Remove the tiny vertical line coming from the very top parent */
+.oc-tree::before {
+    display: none !important;
+}
+.oc-tree li::after {
+    right: auto; left: 50%;
+    border-left: 2px solid #cbd5e1;
+}
+.oc-tree li:only-child::after, .oc-tree li:only-child::before { display: none; }
+.oc-tree li:only-child { padding-top: 0; }
+.oc-tree li:first-child::before, .oc-tree li:last-child::after { border: 0 none; }
+.oc-tree li:last-child::before { border-right: 2px solid #cbd5e1; border-radius: 0 5px 0 0; }
+.oc-tree li:first-child::after { border-radius: 5px 0 0 0; }
+
+.oc-tree ul::before {
+    content: '';
+    position: absolute; top: 0; left: 50%;
+    border-left: 2px solid #cbd5e1;
+    width: 0; height: 40px;
+}
+
+/* Node/Card Styling */
+.oc-node {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 200px;
+    display: inline-block;
+    position: relative;
+    z-index: 10;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.oc-node:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: var(--primary);
+}
+
+.oc-node-header {
+    padding: 8px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.oc-id { font-size: 9px; font-weight: 800; color: var(--muted); font-family: 'JetBrains Mono'; }
+
+.oc-node-body {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+}
+
+.oc-node-avatar {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.oc-node-info { min-width: 0; }
+.oc-node-name { font-size: 0.85rem; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oc-node-role { font-size: 0.65rem; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+.oc-node-footer {
+    padding: 6px 12px;
+    background: #f8fafc;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    border-top: 1px solid #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Level Specifics */
+.oc-ceo { border-top: 4px solid #0f172a; width: 220px; }
+.oc-mgr { border-top: 4px solid var(--primary); }
+.oc-staff { border-top: 4px solid #cbd5e1; width: 170px; padding: 12px; }
+.oc-staff .oc-node-name { font-size: 0.75rem; text-align: center; width: 100%; }
+.oc-staff .oc-node-role { font-size: 0.6rem; text-align: center; width: 100%; }
+
+/* Drag cursor hint */
+.oc-blueprint:active { cursor: grabbing; }
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;display:none;align-items:center;justify-content:center;padding:16px}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--surface);border-radius:14px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
@@ -373,7 +503,44 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 .vault-slot:hover{transform:scale(1.1);filter:brightness(.9)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin .8s linear infinite}
+@media(min-width:769px){ 
+  .sidebar.collapsed .nav-group:hover .submenu {
+    display:flex!important;
+    position:absolute;
+    left:70px; 
+  }
+}
+/* --- EASY MOBILE HIDE --- */
+@media (max-width: 800px) {
+  .sidebar {
+    transform: translateX(-100%); /* Completely hidden to the left */
+    position: fixed;
+    height: 100vh;
+    width: 280px !important; /* Set a standard mobile width */
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out; /* Smooth slide-in effect */
+  }
 
+  .sidebar.mobile-open {
+    transform: translateX(0); /* Slides into view */
+  }
+
+  .main {
+    margin-left: 0 !important; /* Ensure content takes full width */
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none; /* Hidden by default */
+  }
+
+  .sidebar-overlay.visible {
+    display: block; /* Show darkened background when menu is open */
+  }
+}
 /* --- PROFESSIONAL COMMAND CENTER STYLES --- */
 .db-hero-banner {
   background: var(--primary);
@@ -431,15 +598,10 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 }
 /* --- MAIN DASHBOARD GRID CONTROL --- */
 .bento-container {
-  display: grid;
-  /* CHANGE WIDTHS HERE: 
-     1fr 1fr = 50% / 50% (Equal Width)
-     7fr 3fr = 70% / 30% 
-     6fr 4fr = 60% / 40% 
-  */
+  display: grid; 
   grid-template-columns: 1fr 1fr; 
   gap: 24px;
-  align-items: stretch; /* This keeps both cards the same height */
+  align-items: stretch;  
   width: 100%;
 }
 
@@ -696,7 +858,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   background: rgba(15, 23, 42, 0.08); 
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
   border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
@@ -1427,7 +1589,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   <!-- CENTER IMAGE -->
   <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
   
-   <button class="btn-glass-pro-slim"  >
+   <button class="btn-glass-pro-slim"  onclick="openEditCompanyModal(this)">
         <i data-lucide="edit" size="14"></i>
         <span>Update records</span>
       </button>
@@ -1501,22 +1663,99 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
     </div>
 </div>
 
-<!-- ORG CHART -->
+<!-- ORG CHART PAGE -->
 <div class="page" id="p-org-chart">
   <div class="page-header">
-    <div><div class="page-title">Company Hierarchy</div><div class="page-sub">Organizational reporting structure and chain of command</div></div>
-    <div class="flex-row">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:4px;display:flex;align-items:center;">
-        <button class="icon-btn" onclick="zoomOC(-.1)"><i data-lucide="minus" size="14"></i></button>
-        <span id="oc-zoom-label" style="font-size:.75rem;font-weight:800;width:50px;text-align:center;">100%</span>
-        <button class="icon-btn" onclick="zoomOC(.1)"><i data-lucide="plus" size="14"></i></button>
-      </div>
-      <button class="btn btn-secondary" onclick="initOrgChart()"><i data-lucide="refresh-cw" size="14"></i> Reload</button>
+    <div>
+      <div class="page-title">Organizational Hierarchy</div>
+      <div class="page-sub">Visualizing reporting lines and departmental structures</div>
+    </div>
+    
+    <div class="flex-row" style="gap: 10px;">
+        <!-- NEW ZOOM CONTROLS -->
+        <div class="icon-btn-group" style="display: flex; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 2px;">
+            <button class="icon-btn" onclick="zoomOC(-0.1)" title="Zoom Out" style="border:none;"><i data-lucide="minus-circle" size="16"></i></button>
+            <div id="oc-zoom-label" style="font-size: 0.7rem; font-weight: 800; width: 45px; display: flex; align-items: center; justify-content: center; color: var(--muted); border-left: 1px solid var(--border); border-right: 1px solid var(--border);">100%</div>
+            <button class="icon-btn" onclick="zoomOC(0.1)" title="Zoom In" style="border:none;"><i data-lucide="plus-circle" size="16"></i></button>
+            <button class="icon-btn" onclick="resetOC()" title="Reset Chart" style="border:none; color: var(--primary);"><i data-lucide="refresh-cw" size="14"></i></button>
+        </div>
+
+        <button class="btn btn-primary"><i data-lucide="printer" size="14"></i> Export PDF</button>
     </div>
   </div>
-  <div class="card" style="overflow:hidden;"><div class="oc-scroll-wrap"><div id="oc-container"></div></div></div>
-</div>
 
+  <div class="oc-blueprint" id="oc-blueprint-area">
+    <div class="oc-container" id="oc-zoom-container" style="transform-origin: top center; transition: transform 0.2s ease-out;">
+      <ul class="oc-tree" id="oc-tree-root">
+        <!-- Tree content remains the same -->
+        <li>
+          <div class="oc-node oc-ceo">
+            <div class="oc-node-header">
+                <span class="oc-id">E-001</span>
+                <span class="badge badge-success" style="font-size: 8px;">Active</span>
+            </div>
+            <div class="oc-node-body">
+                <div class="oc-node-avatar">AB</div>
+                <div class="oc-node-info">
+                    <div class="oc-node-name">Abebe Bikila</div>
+                    <div class="oc-node-role">Chief Executive Officer</div>
+                </div>
+            </div>
+            <div class="oc-node-footer">Executive Board</div>
+          </div>
+          
+          <ul>
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-012</span></div>
+                <div class="oc-node-body">
+                    <div class="oc-node-avatar" style="background: #eff6ff; color: #3b82f6;">SJ</div>
+                    <div class="oc-node-info">
+                        <div class="oc-node-name">Sara Jenkins</div>
+                        <div class="oc-node-role">Operations Dir.</div>
+                    </div>
+                </div>
+              </div>
+              <ul>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Daniel Smith</div><div class="oc-node-role">Logistics Mgr</div></div></li>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Helen Gebre</div><div class="oc-node-role">Ops Supervisor</div></div></li>
+              </ul>
+            </li>
+
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
+                <div class="oc-node-body">
+                    <div class="oc-node-avatar" style="background: #fdf2f2; color: #ef4444;">MK</div>
+                    <div class="oc-node-info">
+                        <div class="oc-node-name">Michael Kassa</div>
+                        <div class="oc-node-role">Technical Dir.</div>
+                    </div>
+                </div>
+              </div>
+              <ul>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Kevin Vark</div><div class="oc-node-role">Lead Engineer</div></div></li>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Yared Tolla</div><div class="oc-node-role">QA Specialist</div></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
+                <div class="oc-node-body">
+                    <div class="oc-node-avatar" style="background: #fdf2f2; color: #ef4444;">MK</div>
+                    <div class="oc-node-info">
+                        <div class="oc-node-name">Michael Kassa</div>
+                        <div class="oc-node-role">Technical Dir.</div>
+                    </div>
+                </div>
+              </div> 
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 <!-- DEPARTMENTS -->
 <div class="page" id="p-departments">
   <div class="page-header">
@@ -2114,30 +2353,43 @@ lucide.createIcons();
 // ── SIDEBAR TOGGLE ──
 let sidebarCollapsed = false;
 const isMobile = () => window.innerWidth <= 768;
-
 function toggleSidebar() {
-  if (isMobile()) {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  
+  if (window.innerWidth <= 768) {
+    // MOBILE LOGIC: Slide in and out
     const isOpen = sidebar.classList.contains('mobile-open');
-    sidebar.classList.toggle('mobile-open', !isOpen);
-    overlay.classList.toggle('visible', !isOpen);
+    if (isOpen) {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('visible');
+    } else {
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('visible');
+    }
   } else {
+    // DESKTOP LOGIC: Collapse to icons
     sidebarCollapsed = !sidebarCollapsed;
-    const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed', sidebarCollapsed);
     document.getElementById('main-content').classList.toggle('sidebar-collapsed', sidebarCollapsed);
     
-    // When collapsing the sidebar, close all expanded submenus
+    // Close submenus if collapsing
     if (sidebarCollapsed) {
       document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
       document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
     }
-
+    
+    // Switch the menu icon
     const icon = document.getElementById('toggle-icon');
     icon.setAttribute('data-lucide', sidebarCollapsed ? 'panel-left-open' : 'menu');
     lucide.createIcons();
   }
+}
+
+// Ensure clicking the overlay closes the sidebar
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
 }
 function closeMobileSidebar() {
   document.getElementById('sidebar').classList.remove('mobile-open');
@@ -2254,17 +2506,47 @@ function renderTree(node) {
   const children = node.children && node.children.length ? `<ul>${node.children.map(renderTree).join('')}</ul>` : '';
   return `<li><div class="oc-node ${node.type}"><div class="oc-avatar">${ini}</div><span class="oc-name">${node.name}</span><span class="oc-role">${node.role}</span></div>${children}</li>`;
 }
-let ocZoom = 1;
+// --- UPDATED ORG CHART LOGIC ---
+let ocZoom = 1.0;
+
 function zoomOC(delta) {
-  ocZoom = Math.max(0.4, Math.min(1.5, ocZoom + delta));
-  document.getElementById('oc-container').style.transform = `scale(${ocZoom})`;
-  document.getElementById('oc-zoom-label').textContent = Math.round(ocZoom * 100) + '%';
-}
-function initOrgChart() {
-  const c = document.getElementById('oc-container');
-  if (c) { c.innerHTML = `<ul class="oc-tree">${renderTree(orgData)}</ul>`; lucide.createIcons(); }
+  // Set limits: Min 30%, Max 150%
+  const newZoom = ocZoom + delta;
+  if (newZoom >= 0.3 && newZoom <= 1.5) {
+    ocZoom = newZoom;
+    applyOCZoom();
+  }
 }
 
+function resetOC() {
+  ocZoom = 1.0;
+  applyOCZoom();
+  
+  // Also reset scroll position to center
+  const blueprint = document.getElementById('oc-blueprint-area');
+  if (blueprint) {
+    blueprint.scrollLeft = (blueprint.scrollWidth - blueprint.clientWidth) / 2;
+  }
+}
+
+function applyOCZoom() {
+  const container = document.getElementById('oc-zoom-container');
+  const label = document.getElementById('oc-zoom-label');
+  
+  if (container) {
+    container.style.transform = `scale(${ocZoom})`;
+  }
+  
+  if (label) {
+    label.textContent = Math.round(ocZoom * 100) + '%';
+  }
+}
+
+// Update the initOrgChart function to ensure icons load in the toolbar
+function initOrgChart() {
+  applyOCZoom(); // Set initial scale
+  lucide.createIcons();
+}
 // ── PAGE INIT ──
 const inited = new Set();
 function initPage(id) {
