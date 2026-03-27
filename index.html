@@ -80,8 +80,41 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 }.sidebar-overlay{display:none;position:fixed;inset:0;background:rgb(0, 0, 0);z-index:199;opacity:0;transition:opacity var(--transition)}
 .sidebar-overlay.visible{opacity:1}
 .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:200;transition:width var(--transition),transform var(--transition);overflow:visible}
-.sidebar.collapsed { max-height: 0 !important;}
+/* 1. The main container background */
+.sidebar.collapsed {
+  width: 78px !important;
+  background: #0f172a !important; /* Deep Slate Black */ 
+  overflow: visible !important;
+}
 
+/* 2. The Brand/Logo area at the top */
+.sidebar.collapsed .sidebar-brand {
+  background: #ffffff !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* 3. The scrollable area */
+.sidebar.collapsed .sidebar-scroll {
+  background: #ffffff !important;
+}
+
+/* 4. REMOVE the light grey boxes behind the icons */
+.sidebar.collapsed .nav-icon {
+  background: transparent !important; /* Removes the light square */
+  color: #94a3b8 !important; /* Greyish icons for a sleek look */
+}
+
+/* 5. Handle Hover states (so it doesn't turn white on hover) */
+.sidebar.collapsed .nav-trigger:hover .nav-icon,
+.sidebar.collapsed .dash-link:hover .nav-icon {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--primary) !important;
+}
+
+/* 6. Fix for the Dash-link (Dashboard icon) background */
+.sidebar.collapsed .dash-link.active {
+    background: rgba(21, 178, 1, 0.15) !important;
+}
 
 .sidebar.collapsed .nav-group:hover{ max-height: none !important; display: flex !important;}
 .sidebar.collapsed{width:78px;overflow:visible!important}
@@ -544,15 +577,24 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   .chart-main-wrap, .activity-side-wrap { grid-column: span 1; }
 }
 /* Quick Actions Label inside Hero */
+.db-actions-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Aligns title and buttons to the right */
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
 .qa-label {
   font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 20px;
-  opacity: 0.9;
-  display: block;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
 }
+
 
 /* System Logs Filling the space */
 .log-container {
@@ -632,93 +674,131 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   margin-top: 2px;
 }
 /* --- PREMIUM ENTERPRISE STAT RIBBON --- */
-.stat-ribbon-v10 {
+/* --- RESPONSIVE LUXURY RIBBON --- */
+.stat-ribbon-art {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-  width: 100%;
+  /* minmax(200px, 1fr) ensures cards don't get too thin before wrapping */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px; 
+  background: rgba(15, 23, 42, 0.08); 
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 40px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
-.premium-pod {
-  background: linear-gradient(145deg, #ffffff, #f9fafb);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  height: 78px;
-  padding: 0 20px;
+.art-card {
+  position: relative;
+  min-height: 92px; 
+  padding: 16px 24px;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  position: relative;
+  justify-content: space-between;
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
-.premium-pod:hover {
-  transform: translateY(-4px);
-  border-color: var(--primary);
-  box-shadow: 0 20px 25px -5px rgba(21, 178, 1, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+.art-card:hover {
+  background: color-mix(in srgb, var(--accent-color) 4%, #ffffff);
 }
 
-/* Subtle Top Glow Accent */
-.premium-pod::after {
-  content: '';
+.art-card::after {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 20px;
-  right: 20px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   height: 2px;
-  background: var(--primary);
-  opacity: 0;
-  transition: opacity 0.3s;
-  border-radius: 0 0 10px 10px;
+  background: var(--accent-color);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.6;
 }
 
-.premium-pod:hover::after {
-  opacity: 1;
+.art-card:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
-/* Theme Color Logic for Labels */
-.premium-pod.alert-red:hover::after { background: var(--danger); }
-.premium-pod.alert-orange:hover::after { background: var(--warning); }
-.premium-pod.info-blue:hover::after { background: var(--info); }
-
-.pod-label {
-  font-size: 0.65rem;
+/* Typography Hierarchy */
+.art-label {
+  font-size: 10px;
   font-weight: 800;
-  color: var(--muted);
+  color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
 }
 
-.pod-value {
-  font-size: 1.5rem;
+.art-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.art-value {
+  font-size: 32px;
+  font-weight: 200;
+  color: #0f172a;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+}
+
+.art-meta-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.art-indicator {
+  font-size: 11px;
   font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.04em;
-  line-height: 1;
+  color: var(--accent-color);
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
 }
 
-/* Decorative Watermark Initials (Replaces boring icons) */
-.pod-watermark {
-  position: absolute;
-  right: -5px;
-  bottom: -10px;
-  font-size: 3rem;
-  font-weight: 900;
-  color: var(--primary);
-  opacity: 0.04;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-style: italic;
-  pointer-events: none;
+.art-subtext {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: capitalize;
+  line-height: 1.2;
 }
 
-.alert-red .pod-watermark { color: var(--danger); }
-.alert-orange .pod-watermark { color: var(--warning); }
-.info-blue .pod-watermark { color: var(--info); }
+/* Tablet & Mobile Optimization */
+@media (max-width: 1024px) {
+  .stat-ribbon-art {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
 
+@media (max-width: 640px) {
+  .art-card {
+    padding: 20px;
+    height: auto; /* Allow card to grow if text wraps */
+  }
+  
+  .art-main-row {
+    flex-direction: row; /* Keep horizontal but allow wrapping if needed */
+    align-items: flex-end;
+  }
+
+  .art-value {
+    font-size: 28px; /* Slightly scale down for small screens */
+  }
+}
+
+/* Cinematic Accents */
+.art-headcount { --accent-color: #10b981; }
+.art-units     { --accent-color: #3b82f6; }
+.art-leave     { --accent-color: #f59e0b; }
+.art-expired   { --accent-color: #ef4444; }
+.art-missing   { --accent-color: #6366f1; }
 /* Layout Smoothing */
 .bento-container {
   display: grid;
@@ -931,7 +1011,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   <header class="db-hero-banner">
     <div class="db-hero-content">
       <h1 class="db-hero-title">Dashboard Intelligence</h1>
-      <p class="db-hero-sub">Enterprise Management Hub • March 2026 Operations</p>
+      <p class="db-hero-sub">Welcome back, YDY. Monitor your organization here.</p>
     </div>
     
     <div class="db-quick-actions">
@@ -947,45 +1027,64 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
     </div>
   </header>
 
-  <!-- PREMIUM 5-COLUMN STAT RIBBON -->
-  <div class="stat-ribbon-v10">
-    
-    <!-- 1: Headcount -->
-    <div class="premium-pod">
-      <span class="pod-label">Total Headcount</span>
-      <span class="pod-value">1,248</span>
-      <span class="pod-watermark">HC</span>
+<div class="stat-ribbon-art">
+  
+  <div class="art-card art-headcount">
+    <span class="art-label">Headcount</span>
+    <div class="art-main-row">
+      <span class="art-value">1,248</span>
+      <div class="art-meta-group">
+        <span class="art-indicator">↑ 12</span>
+        <span class="art-subtext">Monthly Growth</span>
+      </div>
     </div>
-
-    <!-- 2: Active Units -->
-    <div class="premium-pod info-blue">
-      <span class="pod-label">Active Units</span>
-      <span class="pod-value">7</span>
-      <span class="pod-watermark">AU</span>
-    </div>
-
-    <!-- 3: On Leave -->
-    <div class="premium-pod alert-orange">
-      <span class="pod-label">On Leave</span>
-      <span class="pod-value">47</span>
-      <span class="pod-watermark">OL</span>
-    </div>
-
-    <!-- 4: Expiring Contracts -->
-    <div class="premium-pod alert-red">
-      <span class="pod-label">Expiring Contracts</span>
-      <span class="pod-value">18</span>
-      <span class="pod-watermark">EC</span>
-    </div>
-
-    <!-- 5: Missing Files -->
-    <div class="premium-pod alert-red">
-      <span class="pod-label">Missing Files</span>
-      <span class="pod-value">48</span>
-      <span class="pod-watermark">MF</span>
-    </div>
-
   </div>
+
+  <div class="art-card art-units">
+    <span class="art-label">Departments</span>
+    <div class="art-main-row">
+      <span class="art-value">07</span>
+      <div class="art-meta-group">
+        <span class="art-indicator">Active</span>
+        <span class="art-subtext">Internal Units</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="art-card art-leave">
+    <span class="art-label">On Leave</span>
+    <div class="art-main-row">
+      <span class="art-value">47</span>
+      <div class="art-meta-group">
+        <span class="art-indicator">Staff</span>
+        <span class="art-subtext"> Outbound</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="art-card art-expired">
+    <span class="art-label">Expiring</span>
+    <div class="art-main-row">
+      <span class="art-value">18</span>
+      <div class="art-meta-group">
+        <span class="art-indicator">Critical</span>
+        <span class="art-subtext">Contract Review</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="art-card art-missing">
+    <span class="art-label">Compliance</span>
+    <div class="art-main-row">
+      <span class="art-value">48</span>
+      <div class="art-meta-group">
+        <span class="art-indicator">Missing</span>
+        <span class="art-subtext">Vault Files</span>
+      </div>
+    </div>
+  </div>
+
+</div>
 
   <div class="bento-container">
     <!-- ANALYTICS CHART -->  
