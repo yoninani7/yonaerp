@@ -429,18 +429,33 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.5);
 }
-
-/* FIX: Prevent chart from stretching to match activity height */
+/* --- MAIN DASHBOARD GRID CONTROL --- */
 .bento-container {
   display: grid;
- grid-template-columns: 1fr 1fr 0.95fr 1.25fr; 
-  gap: 20px;
-  align-items: start;
+  /* CHANGE WIDTHS HERE: 
+     1fr 1fr = 50% / 50% (Equal Width)
+     7fr 3fr = 70% / 30% 
+     6fr 4fr = 60% / 40% 
+  */
+  grid-template-columns: 1fr 1fr; 
+  gap: 24px;
+  align-items: stretch; /* This keeps both cards the same height */
+  width: 100%;
 }
 
+/* Ensure children don't try to span multiple columns */
+.bento-container > * {
+  grid-column: span 1 !important;
+}
+
+/* Responsive: Stack them on mobile/tablet */
+@media (max-width: 1100px) {
+  .bento-container {
+    grid-template-columns: 1fr;
+  }
+}
 /* NEW: Compact & "Watchworthy" Pulse Feed */
-.activity-side-wrap {
-  grid-column: span 1;
+.activity-side-wrap { 
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -561,7 +576,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 .stat-v6-trend { font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 4px; }
 
 /* Dashboard Chart Area */
-.chart-main-wrap { grid-column: span 3; padding: 20px;}
+.chart-main-wrap {   padding: 20px;}
  
 
 @media (max-width: 1200px) {
@@ -798,12 +813,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 .art-expired   { --accent-color: #ef4444; }
 .art-missing   { --accent-color: #6366f1; }
 /* Layout Smoothing */
-.bento-container {
-  display: grid;
-  grid-template-columns: 2.2fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
+ 
 
 @media (max-width: 1200px) {
   .stat-ribbon-v10 { grid-template-columns: repeat(3, 1fr); }
@@ -918,6 +928,141 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   .db-hero-center-img {
     display: none; /* Hide completely on small phones */
   }
+}
+/* Premium Refresh Pill */
+.refresh-pill {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.refresh-pill:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px -2px rgba(21, 178, 1, 0.15);
+}
+
+.refresh-pill:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.refresh-pill i {
+  transition: transform 0.2s ease;
+}
+/* --- EXECUTIVE MASTER DATA (ZERO-GAP 100VH) --- */
+.master-profile-wrapper {
+    height: calc(100vh - var(--header-h) - 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-identity-bar {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+/* The Grid - Now with 2 Rows to fill space */
+.profile-main-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr; /* Top row fits content, bottom row fills rest */
+    gap: 16px;
+    min-height: 0; 
+}
+
+.data-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+}
+
+/* Fill the whole column for the first two cards */
+.span-v-2 { grid-row: span 2; }
+
+.card-label-strip {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-label-strip i { color: var(--primary); }
+.card-label-strip span { font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.card-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.data-entry {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-entry:last-child { border-bottom: none; }
+
+.de-label { font-size: 0.7rem; font-weight: 600; color: var(--muted); }
+.de-value { font-size: 0.8rem; font-weight: 700; color: #0f172a; text-align: right; }
+.de-value.mono { font-family: 'JetBrains Mono', monospace; color: var(--primary-dark); }
+
+/* Table style for the Branch Section */
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.mini-table th {
+    text-align: left;
+    font-size: 0.6rem;
+    color: var(--muted);
+    padding: 10px 16px;
+    background: #fafafa;
+    text-transform: uppercase;
+}
+.mini-table td {
+    font-size: 0.75rem;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text);
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .master-profile-wrapper { height: auto; overflow: visible; }
+    .profile-main-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .span-v-2 { grid-row: auto; }
 }
 </style>
 </head>
@@ -1228,12 +1373,17 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 
     <!-- LIVE SYSTEM PULSE -->
     <div class="activity-side-wrap" style="max-height: 445px; border-radius: 20px;">
-      <div class="pulse-header">
-        <div class="pulse-label">
-          <div class="live-indicator"></div>
-          System Pulse
-        </div>
-      </div>
+    <!-- UPDATED PULSE HEADER -->
+<div class="pulse-header">
+  <div class="pulse-label">
+    <div class="live-indicator"></div>
+    Recent activities
+  </div>
+   <button class="refresh-pill" onclick="triggerRefresh(this)">
+    <i data-lucide="refresh-cw" size="12"></i>
+    <span id="refresh-text">Refresh</span>
+  </button>
+</div>
       
       <div class="hr-pulse-feed">
         <div class="pulse-item">
@@ -1261,60 +1411,91 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 
   </div>
 </div>
-<!-- COMPANY PROFILE -->
 <div class="page" id="p-company-profile">
-  <div class="bento-grid">
-    <div class="brand-strip">
-      <div style="display:flex;align-items:center;gap:16px;">
-        <div style="background:rgba(255,255,255,.2);padding:10px;border-radius:8px;"><i data-lucide="building-2" size="28"></i></div>
-        <div><h1 style="font-size:1.2rem;font-weight:800;line-height:1;">HRM Enterprises Ltd.</h1><p style="font-size:.7rem;opacity:.8;margin-top:4px;">Global Personnel & Operations Master Data</p></div>
-      </div>
-      <button class="btn btn-edit-glass" onclick="openEditCompanyModal()"><i data-lucide="pencil-line" size="14"></i><span>Edit Company Profile</span></button>
-    </div>
-    <div class="bento-card" style="grid-column:span 5;">
-      <div class="bento-header"><i data-lucide="shield-check" size="14"></i><span class="bento-title">Legal & Statutory Identity</span></div>
-      <div class="bento-body">
-        <div class="d-row"><span class="d-label">Legal Name</span><span class="d-value">HRM Enterprises PLC</span></div>
-        <div class="d-row"><span class="d-label">Entity Type</span><span class="d-value">Private Limited</span></div>
-        <div class="d-row"><span class="d-label">Trade License</span><span class="d-value">AA/14/667/09</span></div>
-        <div class="d-row"><span class="d-label">TIN Number</span><span class="d-value">0019283746</span></div>
-        <div class="d-row"><span class="d-label">VAT Reg.</span><span class="d-value">9928374-VAT-01</span></div>
-        <div class="d-row"><span class="d-label">Establishment Date</span><span class="d-value">Oct 12, 2010</span></div>
-      </div>
-    </div>
-    <div class="bento-card" style="grid-column:span 4;">
-      <div class="bento-header"><i data-lucide="settings-2" size="14"></i><span class="bento-title">System Locales</span></div>
-      <div class="bento-body">
-        <div class="d-row"><span class="d-label">Reporting Currency</span><span class="d-value">ETB (Birr)</span></div>
-        <div class="d-row"><span class="d-label">Fiscal Year Start</span><span class="d-value">July 1st</span></div>
-        <div class="d-row"><span class="d-label">Timezone</span><span class="d-value">UTC+3 (EAT)</span></div>
-        <div class="d-row"><span class="d-label">Work Week</span><span class="d-value">Mon — Fri</span></div>
-        <div class="d-row"><span class="d-label">Daily Standard</span><span class="d-value">8.00 Hours</span></div>
-        <div class="d-row"><span class="d-label">System Lang</span><span class="d-value">English (US)</span></div>
-      </div>
-    </div>
-    <div class="bento-card" style="grid-column:span 3;">
-      <div class="bento-header"><i data-lucide="contact-2" size="14"></i><span class="bento-title">Communication</span></div>
-      <div class="bento-body">
-        <div class="d-row"><span class="d-label">Phone</span><span class="d-value">+251 11 667 89</span></div>
-        <div class="d-row"><span class="d-label">Email</span><span class="d-value">corp@hrm.com</span></div>
-        <div class="d-row"><span class="d-label">Web</span><span class="d-value">hrm.com</span></div>
-        <div style="margin-top:12px;padding:10px;background:var(--primary-light);border-radius:6px;border:1px solid var(--primary);">
-          <div style="font-size:.6rem;color:var(--primary);font-weight:800;">STATUS</div>
-          <div style="font-size:.7rem;font-weight:700;color:var(--primary);">Verified Profile</div>
+    <div class="master-profile-wrapper">
+        
+        <!-- IDENTITY BAR -->
+        <div class="profile-identity-bar">
+            <div class="id-main">
+                <div class="id-logo"><i data-lucide="layers" size="24"></i></div>
+                <div class="id-text">
+                    <h1>YDY HRM Enterprise Ltd.</h1>
+                    <span>Corporate Registry • Global Headquarters</span>
+                </div>
+            </div>
+            <div class="flex-row">
+                <span class="badge badge-success">● VERIFIED ENTITY</span>
+                <button class="btn btn-primary btn-sm" onclick="openEditCompanyModal()">
+                    <i data-lucide="edit-3" size="14"></i> Update Record
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="bento-card" style="grid-column:span 12;">
-      <div class="bento-header"><i data-lucide="map-pin" size="14"></i><span class="bento-title">Registered Head Office Address</span></div>
-      <div class="bento-body">
-        <div style="display:flex;gap:20px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:200px;"><div class="d-label">Street Address</div><div class="d-value" style="text-align:left;margin-top:4px;">Ras Desta Damtew St, Kirkos Sub-City, Woreda 01</div></div>
-          <div style="flex:1;min-width:200px;"><div class="d-label">City / Country</div><div class="d-value" style="text-align:left;margin-top:4px;">Addis Ababa, Ethiopia</div></div>
+
+        <!-- MAIN DATA CORE -->
+        <div class="profile-main-grid">
+            
+            <!-- COLUMN 1: LEGAL (Full Height) -->
+            <div class="data-card span-v-2">
+                <div class="card-label-strip"><i data-lucide="file-text" size="14"></i><span>Legal & Incorporation</span></div>
+                <div class="card-content">
+                    <div class="data-entry"><span class="de-label">Legal Name</span><span class="de-value">YDY HRM Enterprise Ltd.</span></div>
+                    <div class="data-entry"><span class="de-label">Trading Name</span><span class="de-value">YDY Systems</span></div>
+                    <div class="data-entry"><span class="de-label">Entity Type</span><span class="de-value">Private Ltd. Co</span></div>
+                    <div class="data-entry"><span class="de-label">Incorporate Date</span><span class="de-value">12 Oct 2010</span></div>
+                    <div class="data-entry"><span class="de-label">Registration No.</span><span class="de-value mono">MT/AA/14/667/09</span></div>
+                    <div class="data-entry"><span class="de-label">Capital (Authorized)</span><span class="de-value">50,000,000 ETB</span></div>
+                    <div class="data-entry"><span class="de-label">Issued By</span><span class="de-value">Min. of Trade</span></div>
+                    <div class="data-entry"><span class="de-label">Country</span><span class="de-value">Ethiopia</span></div>
+                    <div class="data-entry"><span class="de-label">Life Span</span><span class="de-value">Perpetual</span></div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: TAX (Full Height) -->
+            <div class="data-card span-v-2">
+                <div class="card-label-strip"><i data-lucide="shield-check" size="14"></i><span>Tax & Regulatory DNA</span></div>
+                <div class="card-content">
+                    <div class="data-entry"><span class="de-label">Tax ID (TIN)</span><span class="de-value mono">0019283746</span></div>
+                    <div class="data-entry"><span class="de-label">VAT Reg Number</span><span class="de-value mono">9928374-VAT-01</span></div>
+                    <div class="data-entry"><span class="de-label">Pension Code (ER)</span><span class="de-value mono">P-99283-746-X</span></div>
+                    <div class="data-entry"><span class="de-label">Trade License No.</span><span class="de-value mono">01/01/14/19283</span></div>
+                    <div class="data-entry"><span class="de-label">Tax Office</span><span class="de-value">Large Taxpayers (LTO)</span></div>
+                    <div class="data-entry"><span class="de-label">Filing Frequency</span><span class="de-value">Monthly</span></div>
+                    <div class="data-entry"><span class="de-label">Audit Status</span><span class="de-value" style="color:var(--success)">Current (2025)</span></div>
+                    <div class="data-entry"><span class="de-label">License Renewal</span><span class="de-value">30 June 2026</span></div>
+                    <div class="data-entry"><span class="de-label">Compliance Grade</span><span class="de-value">A+ Rating</span></div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3 TOP: SYSTEM/BANKING -->
+            <div class="data-card">
+                <div class="card-label-strip"><i data-lucide="globe" size="14"></i><span>System & Treasury</span></div>
+                <div class="card-content">
+                    <div class="data-entry"><span class="de-label">Main Bank</span><span class="de-value">CBE</span></div>
+                    <div class="data-entry"><span class="de-label">Account (Primary)</span><span class="de-value mono">1000192837465</span></div>
+                    <div class="data-entry"><span class="de-label">Base Currency</span><span class="de-value">ETB (Birr)</span></div>
+                    <div class="data-entry"><span class="de-label">Fiscal Start</span><span class="de-value">Hamle 01</span></div>
+                    <div class="data-entry"><span class="de-label">Timezone</span><span class="de-value">UTC+3 (EAT)</span></div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3 BOTTOM: BRANCH DIRECTORY (Fills the space) -->
+            <div class="data-card">
+                <div class="card-label-strip"><i data-lucide="map-pin" size="14"></i><span>Branch Directory</span></div>
+                <div class="card-content">
+                    <table class="mini-table">
+                        <thead>
+                            <tr><th>Branch</th><th>Location</th><th>Staff</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Headquarters</td><td>Addis Ababa</td><td>840</td></tr>
+                            <tr><td>Northern Hub</td><td>Mekelle</td><td>120</td></tr> 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- ORG CHART -->
@@ -2254,10 +2435,10 @@ function initVaultMatrix() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // 1. Create a Premium Horizontal Gradient
-  const gradient = ctx.createLinearGradient(0, 0, 450, 0);
-  gradient.addColorStop(0, '#15b201'); // Brand Primary
-  gradient.addColorStop(1, '#a3e635'); // Vibrant Lime
+  // 1. Create a Premium Horizontal Gradient 
+const gradient = ctx.createLinearGradient(0, 220, 0, 0); 
+gradient.addColorStop(0, '#44c100'); 
+gradient.addColorStop(1, '#d4fc79');
 
   const dataValues = [490, 320, 210, 145, 88, 45];
   const labelNames = ['Operations', 'Engineering', 'Sales', 'Marketing', 'Finance', 'HR'];
@@ -2352,23 +2533,23 @@ function initDashboard() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
- new Chart(ctx, {
-    type: 'bar',
+  // Create a Vertical Gradient: Green (Bottom) -> Yellow Green (Top)
+  // (0, 300, 0, 0) coordinates map to the height of your chart container
+  const gradient = ctx.createLinearGradient(0, 300, 0, 0);
+  gradient.addColorStop(0, '#44c100'); // Brand Green
+  gradient.addColorStop(1, '#d4fc79'); // Yellow Green
+
+  new Chart(ctx, {
+    type: 'bar', // Restored to Vertical
     data: {
-      labels: [ 'Engineering', 'Sales', 'Marketing', 'Finance', 'HR', 'Legal'],
+      labels: ['Engineering', 'Sales', 'Marketing', 'Finance', 'HR', 'Legal', 'IT'],
       datasets: [{
         label: 'Personnel',
-        // Data points calculated to sum to exactly 1,248 as per your subtitle
         data: [485, 312, 195, 110, 82, 48, 16], 
-         backgroundColor: '#44c100',
-        borderRadius: {
-          topLeft: 12,
-          topRight: 12,
-          bottomLeft: 0,
-          bottomRight: 0
-        },
+        backgroundColor: gradient,
+        borderRadius: 6, // Matches the subtle rounding of your other analytics charts
         borderSkipped: false,
-        barThickness: 45, // Thick bars as per screenshot
+        barThickness: 28, // Thinner width to match the professional style of the other charts
       }]
     },
     options: {
@@ -2390,7 +2571,7 @@ function initDashboard() {
           beginAtZero: true,
           max: 500,
           ticks: {
-            stepSize: 50,
+            stepSize: 100,
             font: { family: 'JetBrains Mono', size: 11 },
             color: '#94a3b8'
           },
@@ -2402,7 +2583,7 @@ function initDashboard() {
         x: {
           grid: { display: false },
           ticks: {
-            font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+            font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
             color: '#334155'
           }
         }
@@ -2411,7 +2592,6 @@ function initDashboard() {
   });
   lucide.createIcons();
 }
-
 function initAnalytics() {
   if (inited.has('analytics-charts')) return;
   inited.add('analytics-charts');
