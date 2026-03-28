@@ -83,7 +83,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* 1. The main container background */
 .sidebar.collapsed {
   width: 78px !important;
-  background: #0f172a !important; /* Deep Slate Black */ 
+  background: var(--surface) !important; 
   overflow: visible !important;
 }
 
@@ -95,28 +95,35 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 /* 3. The scrollable area */
 .sidebar.collapsed .sidebar-scroll {
-  background: #ffffff !important;
-   overflow-y: auto !important; /* Enable vertical scrolling */
-  overflow-x: hidden !important; /* Hide horizontal scroll */
+  background: var(--surface) !important;
+  overflow-y: auto !important;   /* This enables the scrollbar */
+  overflow-x: hidden !important; /* Prevents messy horizontal shifting */
+  height: calc(100vh - var(--header-h));
 }
 
 /* 4. REMOVE the light grey boxes behind the icons */
 .sidebar.collapsed .nav-icon {
-  background: transparent !important; /* Removes the light square */
-  color: #94a3b8 !important; /* Greyish icons for a sleek look */
+  background: #f1f5f9 !important; 
+  color: var(--muted) !important;
+  margin: 0 auto;
 }
 
 /* 5. Handle Hover states (so it doesn't turn white on hover) */
 .sidebar.collapsed .nav-trigger:hover .nav-icon,
 .sidebar.collapsed .dash-link:hover .nav-icon {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: var(--primary-light) !important;
   color: var(--primary) !important;
 }
  
 
+  /* Remove the old black tooltip logic */
+  .sidebar.collapsed .dash-link:hover::after {
+    display: none !important;
+  }
+ 
+
 .sidebar.collapsed .nav-group:hover{ max-height: none !important; display: flex !important;}
-.sidebar.collapsed{width:78px;overflow:visible!important}
-.sidebar.collapsed .sidebar-scroll{overflow:visible!important}
+.sidebar.collapsed{width:78px;overflow:visible!important} 
 .sidebar-brand{height:var(--header-h);padding:0 16px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:.95rem;color:var(--primary);border-bottom:1px solid var(--border);letter-spacing:-.01em;flex-shrink:0;white-space:nowrap;overflow:hidden}
 .brand-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
 .sidebar-brand-text{overflow:hidden;white-space:nowrap;transition:opacity var(--transition),width var(--transition)}
@@ -164,15 +171,86 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sidebar.collapsed .nav-icon{margin:0 auto;width:32px;height:32px;}
 .sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .nav-label,.sidebar.collapsed span,.sidebar.collapsed .chevron{display:none!important}
 @media(min-width:769px){
+  .sidebar.collapsed .dash-link:hover .nav-trigger-left span {
+    display: block !important; /* Overrides the display:none */
+    position: fixed;
+    left: 78px; /* Width of collapsed sidebar */
+    
+    /* Styling to match the Submenu Theme */
+    width: 160px;
+    padding: 12px 16px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 700;
+    
+    /* Themed Border & Shadow */
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary); 
+    border-radius: 0 10px 10px 0;
+    box-shadow: 15px 10px 40px rgba(0,0,0,0.15);
+    
+    z-index: 9999;
+    pointer-events: none; /* Prevents flickering */
+    transform: translateX(0);
+  }
+
+  /* 2. Optional: Ensure the background of the icon changes on hover to match the theme */
+  .sidebar.collapsed .dash-link:hover .nav-icon {
+    background: var(--primary-light) !important;
+    color: var(--primary) !important;
+  }
   .sidebar.collapsed .nav-group{position:relative}
   .sidebar.collapsed .nav-group::after{content:'';position:absolute;top:0;right:-20px;width:25px;height:100%;z-index:10;display:none}
   .sidebar.collapsed .nav-group:hover::after{display:block;z-index:5}
   .sidebar.collapsed .nav-group:hover .submenu{display:flex!important;flex-direction:column;z-index:9999;max-height:none;position:absolute;left:70px;top:0;width:230px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 12px 12px 12px;box-shadow:15px 10px 40px rgba(0,0,0,.15);padding:12px 8px;opacity:1;visibility:visible;max-height: none !important;transform:translateX(5px);transition:transform .2s ease,opacity .2s ease}
-  .sidebar.collapsed .nav-group:hover .nav-trigger-left span{display:block!important;position:absolute;left:10px;top:-25px;background:var(--text);color:#fff;padding:4px 10px;border-radius:4px;font-size:.65rem;font-weight:700;text-transform:uppercase;white-space:nowrap;box-shadow:var(--shadow-md)}
-  .sidebar.collapsed .nav-group:hover .sub-link{display:flex!important;padding:10px 12px!important;margin:1px 0;border-radius:6px;color:var(--muted)}
-  .sidebar.collapsed .nav-group:hover .sub-link:hover{background:var(--primary-light);color:var(--primary)}
-  .sidebar.collapsed .nav-group:hover .sub-link span{display:block!important;font-size:.8rem}
-  .sidebar.collapsed .nav-group:hover .sub-dot{display:block!important;background:var(--border)}
+  .sidebar.collapsed .nav-group:hover .nav-trigger-left span {
+    pointer-events: none;
+    display: block !important;
+    position: fixed;
+    left: 82px; /* Sidebar width + border offset */
+    z-index: 10000;
+    width: 222px;
+    padding: 12px 16px;
+    background: #fafafa; /* Slightly different bg for header */
+    color: var(--text);
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0 11px 0 0;
+    pointer-events: none; /* Let clicks pass to the menu */
+  }
+
+  .sidebar.collapsed .nav-group:hover .sub-link {
+    display: flex !important;
+    padding: 10px 12px !important;
+    color: var(--muted) !important;
+  }
+
+  .sidebar.collapsed .nav-group:hover .sub-link span {
+    display: block !important;
+    font-size: 0.8rem !important;
+  }
+
+  .sidebar.collapsed .nav-group:hover .sub-dot {
+    display: block !important;
+  }
+
+  /* Fix for Single Links (Dashboard/etc) Labels */
+   .sidebar.collapsed .dash-link:hover::after {
+    content: attr(title);
+    position: fixed;
+    left: 85px;
+    background: var(--text);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 9999;
+  }
   .sidebar.collapsed .nav-group:hover .dash-link span{display:block!important;position:absolute;left:72px;background:var(--text);color:#fff;padding:5px 12px;border-radius:6px;font-size:.75rem}
 }
 .main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:margin-left var(--transition)}
@@ -292,6 +370,9 @@ table.tbl tr:hover td:last-child{background:#fcfdfe!important}
      min-height: 500px;
     align-items: flex-start; /* Keeps it pinned to top while scaling */
     padding-top: 40px;
+      overflow: auto; /* Ensure both x and y are scrollable */
+    cursor: grab;
+    user-select: none;
 }
 
 .oc-container {
@@ -504,14 +585,36 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin .8s linear infinite}
 @media(min-width:769px){ 
-  .sidebar.collapsed .nav-group:hover .submenu {
-    display:flex!important;
-    position:absolute;
-    left:70px; 
+  .sidebar.collapsed .submenu {
+    display: none !important;
+  }
+   .sidebar.collapsed .nav-group:hover .submenu {
+    display: flex !important;
+    flex-direction: column;
+    z-index: 9999;
+    position: fixed; 
+    left: 78px; 
+    width: 230px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 12px 12px 12px;
+    box-shadow: 15px 10px 40px rgba(0,0,0,.15);
+    /* Add top padding to make room for the title */
+    padding: 45px 8px 12px 8px; 
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0px);
+    transition: opacity .2s ease;
+    max-height: calc(100vh - 20px) !important; /* Prevents menu being taller than screen */
+    overflow-y: auto !important;
   }
 }
+.sidebar.collapsed .sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+}
 /* --- EASY MOBILE HIDE --- */
-@media (max-width: 800px) {
+@media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%); /* Completely hidden to the left */
     position: fixed;
@@ -540,7 +643,32 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   .sidebar-overlay.visible {
     display: block; /* Show darkened background when menu is open */
   }
+  
+  /* Ensure text and labels are visible on mobile regardless of collapsed state */
+  .sidebar.mobile-open .sidebar-brand-text,
+  .sidebar.mobile-open .nav-label,
+  .sidebar.mobile-open span,
+  .sidebar.mobile-open .chevron {
+    display: block !important;
+  }
+
+  .sidebar.mobile-open .nav-trigger,
+  .sidebar.mobile-open .dash-link {
+    justify-content: space-between !important;
+    padding: 9px 10px !important;
+  }
+
+  .sidebar.mobile-open .nav-icon {
+    margin: 0 !important;
+  }
+  
+  /* Prevent the sidebar from being only 78px wide on mobile */
+  .sidebar.collapsed.mobile-open {
+    width: 280px !important;
+    background: var(--surface) !important;
+  }
 }
+
 /* --- PROFESSIONAL COMMAND CENTER STYLES --- */
 .db-hero-banner {
   background: var(--primary);
@@ -554,6 +682,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   align-items: center;
   position: relative;
   overflow: hidden;
+   align-items: center;
   box-shadow: 0 10px 30px -10px rgba(21, 178, 1, 0.3); 
 }
 
@@ -562,6 +691,11 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   content: ""; position: absolute; inset: 0; opacity: 0.1;
   background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
   background-size: 24px 24px;
+}
+.db-hero-content, 
+.qa-stack-v2 {
+  position: relative;
+  z-index: 10; /* Higher than the image (z-index: 1) */
 }
 
 .db-hero-content { position: relative; z-index: 1; }
@@ -953,6 +1087,10 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 }
 
 @media (max-width: 640px) {
+   .db-hero-center-img {
+    height: 60%; /* Shrink it more on tiny screens to avoid clutter */
+    opacity: 0.3;
+  }
   .art-card {
     padding: 20px;
     height: auto; /* Allow card to grow if text wraps */
@@ -1072,11 +1210,13 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
   top: 50%;
   transform: translate(-50%, -50%);
   height: 100%; /* Adjust this to make the image larger or smaller */
+  width:auto;
   max-height: 140px; 
   width: auto;
   pointer-events: none; /* Allows clicking through the image if it overlaps buttons */
   z-index: 1;
-  opacity: 0.8; /* Subtle transparency looks more professional */
+  opacity: 0.5; /* Subtle transparency looks more professional */
+  transition: height 0.3s ease; /* Smooth scaling transition */
 }
 
 /* Hide or shrink image on mobile to prevent overlapping text */
@@ -1245,10 +1385,13 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="nav-icon"><i data-lucide="layout-dashboard" size="15"></i></div>
         <span>Dashboard</span>
       </div> -->
-      <div class="dash-link active" onclick="goPage('dashboard',this)">
-        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="layout-dashboard" size="15"></i></div><span>Dashboard</span></div>
-  
-      </div>
+   <!-- Locate this in your sidebar HTML -->
+<div class="dash-link active" onclick="goPage('dashboard',this)" title="Dashboard">
+    <div class="nav-trigger-left">
+        <div class="nav-icon"><i data-lucide="layout-dashboard" size="15"></i></div>
+        <span>Dashboard</span>
+    </div>
+</div>
     </div>
     <div class="nav-label">Organization</div>
     <div class="nav-group">
@@ -2356,38 +2499,80 @@ const isMobile = () => window.innerWidth <= 768;
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
+  const mainContent = document.getElementById('main-content');
   
   if (window.innerWidth <= 768) {
-    // MOBILE LOGIC: Slide in and out
+    // MOBILE LOGIC
     const isOpen = sidebar.classList.contains('mobile-open');
     if (isOpen) {
       sidebar.classList.remove('mobile-open');
       overlay.classList.remove('visible');
     } else {
+      // Force remove collapsed class so text shows up on mobile
+      sidebar.classList.remove('collapsed'); 
+      mainContent.classList.remove('sidebar-collapsed');
+      
       sidebar.classList.add('mobile-open');
       overlay.classList.add('visible');
     }
   } else {
-    // DESKTOP LOGIC: Collapse to icons
+    // DESKTOP LOGIC
     sidebarCollapsed = !sidebarCollapsed;
     sidebar.classList.toggle('collapsed', sidebarCollapsed);
-    document.getElementById('main-content').classList.toggle('sidebar-collapsed', sidebarCollapsed);
-    
-    // Close submenus if collapsing
-    if (sidebarCollapsed) {
-      document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-      document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
-    }
+    mainContent.classList.toggle('sidebar-collapsed', sidebarCollapsed);
     
     // Switch the menu icon
     const icon = document.getElementById('toggle-icon');
-    icon.setAttribute('data-lucide', sidebarCollapsed ? 'panel-left-open' : 'menu');
+    if (sidebarCollapsed) {
+        icon.setAttribute('data-lucide', 'panel-left-open');
+        // Close all submenus when collapsing
+        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+        document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
+    } else {
+        icon.setAttribute('data-lucide', 'menu');
+    }
     lucide.createIcons();
   }
-}
+} 
+// Smart positioning for collapsed sidebar submenus AND titles
+document.addEventListener('mouseover', (e) => {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar || !sidebar.classList.contains('collapsed')) return;
 
-// Ensure clicking the overlay closes the sidebar
-function closeMobileSidebar() {
+    const navGroup = e.target.closest('.nav-group');
+    if (navGroup) {
+        const submenu = navGroup.querySelector('.submenu');
+        const label = navGroup.querySelector('.nav-trigger-left span');
+        
+        if (submenu && label) {
+            const rect = navGroup.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // Temporary show to calculate height
+            submenu.style.visibility = 'hidden';
+            submenu.style.display = 'flex';
+            
+            const menuHeight = submenu.offsetHeight;
+            submenu.style.display = ''; // Reset
+            submenu.style.visibility = '';
+
+            let topPosition = rect.top;
+
+            // COLLISION DETECTION: 
+            // If the menu height extends past the bottom of the screen...
+            if (topPosition + menuHeight > viewportHeight) {
+                // Shift the menu up so its bottom aligns with the screen bottom (with 10px buffer)
+                topPosition = viewportHeight - menuHeight - 10;
+            }
+
+            // Safety check: ensure it doesn't go off the top either
+            if (topPosition < 10) topPosition = 10;
+
+            submenu.style.top = topPosition + 'px';
+            label.style.top = topPosition + 'px';
+        }
+    }
+});function closeMobileSidebar() {
   document.getElementById('sidebar').classList.remove('mobile-open');
   document.getElementById('sidebar-overlay').classList.remove('visible');
 }
@@ -2957,7 +3142,52 @@ function filterAsDrop(inputId, dropId) {
 }
 function selectAsItem(inputId, dropId, name) { document.getElementById(inputId).value = name; document.getElementById(dropId).classList.remove('active'); }
 window.addEventListener('mousedown', e => { if (!e.target.closest('.as-combo-container')) document.querySelectorAll('.as-combo-results').forEach(d => d.classList.remove('active')); });
+// --- DRAG TO PAN LOGIC ---
+function initOrgChartDrag() {
+    const slider = document.getElementById('oc-blueprint-area');
+    let isDown = false;
+    let startX;
+    let startY;
+    let scrollLeft;
+    let scrollTop;
 
+    slider.addEventListener('mousedown', (e) => {
+        // Only allow drag if clicking the background, not buttons/nodes if preferred
+        // but usually, it's fine to allow all.
+        isDown = true;
+        slider.classList.add('active');
+        startX = e.pageX - slider.offsetLeft;
+        startY = e.pageY - slider.offsetTop;
+        scrollLeft = slider.scrollLeft;
+        scrollTop = slider.scrollTop;
+    });
+
+    slider.addEventListener('mouseleave', () => {
+        isDown = false;
+    });
+
+    slider.addEventListener('mouseup', () => {
+        isDown = false;
+    });
+
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const y = e.pageY - slider.offsetTop;
+        const walkX = (x - startX) * 2; // Scroll speed
+        const walkY = (y - startY) * 2;
+        slider.scrollLeft = scrollLeft - walkX;
+        slider.scrollTop = scrollTop - walkY;
+    });
+}
+
+// Call this inside your existing initOrgChart function
+function initOrgChart() {
+    applyOCZoom(); 
+    initOrgChartDrag(); // <--- Add this line
+    lucide.createIcons();
+}
 // ── STARTUP ──
 window.addEventListener('DOMContentLoaded', () => { initPage('dashboard'); initDashboard(); });
 </script>
