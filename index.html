@@ -1596,8 +1596,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
         <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="heart-pulse" size="15"></i></div><span>Benefits</span></div>
         <i data-lucide="chevron-right" size="13" class="chevron"></i>
       </div>
-      <div class="submenu" id="m-ben">
-        <div class="sub-link" onclick="goPage('benefits-catalog',this)"><span class="sub-dot"></span><span>Benefits Catalog</span></div>
+      <div class="submenu" id="m-ben"> 
         <div class="sub-link" onclick="goPage('medical-claims',this)"><span class="sub-dot"></span><span>Medical Claims</span></div>
       </div>
     </div>
@@ -2061,8 +2060,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 <div class="page" id="p-employee-directory">
   <div class="page-header">
     <div><div class="page-title">Employee Profile</div><div class="page-sub">1,248 employees across all branches</div></div>
-    <div class="flex-row">
-      <div class="search-bar"><i data-lucide="search" size="13" class="search-icon"></i><input placeholder="Search name, ID, department..."></div>
+    <div class="flex-row"> 
       <select class="sel"><option>All Departments</option><option>Engineering</option><option>Sales</option><option>HR</option><option>Finance</option></select>
       <button class="btn btn-primary"><i data-lucide="user-plus" size="13"></i>Add Employee</button>
     </div>
@@ -2244,21 +2242,12 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 <!-- LEAVE ENTITLEMENT -->
 <div class="page" id="p-leave-entitlement">
   <div class="page-header">
-    <div><div class="page-title">Leave Entitlement</div><div class="page-sub">Per-employee leave balance and policy</div></div>
-    <button class="btn btn-secondary"><i data-lucide="refresh-cw" size="13"></i>Reset Annual</button>
+    <div><div class="page-title">Leave Entitlement</div><div class="page-sub">Per-employee leave balance and policy</div></div> 
   </div>
   <div id="tbl-leave-entitlement"></div>
 </div>
 
-<!-- BENEFITS CATALOG -->
-<div class="page" id="p-benefits-catalog">
-  <div class="page-header">
-    <div><div class="page-title">Benefits Catalog</div><div class="page-sub">Available employee benefit programs</div></div>
-    <button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Benefit</button>
-  </div>
-  <div id="tbl-benefits"></div>
-</div>
-
+ 
 <!-- MEDICAL CLAIMS -->
 <div class="page" id="p-medical-claims">
   <div class="page-header">
@@ -2489,8 +2478,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 <div class="page" id="p-audit-logs">
   <div class="page-header">
     <div><div class="page-title">Audit Logs</div><div class="page-sub">Complete system activity trail</div></div>
-    <div class="flex-row">
-      <div class="search-bar"><i data-lucide="search" size="13" class="search-icon"></i><input placeholder="Search logs..."></div>
+    <div class="flex-row"> 
       <select class="sel"><option>All Actions</option><option>Create</option><option>Update</option><option>Delete</option><option>Login</option></select>
     </div>
   </div>
@@ -2839,10 +2827,7 @@ document.addEventListener('mouseover', (e) => {
             label.style.top = topPosition + 'px';
         }
     }
-});function closeMobileSidebar() {
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('sidebar-overlay').classList.remove('visible');
-}
+});  
 function closeMobileSidebar() {
   document.getElementById('sidebar').classList.remove('mobile-open');
   document.getElementById('sidebar-overlay').classList.remove('visible');
@@ -3012,11 +2997,7 @@ function applyOCZoom() {
   }
 }
 
-// Update the initOrgChart function to ensure icons load in the toolbar
-function initOrgChart() {
-  applyOCZoom(); // Set initial scale
-  lucide.createIcons();
-}
+
 // ── PAGE INIT ──
 const inited = new Set();
 function initPage(id) {
@@ -3555,12 +3536,11 @@ function initOrgChart() {
     initOrgChartDrag(); // <--- Add this line
     lucide.createIcons();
 }
-function selectAsItem(inputId, dropId, name) { 
-   document.getElementById(inputId).value = name; // Writes the name to the input
-   document.getElementById(dropId).classList.remove('active'); // Just hides the list
-}
+ 
 // ── STARTUP ──
-window.addEventListener('DOMContentLoaded', () => { initPage('dashboard'); initDashboard(); });
+window.addEventListener('DOMContentLoaded', () => { 
+    initPage('dashboard'); 
+});
 </script>
 </body>
 </html>
