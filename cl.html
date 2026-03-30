@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YDY HRM Enterprise</title>
+<!-- Google Fonts: display=swap prevents invisible text during load -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS (CSS Custom Properties)
+   ============================================================ */
+:root {
+  --primary:#15b201;--primary-light:#f1fcf0;--primary-dark:#0f8a00;
+  --sidebar-w:268px;--header-h:60px;
+  --bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;
+  --text:#0f172a;--muted:#64748b;
+  --success:#16a34a;--success-bg:#dcfce7;
+  --warning:#d97706;--warning-bg:#fef3c7;
+  --danger:#dc2626;--danger-bg:#fee2e2;
+  --info:#0891b2;--info-bg:#cffafe;
+  --radius:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.05);
+  --transition:.28s cubic-bezier(.4,0,.2,1);
+}
+
+/* ============================================================
+   GLOBAL RESET & SCROLLBARS
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* Firefox thin scrollbar */
+*{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+
+/* Webkit (Chrome/Edge/Safari) scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:20px;border:1px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--primary);border:0 solid transparent}
+
+/* Reveal scrollbar thumb on container hover; highlight on thumb hover */
+.sidebar-scroll:hover::-webkit-scrollbar-thumb,
+.content-area:hover::-webkit-scrollbar-thumb,
+.table-wrap:hover::-webkit-scrollbar-thumb,
+.modal-box:hover::-webkit-scrollbar-thumb{background:#cbd5e1}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover,
+.content-area::-webkit-scrollbar-thumb:hover,
+.table-wrap::-webkit-scrollbar-thumb:hover,
+.modal-box::-webkit-scrollbar-thumb:hover{background:var(--primary)!important}
+
+/* ============================================================
+   BASE LAYOUT
+   ============================================================ */
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden}
+
+/* ============================================================
+   SIDEBAR — Expanded State
+   ============================================================ */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:200;transition:width var(--transition),transform var(--transition);overflow:visible}
+.sidebar-brand{height:var(--header-h);padding:0 16px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:.95rem;color:var(--primary);border-bottom:1px solid var(--border);letter-spacing:-.01em;flex-shrink:0;white-space:nowrap;overflow:hidden}
+.brand-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.sidebar-brand-text{overflow:hidden;white-space:nowrap;transition:opacity var(--transition),width var(--transition)}
+.sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 10px 20px}
+
+/* Section headings inside the nav */
+.nav-label{padding:14px 10px 5px;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden}
+
+/* Nav groups wrap each collapsible section */
+.nav-group{margin-bottom:1px}
+.nav-trigger{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;color:#334155;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .15s,color .15s;user-select:none;white-space:nowrap}
+.nav-trigger:hover,
+.nav-trigger.parent-active{background:var(--primary-light)!important;color:var(--primary)!important}
+/* Open state: keep neutral so active child sub-link stands out */
+.nav-trigger.open{background:transparent;color:var(--text)}
+.nav-trigger-left{display:flex;align-items:center;gap:8px;overflow:hidden}
+
+/* Icon pill inside each nav item */
+.nav-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:var(--muted);flex-shrink:0;transition:all .15s}
+.nav-trigger.open .nav-icon{background:#f1f5f9;color:var(--muted)}
+.nav-trigger:hover .nav-icon,
+.nav-active .nav-icon,
+.nav-trigger.parent-active .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
+
+/* Chevron rotates when submenu is open */
+.chevron{transition:transform .2s;color:#94a3b8;flex-shrink:0}
+.nav-trigger.open .chevron{transform:rotate(90deg);color:var(--primary)}
+
+/* Submenu: collapses to 0 height, expands via JS adding .open */
+.submenu{overflow:hidden;max-height:0;transition:max-height .3s ease;padding-left:10px}
+.submenu.open{max-height:1000px}
+
+/* Sub-links inside submenus */
+.sub-link{display:flex;align-items:center;gap:8px;padding:7px 10px;color:var(--muted);font-size:.77rem;font-weight:500;border-radius:6px;cursor:pointer;transition:all .15s;margin-bottom:1px;white-space:nowrap}
+.sub-link:hover{color:var(--primary);background:#f8fafc}
+.sub-link.active{color:var(--primary)!important;background:var(--primary-light);font-weight:700}
+.sub-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.sub-link.active .sub-dot{background:var(--primary)}
+
+/* Top-level single link (Dashboard) */
+.dash-link{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;color:#334155;transition:all .15s;white-space:nowrap}
+.dash-link:hover,.dash-link.active{background:var(--primary-light);color:var(--primary)}
+
+/* Mobile backdrop overlay */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgb(0,0,0);z-index:199;opacity:0;transition:opacity var(--transition)}
+.sidebar-overlay.visible{opacity:1}
+
+/* ============================================================
+   SIDEBAR — Collapsed State (78px icon-only, desktop)
+   ============================================================ */
+.sidebar.collapsed{width:78px!important;overflow:visible!important}
+.sidebar.collapsed .sidebar-brand{background:#fff!important;border-bottom:1px solid #1e293b!important}
+.sidebar.collapsed .sidebar-scroll{background:var(--surface)!important;overflow-y:auto!important;overflow-x:hidden!important;height:calc(100vh - var(--header-h))}
+/* Collapsed scrollbar thumb (subdued) */
+.sidebar.collapsed .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+/* Remove grey boxes behind icons */
+.sidebar.collapsed .nav-icon{background:#f1f5f9!important;color:var(--muted)!important;margin:0 auto}
+/* Icon hover in collapsed state */
+.sidebar.collapsed .nav-trigger:hover .nav-icon,
+.sidebar.collapsed .dash-link:hover .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
+/* Shrink padding so only the icon shows */
+.sidebar.collapsed .nav-trigger,.sidebar.collapsed .dash-link{margin:4px 8px;padding:10px 0;justify-content:flex-start}
+.sidebar.collapsed .nav-trigger-left{gap:0}
+.sidebar.collapsed .nav-icon{margin:0 auto;width:32px;height:32px}
+/* Hide all text labels, section headings, chevrons */
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed span,
+.sidebar.collapsed .chevron{display:none!important}
+/* Remove default tooltip arrow */
+.sidebar.collapsed .dash-link:hover::after{display:none!important}
+/* Invisible bridge so mouse can travel from icon to flyout without it closing */
+.sidebar.collapsed .nav-group::after{content:'';position:absolute;top:0;right:-15px;width:20px;height:100%;z-index:5;display:none}
+
+/* ── Collapsed flyout menus (desktop only) ── */
+@media(min-width:769px){
+  /* Hide submenus while not hovering — CSS :hover flyout handles visibility */
+  .sidebar.collapsed .submenu{display:none!important}
+
+  /* Dashboard link: show label tooltip on hover */
+  .sidebar.collapsed .dash-link:hover .nav-trigger-left span{
+    display:block!important;
+    position:fixed;left:78px;
+    width:160px;padding:12px 16px;
+    background:var(--surface);color:var(--text);font-size:.8rem;font-weight:700;
+    border:1px solid var(--border);border-left:4px solid var(--primary);
+    border-radius:0 10px 10px 0;box-shadow:15px 10px 40px rgba(0,0,0,.15);
+    z-index:9999;pointer-events:none;transform:translateX(0)
+  }
+  /* Show cursor-bridge on group hover */
+  .sidebar.collapsed .nav-group{position:relative}
+  .sidebar.collapsed .nav-group::after{content:'';position:absolute;top:0;right:-20px;width:25px;height:100%;z-index:10;display:none}
+  .sidebar.collapsed .nav-group:hover::after{display:block;z-index:5}
+
+  /* Flyout submenu panel */
+  .sidebar.collapsed .nav-group:hover .submenu{
+    display:flex!important;flex-direction:column;
+    position:fixed;left:78px;width:230px;
+    background:var(--surface);border:1px solid var(--border);
+    border-left:4px solid var(--primary);border-radius:0 12px 12px 12px;
+    box-shadow:15px 10px 40px rgba(0,0,0,.15);
+    padding:45px 8px 12px;   /* top padding reserves space for group title label */
+    opacity:1;visibility:visible;z-index:9999;
+    max-height:calc(100vh - 20px)!important;overflow-y:auto!important;
+    margin-left:-1px;transform:translateX(0);transition:opacity .2s ease
+  }
+  /* Group title floating above sub-links in the flyout */
+  .sidebar.collapsed .nav-group:hover .nav-trigger-left span{
+    pointer-events:none;
+    display:block!important;
+    position:fixed;left:78px;z-index:10000;
+    margin-left:-1px;width:222px;padding:12px 16px;
+    background:#fafafa;color:var(--text);
+    font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    border-bottom:1px solid var(--border);border-radius:0 11px 0 0;
+    transform:translateX(0)
+  }
+  /* Show sub-links inside the flyout */
+  .sidebar.collapsed .nav-group:hover .sub-link{display:flex!important;padding:10px 12px!important;color:var(--muted)!important}
+  .sidebar.collapsed .nav-group:hover .sub-link span{display:block!important;font-size:.8rem!important}
+  .sidebar.collapsed .nav-group:hover .sub-dot{display:block!important}
+
+  /* Dash-link tooltip fallback */
+  .sidebar.collapsed .dash-link:hover::after{content:attr(title);position:fixed;left:85px;background:var(--text);color:#fff;padding:6px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;z-index:9999}
+  .sidebar.collapsed .nav-group:hover .dash-link span{display:block!important;position:absolute;left:72px;background:var(--text);color:#fff;padding:5px 12px;border-radius:6px;font-size:.75rem}
+}
+
+/* ============================================================
+   MAIN CONTENT WRAPPER
+   ============================================================ */
+.main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:margin-left var(--transition)}
+.main.sidebar-collapsed{margin-left:78px}
+@media(max-width:768px){.main{margin-left:0!important}}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.breadcrumb span{color:var(--text);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:8px;background:#f8fafc;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s;position:relative;flex-shrink:0}
+.icon-btn:hover{background:var(--primary-light);color:var(--primary)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+.sidebar-toggle{cursor:pointer;width:34px;height:34px;border-radius:8px;background:#f8fafc;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s;flex-shrink:0}
+.sidebar-toggle:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;cursor:pointer;transition:background .15s}
+.topbar-user:hover{background:var(--primary-light)}
+.topbar-user-avatar{width:28px;height:28px;border-radius:7px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
+.topbar-user-info{line-height:1.3}
+.topbar-user-info .u-name{font-size:.75rem;font-weight:700;color:var(--text);white-space:nowrap}
+.topbar-user-info .u-role{font-size:.65rem;color:var(--muted);white-space:nowrap}
+@media(max-width:480px){.topbar-user-info{display:none}.topbar-user{padding:5px}}
+
+/* ============================================================
+   CONTENT AREA & PAGE VISIBILITY
+   ============================================================ */
+.content-area{flex:1;overflow-y:auto;padding:24px 28px}
+@media(max-width:768px){.content-area{padding:16px}}
+@media(max-width:480px){.content-area{padding:12px}}
+/* Only the active page is visible; others are hidden */
+.page{display:none}
+.page.active{display:block}
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:1.1rem;font-weight:800;color:var(--text)}
+.page-sub{font-size:.78rem;color:var(--muted);margin-top:3px}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit;white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#f1f5f9;color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#15803d}
+.btn-sm{padding:5px 10px;font-size:.72rem}
+.btn-xs{padding:3px 8px;font-size:.68rem}
+
+/* Glass buttons used on hero banners */
+.btn-glass-pro{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(10px);color:white;padding:12px 20px;border-radius:12px;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:8px;transition:all .2s ease;cursor:pointer}
+.btn-glass-pro:hover{background:rgba(255,255,255,.25);transform:translateY(-2px);border-color:rgba(255,255,255,.5)}
+.btn-glass-pro-slim{all:unset;display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:10px;color:white;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(4px)}
+.btn-glass-pro-slim i{opacity:.9}
+.btn-glass-pro-slim:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);transform:translateY(-2px)}
+.btn-glass-pro-slim:active{transform:translateY(0) scale(.97)}
+.btn-edit-glass{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(4px);padding:10px 18px;font-size:.75rem;letter-spacing:.02em;transition:all .2s ease}
+.btn-edit-glass:hover{background:rgba(255,255,255,.3);color:#fff;transform:translateY(-2px)}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-body{padding:20px}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:.88rem;font-weight:700;color:var(--text)}
+
+/* ── Stat Cards (KPI tiles) ── */
+.stats-row{display:grid;gap:16px;margin-bottom:20px}
+.stats-4{grid-template-columns:repeat(4,1fr)}
+.stats-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1100px){.stats-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stats-4,.stats-3{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.stats-4,.stats-3{grid-template-columns:1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.stat-label{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-size:1.5rem;font-weight:800;color:var(--text);line-height:1}
+.stat-change{font-size:.72rem;margin-top:6px}
+.stat-up{color:var(--success)}
+.stat-icon-wrap{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-flex{display:flex;align-items:center;justify-content:space-between}
+
+/* ── Bento Grid Cards (dashboard sections) ── */
+.bento-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:min-content;gap:12px}
+@media(max-width:900px){.bento-grid>[style*="span 5"],.bento-grid>[style*="span 4"],.bento-grid>[style*="span 3"],.bento-grid>[style*="span 7"],.bento-grid>[style*="span 12"]{grid-column:span 12!important}}
+.bento-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column}
+.bento-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fafafa}
+.bento-header i{color:var(--primary)}
+.bento-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.bento-body{padding:16px;flex:1}
+.bento-item{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;transition:transform .2s ease,border-color .2s ease}
+.bento-item:hover{border-color:var(--primary)}
+
+/* Detail row (key/value pair in panels) */
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dotted var(--border);gap:8px}
+.d-row:last-child{border-bottom:none;padding-bottom:0}
+.d-row:first-child{padding-top:0}
+.d-label{font-size:.72rem;color:var(--muted);font-weight:500;flex-shrink:0}
+.d-value{font-size:.78rem;font-weight:700;color:var(--text);text-align:right}
+
+/* ============================================================
+   TABLES & PAGINATION
+   ============================================================ */
+.table-wrap{overflow-x:auto;position:relative;border-radius:0 0 var(--radius) var(--radius);-webkit-overflow-scrolling:touch}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto}
+table.tbl th{padding:6px 18px!important;background:#f8fafc;font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;text-align:left}
+table.tbl td{padding:4px 14px!important;font-size:.8rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;background-color:var(--surface)}
+table.tbl tr:hover td{background-color:#fcfdfe!important}
+/* Sticky "Actions" column pinned to the right */
+table.tbl th:last-child,table.tbl td:last-child{width:.1%;white-space:nowrap;position:sticky;right:0;z-index:20;border-left:1px solid var(--border);box-shadow:-4px 0 8px -4px rgba(0,0,0,.1)}
+table.tbl th:last-child{background:#f8fafc}
+table.tbl td:last-child{background:var(--surface);text-align:center}
+table.tbl tr:hover td:last-child{background:#fcfdfe!important}
+/* Employee table: horizontally scrollable with sticky first column */
+#tbl-employees table.tbl{width:max-content;min-width:100%}
+#tbl-employees table.tbl td,#tbl-employees table.tbl th{min-width:140px}
+#tbl-employees table.tbl th:first-child,#tbl-employees table.tbl td:first-child{position:sticky;left:0;z-index:21;border-right:1px solid var(--border);background:#f8fafc}
+#tbl-employees table.tbl td:first-child{background:var(--surface)}
+
+/* Pagination controls */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.pagination-info{font-size:.75rem;color:var(--muted)}
+.pagination-btns{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pg-btn{min-width:30px;height:30px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s}
+.pg-btn:hover:not(:disabled){background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ============================================================
+   BADGES & AVATARS
+   ============================================================ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700}
+.badge-success{background:var(--success-bg);color:var(--success)}
+.badge-warning{background:var(--warning-bg);color:var(--warning)}
+.badge-danger{background:var(--danger-bg);color:var(--danger)}
+.badge-info{background:var(--info-bg);color:var(--info)}
+.badge-neutral{background:#f1f5f9;color:var(--muted)}
+.badge-primary{background:var(--primary-light);color:var(--primary)}
+.avatar{width:36px;height:36px;border-radius:8px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}
+.avatar-sm{width:28px;height:28px;font-size:.6rem}
+
+/* ============================================================
+   SEARCH BAR (Executive style)
+   ============================================================ */
+.search-container{width:100%;max-width:400px;position:relative}
+.search-inner{display:flex;align-items:center;height:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 4px 0 14px;transition:all .2s ease;box-shadow:var(--shadow)}
+.search-inner:focus-within{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px var(--primary-light),0 4px 12px rgba(0,0,0,.05)}
+.search-lead-icon{color:var(--muted);width:15px;height:15px;flex-shrink:0;transition:color .2s ease}
+.search-inner:focus-within .search-lead-icon{color:var(--primary)}
+.search-inner input{flex:1;border:none;background:transparent;outline:none;padding:0 10px;font-family:inherit;font-size:.8rem;font-weight:600;color:var(--text)}
+.search-inner input::placeholder{color:var(--muted);font-weight:500}
+.search-actions{display:flex;align-items:center;gap:4px}
+.btn-search-ghost,.btn-search-primary{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:none;transition:all .15s ease}
+.btn-search-ghost i,.btn-search-primary i{width:14px;height:14px}
+/* Clear button: invisible until user starts typing (CSS :has trick) */
+.btn-search-ghost{background:transparent;color:var(--muted);opacity:0;visibility:hidden;transform:scale(.9)}
+.btn-search-ghost:hover{background:var(--danger-bg);color:var(--danger)}
+.search-inner:has(input:not(:placeholder-shown)) .btn-search-ghost{opacity:1;visibility:visible;transform:scale(1)}
+.btn-search-primary{background:var(--primary);color:#fff;box-shadow:0 2px 4px rgba(21,178,1,.2)}
+.btn-search-primary:hover{background:var(--primary-dark);transform:translateX(2px)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;cursor:pointer}
+.sel:focus{border-color:var(--primary)}
+.form-grid{display:grid;gap:16px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:600px){.fg-2,.fg-3{grid-template-columns:1fr}}
+.form-group label{display:block;font-size:.75rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;transition:border .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff}
+.form-group textarea{resize:vertical;min-height:80px}
+input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+
+/* ============================================================
+   ORG CHART — Blueprint Canvas
+   ============================================================ */
+/* Dot-grid background gives a blueprint/whiteboard feel */
+.oc-blueprint{width:100%;background-color:#f8fafc;background-image:radial-gradient(#e2e8f0 1.5px,transparent 1.5px);background-size:30px 30px;border:1px solid var(--border);border-radius:16px;padding:40px 20px 20px;overflow:auto;display:flex;justify-content:center;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.02);min-height:500px;align-items:flex-start;cursor:grab;user-select:none}
+.oc-blueprint:active{cursor:grabbing}
+.oc-container{display:inline-block;text-align:center}
+
+/* ── SVG-like connector lines via CSS borders ── */
+.oc-tree ul{padding-top:40px;position:relative;display:flex;justify-content:center;padding-left:0}
+.oc-tree li{list-style-type:none;position:relative;padding:40px 10px 0}
+.oc-tree li::before,.oc-tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid #cbd5e1;width:50%;height:40px}
+/* Remove connector lines from root (CEO) node */
+.oc-tree>li::before,.oc-tree>li::after{display:none!important}
+.oc-tree>li{padding-top:0!important}
+.oc-tree::before{display:none!important}
+.oc-tree li::after{right:auto;left:50%;border-left:2px solid #cbd5e1}
+.oc-tree li:only-child::after,.oc-tree li:only-child::before{display:none}
+.oc-tree li:only-child{padding-top:0}
+.oc-tree li:first-child::before,.oc-tree li:last-child::after{border:0 none}
+.oc-tree li:last-child::before{border-right:2px solid #cbd5e1;border-radius:0 5px 0 0}
+.oc-tree li:first-child::after{border-radius:5px 0 0 0}
+.oc-tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid #cbd5e1;width:0;height:40px}
+
+/* ── Org Chart Node Cards ── */
+.oc-node{background:#fff;border:1px solid var(--border);border-radius:14px;width:200px;display:inline-block;position:relative;z-index:10;box-shadow:var(--shadow-md);transition:all .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.oc-node:hover{transform:translateY(-8px);box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);border-color:var(--primary)}
+.oc-node-header{padding:8px 12px;background:#fafafa;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.oc-id{font-size:9px;font-weight:800;color:var(--muted);font-family:'JetBrains Mono'}
+.oc-node-body{padding:15px;display:flex;align-items:center;gap:12px;text-align:left}
+.oc-node-avatar{width:42px;height:42px;border-radius:10px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0}
+.oc-node-info{min-width:0}
+.oc-node-name{font-size:.85rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-node-role{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px}
+.oc-node-footer{padding:6px 12px;background:#f8fafc;font-size:9px;font-weight:700;color:var(--muted);border-top:1px solid #f1f5f9;text-transform:uppercase;letter-spacing:.05em}
+/* Level-specific top border accents */
+.oc-ceo{border-top:4px solid #0f172a;width:220px}
+.oc-mgr{border-top:4px solid var(--primary)}
+.oc-staff{border-top:4px solid #cbd5e1;width:170px;padding:12px}
+.oc-staff .oc-node-name{font-size:.75rem;text-align:center;width:100%}
+.oc-staff .oc-node-role{font-size:.6rem;text-align:center;width:100%}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:14px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:none}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.modal-body{padding:20px 24px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ============================================================
+   DASHBOARD — Hero Banner
+   ============================================================ */
+/* Gradient green banner; dot-grid texture via ::before pseudo */
+.db-hero-banner{background:linear-gradient(135deg,#15b201 0%,#0f8a00 100%);border-radius:20px;padding:20px;color:white;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;box-shadow:0 10px 30px -10px rgba(21,178,1,.3)}
+.db-hero-banner::before{content:"";position:absolute;inset:0;opacity:.1;background-image:radial-gradient(circle at 2px 2px,white 1px,transparent 0);background-size:24px 24px}
+/* Keep text/buttons above the pseudo-element */
+.db-hero-content,.qa-stack-v2{position:relative;z-index:10}
+.db-hero-content{position:relative;z-index:1}
+.db-hero-title{font-size:1.75rem;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.db-hero-sub{font-size:.85rem;opacity:.9;font-weight:500}
+.db-quick-actions{display:flex;gap:12px;position:relative;z-index:1}
+
+/* Decorative center illustration */
+.db-hero-center-img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:100%;width:auto;max-height:140px;pointer-events:none;z-index:1;opacity:.5;transition:height .3s ease}
+@media(max-width:900px){.db-hero-center-img{opacity:.2;max-height:80px}}
+@media(max-width:600px){.db-hero-center-img{display:none}}
+
+/* Quick Actions stack above buttons */
+.db-actions-wrapper{display:flex;flex-direction:column;align-items:flex-end;gap:8px;position:relative;z-index:1}
+.qa-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.9);margin-bottom:4px}
+.qa-stack-v2{display:flex;flex-direction:column;align-items:center;gap:10px}
+.qa-mini-header{display:flex;align-items:center;gap:10px;width:100%}
+.qa-mini-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.85);white-space:nowrap}
+.qa-mini-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+.qa-button-row{display:flex;gap:8px}
+
+/* ============================================================
+   DASHBOARD — Premium Stat Ribbon
+   ============================================================ */
+/* Auto-fit grid; 1px gap between cards creates thin divider effect */
+.stat-ribbon-art{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:rgba(15,23,42,.08);border-radius:12px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(15,23,42,.05)}
+@media(max-width:1024px){.stat-ribbon-art{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+
+.art-card{position:relative;min-height:92px;padding:16px 24px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;transition:all .6s cubic-bezier(.22,1,.36,1);overflow:hidden;cursor:pointer}
+.art-card:hover{background:color-mix(in srgb,var(--accent-color) 4%,#fff)}
+/* Animated underline accent on hover */
+.art-card::after{content:"";position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--accent-color);transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.22,1,.36,1);opacity:.6}
+.art-card:hover::after{transform:scaleX(1);transform-origin:left}
+.art-label{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.18em;margin-bottom:8px}
+.art-main-row{display:flex;justify-content:space-between;align-items:flex-end}
+.art-value{font-size:32px;font-weight:200;color:#0f172a;letter-spacing:-.05em;line-height:.8}
+.art-meta-group{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.art-indicator{font-size:11px;font-weight:800;color:var(--accent-color);letter-spacing:.02em;margin-bottom:2px}
+.art-subtext{font-size:11px;font-weight:500;color:#64748b;text-transform:capitalize;line-height:1.2}
+/* Per-card accent colors via CSS custom property */
+.art-headcount{--accent-color:#10b981}
+.art-units{--accent-color:#3b82f6}
+.art-leave{--accent-color:#f59e0b}
+.art-expired{--accent-color:#ef4444}
+.art-missing{--accent-color:#6366f1}
+@media(max-width:640px){.db-hero-center-img{height:60%;opacity:.3}.art-card{padding:20px;height:auto}.art-value{font-size:28px}}
+
+/* ============================================================
+   DASHBOARD — Bento Two-Column Layout
+   ============================================================ */
+.bento-container{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch;width:100%}
+.bento-container>*{grid-column:span 1!important}
+@media(max-width:1100px){.bento-container{grid-template-columns:1fr}}
+@media(max-width:1200px){.chart-main-wrap,.activity-side-wrap{grid-column:span 2}}
+@media(max-width:768px){
+  .db-hero-banner{flex-direction:column;align-items:flex-start;gap:20px;padding:20px!important}
+  .bento-container{grid-template-columns:1fr}
+  .chart-main-wrap,.activity-side-wrap{grid-column:span 1}
+  .qa-button-row{flex-wrap:wrap;justify-content:center}
+}
+.chart-main-wrap{padding:20px}
+
+/* ── Live Activity / Pulse Feed Panel ── */
+.activity-side-wrap{background:var(--surface);border:1px solid var(--border);border-radius:20px;display:flex;flex-direction:column;max-height:420px;overflow:hidden;box-shadow:var(--shadow)}
+.pulse-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#fafafa}
+.pulse-label{font-size:.75rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.05em}
+/* Pulsing green dot indicating live data */
+.live-indicator{width:8px;height:8px;background:var(--primary);border-radius:50%;position:relative}
+.live-indicator::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--primary);animation:pulse-ring 1.5s cubic-bezier(.455,.03,.515,.955) infinite}
+@keyframes pulse-ring{0%{transform:scale(.3);opacity:1}80%,100%{transform:scale(1.5);opacity:0}}
+.hr-pulse-feed{padding:12px;overflow-y:auto;flex:1;scrollbar-width:thin}
+.pulse-item{padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:10px;border:1px solid transparent;transition:all .2s ease}
+.pulse-item:hover{background:#fff;border-color:var(--border);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pulse-type{font-size:.6rem;font-weight:800;text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-bottom:6px;display:inline-block}
+.type-asset{background:#e0f2fe;color:#0369a1}
+.type-prob{background:#fef3c7;color:#92400e}
+.type-crit{background:#fee2e2;color:#991b1b}
+.type-hire{background:#dcfce7;color:#166534}
+.pulse-content{font-size:.75rem;font-weight:600;color:var(--text);line-height:1.4}
+.pulse-ts{font-size:.65rem;color:var(--muted);margin-top:6px;display:block;font-family:'JetBrains Mono',monospace}
+
+/* Pill-shaped refresh button */
+.refresh-pill{all:unset;display:flex;align-items:center;gap:6px;padding:5px 12px;background:#fff;border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;transition:all .2s ease;user-select:none}
+.refresh-pill:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);box-shadow:0 2px 8px -2px rgba(21,178,1,.15)}
+.refresh-pill:active{transform:translateY(1px) scale(.96)}
+.refresh-pill i{transition:transform .2s ease}
+
+/* Legacy activity stream (retained for compatibility) */
+.activity-item{position:relative;padding:12px 16px;background:#f8fafc;border-radius:12px;border-left:4px solid var(--border);margin-bottom:12px;transition:transform .2s ease,box-shadow .2s ease;cursor:default}
+.activity-item:hover{transform:translateX(4px);background:#fff;box-shadow:var(--shadow)}
+.activity-item.success{border-left-color:var(--success)}
+.activity-item.warning{border-left-color:var(--warning)}
+.activity-item.danger{border-left-color:var(--danger)}
+.activity-item.info{border-left-color:var(--info)}
+.activity-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.activity-module-tag{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.activity-time{font-size:.65rem;color:#94a3b8;font-family:'JetBrains Mono',monospace}
+.activity-title{font-size:.75rem;font-weight:700;color:var(--text);display:block}
+.activity-desc{font-size:.7rem;color:var(--muted);line-height:1.4;margin-top:2px}
+.log-container{display:flex;flex-direction:column;gap:12px;height:100%}
+.no-activity{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;opacity:.6;padding:40px 0}
+.stat-v6-label{font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat-v6-value{font-size:1.8rem;font-weight:800;color:var(--text);margin:4px 0}
+.stat-v6-trend{font-size:.7rem;font-weight:700;display:flex;align-items:center;gap:4px}
+
+/* ============================================================
+   ASSET TRACKING
+   ============================================================ */
+.as-search-wrapper{display:flex;align-items:center;background:#fff;padding:4px 4px 4px 14px;border-radius:10px;border:1px solid var(--border);flex:1;max-width:460px;box-shadow:var(--shadow)}
+.as-search-icon{color:var(--muted);flex-shrink:0}
+.as-search-input{border:none;background:transparent;padding:8px 12px;font-size:.8rem;outline:none;flex:1;font-family:inherit;color:var(--text);min-width:0}
+.as-add-btn{height:32px;padding:0 12px;white-space:nowrap;flex-shrink:0}
+/* Responsive column grid for asset rows */
+.as-stream-header,.asset-stripe{display:grid;grid-template-columns:110px 1.4fr 1fr 1fr 1fr 1.2fr 120px;align-items:center}
+@media(max-width:900px){.as-stream-header,.asset-stripe{grid-template-columns:90px 1fr 1fr 90px}.as-stream-header>*:nth-child(n+5),.asset-stripe>*:nth-child(n+5){display:none}}
+@media(max-width:580px){.as-stream-header,.asset-stripe{grid-template-columns:80px 1fr 80px}.as-stream-header>*:nth-child(n+4),.asset-stripe>*:nth-child(n+4){display:none}}
+.as-stream-header{padding:12px 0;font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.asset-stream{display:flex;flex-direction:column;gap:4px}
+.asset-stripe{background:var(--surface);padding:14px 0;border-radius:10px;border:1px solid var(--border);transition:all .2s cubic-bezier(.4,0,.2,1)}
+/* Left accent stripe appears on hover via box-shadow trick */
+.asset-stripe:hover{background:#fcfdfe;border-color:var(--primary);transform:translateX(4px);box-shadow:-4px 0 0 var(--primary),var(--shadow-md)}
+.as-id{font-size:.75rem;font-weight:600;color:var(--muted);padding-left:16px}
+.as-name{font-size:.8rem;font-weight:700;color:var(--text)}
+.as-custodian-prev{font-size:.78rem;font-weight:500;color:var(--muted);opacity:.7}
+.as-custodian-curr{font-size:.78rem;font-weight:600;color:var(--text)}
+.as-ref-text,.as-location-text{font-size:.75rem;color:var(--muted)}
+.as-actions{display:flex;gap:8px;justify-content:flex-end;padding-right:16px}
+.as-icon-btn{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all .15s;cursor:pointer}
+.as-icon-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.as-icon-btn.edit-btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* Combo autocomplete dropdown */
+.as-combo-container{position:relative;width:100%}
+.as-combo-results{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);max-height:180px;overflow-y:auto;z-index:9999;display:none}
+.as-combo-results.active{display:block}
+.as-res-item{padding:10px 14px;font-size:.8rem;font-weight:500;cursor:pointer;color:var(--text);border-bottom:1px solid #f8fafc;transition:all .15s}
+.as-res-item:last-child{border-bottom:none}
+.as-res-item:hover{background:var(--primary-light);color:var(--primary);padding-left:18px}
+.info-tile{background:#f8fafc;border:1px solid var(--border);padding:10px 14px;border-radius:8px}
+.tile-label{display:block;font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.03em;margin-bottom:4px}
+.tile-val{font-size:.85rem;font-weight:700;color:var(--text)}
+
+/* Vault compliance slot (filled/empty/expired) */
+.vault-slot{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;transition:all .2s}
+.vault-slot.filled{background:var(--success-bg);color:var(--success);border:1px solid #86efac}
+.vault-slot.empty{background:#f8fafc;color:#cbd5e1;border:1px dashed #cbd5e1}
+.vault-slot.expired{background:var(--danger-bg);color:var(--danger);border:1px solid #fca5a5}
+.vault-slot:hover{transform:scale(1.1);filter:brightness(.9)}
+
+/* ============================================================
+   COMPANY PROFILE — Executive Master Data Grid
+   ============================================================ */
+/* Fills available viewport height below the header */
+.master-profile-wrapper{height:calc(100vh - var(--header-h) - 48px);display:flex;flex-direction:column;gap:16px}
+.profile-identity-bar{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);flex-shrink:0}
+/* 3-column, 2-row grid; first two cards span both rows */
+.profile-main-grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr;gap:16px;min-height:0}
+.data-card{background:#fff;border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.span-v-2{grid-row:span 2}
+.card-label-strip{padding:12px 16px;border-bottom:1px solid var(--border);background:#f8fafc;display:flex;align-items:center;gap:8px}
+.card-label-strip i{color:var(--primary)}
+.card-label-strip span{font-size:.65rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em}
+.card-content{padding:0;display:flex;flex-direction:column;overflow-y:auto}
+.data-entry{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f1f5f9}
+.data-entry:last-child{border-bottom:none}
+.de-label{font-size:.7rem;font-weight:600;color:var(--muted)}
+.de-value{font-size:.8rem;font-weight:700;color:#0f172a;text-align:right}
+.de-value.mono{font-family:'JetBrains Mono',monospace;color:var(--primary-dark)}
+.mini-table{width:100%;border-collapse:collapse}
+.mini-table th{text-align:left;font-size:.6rem;color:var(--muted);padding:10px 16px;background:#fafafa;text-transform:uppercase}
+.mini-table td{font-size:.75rem;padding:10px 16px;border-bottom:1px solid #f1f5f9;color:var(--text);font-weight:600}
+@media(max-width:1024px){.master-profile-wrapper{height:auto;overflow:visible}.profile-main-grid{grid-template-columns:1fr;grid-template-rows:auto}.span-v-2{grid-row:auto}}
+
+/* ============================================================
+   ANALYTICS & MISC
+   ============================================================ */
+.dash-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:768px){.dash-chart-row{grid-template-columns:1fr}}
+.brand-strip{grid-column:span 12;background:var(--primary);color:#fff;padding:16px 24px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.roles-layout{display:grid;grid-template-columns:220px 1fr;gap:20px}
+@media(max-width:768px){.roles-layout{grid-template-columns:1fr}}
+.role-pill{padding:9px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s}
+.role-pill:hover{background:#f1f5f9;color:var(--text)}
+.role-pill.active{background:var(--primary-light);color:var(--primary)}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.filter-bar{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.section-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 12px}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.flex-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.flex-col{display:flex;flex-direction:column;gap:8px}
+.ml-auto{margin-left:auto}
+.mt-4{margin-top:16px}.mt-3{margin-top:12px}.mt-2{margin-top:8px}.mb-4{margin-bottom:16px}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+
+/* ============================================================
+   MOBILE SIDEBAR OVERRIDE
+   ============================================================ */
+@media(max-width:768px){
+  /* Sidebar slides in from left */
+  .sidebar{transform:translateX(-100%);position:fixed;height:100vh;width:280px!important;z-index:1000;transition:transform .3s ease-in-out}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .main{margin-left:0!important}
+  /* Mobile overlay uses display toggle (not opacity fade) */
+  .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none}
+  .sidebar-overlay.visible{display:block}
+  /* Force all text visible while sidebar is open on mobile */
+  .sidebar.mobile-open .sidebar-brand-text,
+  .sidebar.mobile-open .nav-label,
+  .sidebar.mobile-open span,
+  .sidebar.mobile-open .chevron{display:block!important}
+  .sidebar.mobile-open .nav-trigger,
+  .sidebar.mobile-open .dash-link{justify-content:space-between!important;padding:9px 10px!important}
+  .sidebar.mobile-open .nav-icon{margin:0!important}
+  /* Prevent 78px collapsed width on mobile */
+  .sidebar.collapsed.mobile-open{width:280px!important;background:var(--surface)!important}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i data-lucide="layers" size="16"></i></div>
+    <span class="sidebar-brand-text">YDY Systems</span>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="nav-group">
+      <div class="dash-link active" onclick="goPage('dashboard',this)" title="Dashboard">
+        <div class="nav-trigger-left">
+          <div class="nav-icon"><i data-lucide="layout-dashboard" size="15"></i></div>
+          <span>Dashboard</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-label">Organization</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-org')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="building-2" size="15"></i></div><span>Company & Structure</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-org">
+        <div class="sub-link" onclick="goPage('company-profile',this)"><span class="sub-dot"></span><span>Company Profile</span></div>
+        <div class="sub-link" onclick="goPage('org-chart',this)"><span class="sub-dot"></span><span>Organization Chart</span></div>
+        <div class="sub-link" onclick="goPage('departments',this)"><span class="sub-dot"></span><span>Departments</span></div>
+        <div class="sub-link" onclick="goPage('job-positions',this)"><span class="sub-dot"></span><span>Job Positions</span></div>
+        <div class="sub-link" onclick="goPage('branch-offices',this)"><span class="sub-dot"></span><span>Branch Offices</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-emp')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="users" size="15"></i></div><span>Employees</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-emp">
+        <div class="sub-link" onclick="goPage('employee-directory',this)"><span class="sub-dot"></span><span>Employee Profile</span></div>
+        <div class="sub-link" onclick="goPage('employment-types',this)"><span class="sub-dot"></span><span>Employment Types</span></div>
+        <div class="sub-link" onclick="goPage('probation-tracker',this)"><span class="sub-dot"></span><span>Probation Tracker</span></div>
+        <div class="sub-link" onclick="goPage('contract-renewals',this)"><span class="sub-dot"></span><span>Contract Renewals</span></div>
+        <div class="sub-link" onclick="goPage('former-employees',this)"><span class="sub-dot"></span><span>Former employees</span></div>
+        <div class="sub-link" onclick="goPage('document-vault',this)"><span class="sub-dot"></span><span>Attachment Vault</span></div>
+        <div class="sub-link" onclick="goPage('asset-tracking',this)"><span class="sub-dot"></span><span>Asset Tracking</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-rec')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="user-plus" size="15"></i></div><span>Talent Acquisition</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-rec">
+        <div class="sub-link" onclick="goPage('job-vacancies',this)"><span class="sub-dot"></span><span>Add Job Vacancies</span></div>
+        <div class="sub-link" onclick="goPage('candidates',this)"><span class="sub-dot"></span><span>Job Applicant's List</span></div>
+        <div class="sub-link" onclick="goPage('interview-tracker',this)"><span class="sub-dot"></span><span>Interview Tracker</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-move')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="arrow-right-left" size="15"></i></div><span>Employee Movement</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-move">
+        <div class="sub-link" onclick="goPage('Promote/Demote',this)"><span class="sub-dot"></span><span>Promote/Demote</span></div>
+        <div class="sub-link" onclick="goPage('transfers',this)"><span class="sub-dot"></span><span>Department Transfers</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Operations</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-att')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="clock" size="15"></i></div><span>Attendance</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-att">
+        <div class="sub-link" onclick="goPage('shift-management',this)"><span class="sub-dot"></span><span>Shift Management</span></div>
+        <div class="sub-link" onclick="goPage('daily-attendance',this)"><span class="sub-dot"></span><span>Daily Attendance</span></div>
+        <div class="sub-link" onclick="goPage('overtime-requests',this)"><span class="sub-dot"></span><span>Overtime Requests</span></div>
+        <div class="sub-link" onclick="goPage('attendance-reports',this)"><span class="sub-dot"></span><span>Attendance Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-leave')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="calendar-days" size="15"></i></div><span>Leave Management</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-leave">
+        <div class="sub-link" onclick="goPage('leave-types',this)"><span class="sub-dot"></span><span>Leave Types</span></div>
+        <div class="sub-link" onclick="goPage('leave-requests',this)"><span class="sub-dot"></span><span>Leave Requests</span></div>
+        <div class="sub-link" onclick="goPage('leave-entitlement',this)"><span class="sub-dot"></span><span>Leave Entitlement</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-ben')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="heart-pulse" size="15"></i></div><span>Benefits</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-ben">
+        <div class="sub-link" onclick="goPage('medical-claims',this)"><span class="sub-dot"></span><span>Medical Claims</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-comp')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="shield-alert" size="15"></i></div><span>Compliance & Exit</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-comp">
+        <div class="sub-link" onclick="goPage('disciplinary-actions',this)"><span class="sub-dot"></span><span>Disciplinary Actions</span></div>
+        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span><span>Resignation</span></div>
+        <div class="sub-link" onclick="goPage('termination',this)"><span class="sub-dot"></span><span>Separation & Exit</span></div>
+        <div class="sub-link" onclick="goPage('exit-clearance',this)"><span class="sub-dot"></span><span>Exit Clearance</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Growth & Data</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-train')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="graduation-cap" size="15"></i></div><span>Training & Dev</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-train">
+        <div class="sub-link" onclick="goPage('training-needs',this)"><span class="sub-dot"></span><span>Training Needs Analysis</span></div>
+        <div class="sub-link" onclick="goPage('course-catalog',this)"><span class="sub-dot"></span><span>Course Catalog</span></div>
+        <div class="sub-link" onclick="goPage('training-schedule',this)"><span class="sub-dot"></span><span>Training Schedule</span></div>
+        <div class="sub-link" onclick="goPage('learning-history',this)"><span class="sub-dot"></span><span>Learning History</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-perf')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="trending-up" size="15"></i></div><span>Performance</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-perf">
+        <div class="sub-link" onclick="goPage('kpi-setup',this)"><span class="sub-dot"></span><span>KPI Setup</span></div>
+        <div class="sub-link" onclick="goPage('performance-reviews',this)"><span class="sub-dot"></span><span>Performance Reviews</span></div>
+        <div class="sub-link" onclick="goPage('360-feedback',this)"><span class="sub-dot"></span><span>360° Feedback</span></div>
+        <div class="sub-link" onclick="goPage('succession-planning',this)"><span class="sub-dot"></span><span>Succession Planning</span></div>
+        <div class="sub-link" onclick="goPage('performance-reports',this)"><span class="sub-dot"></span><span>Performance Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Analytics & System</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-rep')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="bar-chart-3" size="15"></i></div><span>Reports & Analytics</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-rep">
+        <div class="sub-link" onclick="goPage('hr-analytics',this)"><span class="sub-dot"></span><span>HR Analytics</span></div>
+        <div class="sub-link" onclick="goPage('custom-reports',this)"><span class="sub-dot"></span><span>Custom Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-sys')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="settings-2" size="15"></i></div><span>System Admin</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-sys">
+        <div class="sub-link" onclick="goPage('user-management',this)"><span class="sub-dot"></span><span>User Management</span></div>
+        <div class="sub-link" onclick="goPage('roles-permissions',this)"><span class="sub-dot"></span><span>Roles & Permissions</span></div>
+        <div class="sub-link" onclick="goPage('audit-logs',this)"><span class="sub-dot"></span><span>Audit Logs</span></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main" id="main-content">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" aria-label="Toggle Sidebar">
+        <i data-lucide="menu" size="16" id="toggle-icon"></i>
+      </button>
+      <div class="breadcrumb">
+        <i data-lucide="home" size="13"></i>
+        <span>/</span>
+        <span id="page-title">Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="icon-btn"><i data-lucide="bell" size="15"></i><span class="notif-dot"></span></div>
+      <div class="icon-btn"><i data-lucide="help-circle" size="15"></i></div>
+      <div class="topbar-user">
+        <div class="topbar-user-avatar">AD</div>
+        <div class="topbar-user-info">
+          <div class="u-name">Admin User</div>
+          <div class="u-role">Super Administrator</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-area" id="content-area">
+
+<!-- ── DASHBOARD ── -->
+<div class="page active" id="p-dashboard">
+  <header class="db-hero-banner" style="padding:16px 28px;min-height:auto;position:relative;">
+    <div class="db-hero-content">
+      <h1 class="db-hero-title" style="font-size:1.5rem;">Dashboard Intelligence</h1>
+      <p class="db-hero-sub">Organization performance is at peak efficiency.</p>
+    </div>
+    <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
+    <div class="qa-stack-v2">
+      <div class="qa-mini-header">
+        <span class="qa-mini-line"></span>
+        <span class="qa-mini-label">Quick Actions</span>
+        <span class="qa-mini-line"></span>
+      </div>
+      <div class="qa-button-row">
+        <button class="btn-glass-pro-slim" onclick="goPage('employee-directory',this)"><i data-lucide="user-plus" size="14"></i><span>New Hire</span></button>
+        <button class="btn-glass-pro-slim" onclick="goPage('leave-requests',this)"><i data-lucide="calendar" size="14"></i><span>Leaves</span></button>
+        <button class="btn-glass-pro-slim" onclick="goPage('hr-analytics',this)"><i data-lucide="bar-chart-3" size="14"></i><span>Analytics</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stat-ribbon-art">
+    <div class="art-card art-headcount"><span class="art-label">Headcount</span><div class="art-main-row"><span class="art-value">1,248</span><div class="art-meta-group"><span class="art-indicator">↑ 12</span><span class="art-subtext">Monthly Growth</span></div></div></div>
+    <div class="art-card art-units"><span class="art-label">Departments</span><div class="art-main-row"><span class="art-value">07</span><div class="art-meta-group"><span class="art-indicator">Active</span><span class="art-subtext">Internal Units</span></div></div></div>
+    <div class="art-card art-leave"><span class="art-label">On Leave</span><div class="art-main-row"><span class="art-value">47</span><div class="art-meta-group"><span class="art-indicator">Staff</span><span class="art-subtext"> Outbound</span></div></div></div>
+    <div class="art-card art-expired"><span class="art-label">Expiring</span><div class="art-main-row"><span class="art-value">18</span><div class="art-meta-group"><span class="art-indicator">Critical</span><span class="art-subtext">Contract Review</span></div></div></div>
+    <div class="art-card art-missing"><span class="art-label">Compliance</span><div class="art-main-row"><span class="art-value">48</span><div class="art-meta-group"><span class="art-indicator">Missing</span><span class="art-subtext">Vault Files</span></div></div></div>
+  </div>
+
+  <div class="bento-container">
+    <!-- Headcount bar chart -->
+    <div class="card" style="padding:24px;border-radius:20px;background:#fff;">
+      <div class="card-header" style="border:none;padding:0 0 20px 0;">
+        <div>
+          <div class="card-title" style="font-size:1.15rem;color:#0f172a;font-weight:800;">Headcount Distribution</div>
+          <div class="page-sub">Departmental workload and personnel breakdown</div>
+        </div>
+      </div>
+      <div style="height:240px;width:100%;"><canvas id="chart-headcount-dept"></canvas></div>
+    </div>
+
+    <!-- Live activity feed -->
+    <div class="activity-side-wrap" style="max-height:445px;border-radius:20px;">
+      <div class="pulse-header">
+        <div class="pulse-label"><div class="live-indicator"></div>Recent activities</div>
+        <button class="refresh-pill" onclick="triggerRefresh(this)">
+          <i data-lucide="refresh-cw" size="12"></i><span id="refresh-text">Refresh</span>
+        </button>
+      </div>
+      <div class="hr-pulse-feed">
+        <div class="pulse-item"><span class="pulse-type type-asset">Inventory</span><div class="pulse-content">MacBook Pro 14" (AST-99) assigned to <b>Sarah Jenkins</b></div><span class="pulse-ts">Just now</span></div>
+        <div class="pulse-item"><span class="pulse-type type-crit">Compliance</span><div class="pulse-content">NDA missing for <b>4 employees</b> in Engineering.</div><span class="pulse-ts">12m ago</span></div>
+        <div class="pulse-item"><span class="pulse-type type-hire">Talent</span><div class="pulse-content">New application received for <b>Senior UI Designer</b>.</div><span class="pulse-ts">45m ago</span></div>
+        <div class="pulse-item"><span class="pulse-type type-prob">Probation</span><div class="pulse-content"><b>John Doe</b> completed 90-day review period.</div><span class="pulse-ts">2h ago</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── COMPANY PROFILE ── -->
+<div class="page" id="p-company-profile">
+  <div class="master-profile-wrapper">
+    <header class="db-hero-banner" style="padding:16px 28px;min-height:auto;position:relative;">
+      <div class="db-hero-content">
+        <h1 class="db-hero-title" style="font-size:1.5rem;">YDY HRM Enterprise Ltd.</h1>
+        <p class="db-hero-sub">Corporate Registry</p>
+      </div>
+      <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
+      <button class="btn-glass-pro-slim" onclick="openEditCompanyModal(this)"><i data-lucide="edit" size="14"></i><span>Update records</span></button>
+    </header>
+    <div class="profile-main-grid">
+      <div class="data-card span-v-2">
+        <div class="card-label-strip"><i data-lucide="file-text" size="14"></i><span>Legal & Incorporation</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Legal Name</span><span class="de-value">YDY HRM Enterprise Ltd.</span></div>
+          <div class="data-entry"><span class="de-label">Trading Name</span><span class="de-value">YDY Systems</span></div>
+          <div class="data-entry"><span class="de-label">Entity Type</span><span class="de-value">Private Ltd. Co</span></div>
+          <div class="data-entry"><span class="de-label">Incorporate Date</span><span class="de-value">12 Oct 2010</span></div>
+          <div class="data-entry"><span class="de-label">Registration No.</span><span class="de-value mono">MT/AA/14/667/09</span></div>
+          <div class="data-entry"><span class="de-label">Capital (Authorized)</span><span class="de-value">50,000,000 ETB</span></div>
+          <div class="data-entry"><span class="de-label">Issued By</span><span class="de-value">Min. of Trade</span></div>
+          <div class="data-entry"><span class="de-label">Country</span><span class="de-value">Ethiopia</span></div>
+          <div class="data-entry"><span class="de-label">Life Span</span><span class="de-value">Perpetual</span></div>
+        </div>
+      </div>
+      <div class="data-card span-v-2">
+        <div class="card-label-strip"><i data-lucide="shield-check" size="14"></i><span>Tax & Regulatory DNA</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Tax ID (TIN)</span><span class="de-value mono">0019283746</span></div>
+          <div class="data-entry"><span class="de-label">VAT Reg Number</span><span class="de-value mono">9928374-VAT-01</span></div>
+          <div class="data-entry"><span class="de-label">Pension Code (ER)</span><span class="de-value mono">P-99283-746-X</span></div>
+          <div class="data-entry"><span class="de-label">Trade License No.</span><span class="de-value mono">01/01/14/19283</span></div>
+          <div class="data-entry"><span class="de-label">Tax Office</span><span class="de-value">Large Taxpayers (LTO)</span></div>
+          <div class="data-entry"><span class="de-label">Filing Frequency</span><span class="de-value">Monthly</span></div>
+          <div class="data-entry"><span class="de-label">Audit Status</span><span class="de-value" style="color:var(--success)">Current (2025)</span></div>
+          <div class="data-entry"><span class="de-label">License Renewal</span><span class="de-value">30 June 2026</span></div>
+          <div class="data-entry"><span class="de-label">Compliance Grade</span><span class="de-value">A+ Rating</span></div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="card-label-strip"><i data-lucide="globe" size="14"></i><span>System & Treasury</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Main Bank</span><span class="de-value">CBE</span></div>
+          <div class="data-entry"><span class="de-label">Account (Primary)</span><span class="de-value mono">1000192837465</span></div>
+          <div class="data-entry"><span class="de-label">Base Currency</span><span class="de-value">ETB (Birr)</span></div>
+          <div class="data-entry"><span class="de-label">Fiscal Start</span><span class="de-value">Hamle 01</span></div>
+          <div class="data-entry"><span class="de-label">Timezone</span><span class="de-value">UTC+3 (EAT)</span></div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="card-label-strip"><i data-lucide="map-pin" size="14"></i><span>Branch Directory</span></div>
+        <div class="card-content">
+          <table class="mini-table">
+            <thead><tr><th>Branch</th><th>Location</th><th>Staff</th></tr></thead>
+            <tbody>
+              <tr><td>Headquarters</td><td>Addis Ababa</td><td>840</td></tr>
+              <tr><td>Northern Hub</td><td>Mekelle</td><td>120</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORG CHART ── -->
+<div class="page" id="p-org-chart">
+  <div class="page-header">
+    <div><div class="page-title">Organizational Hierarchy</div><div class="page-sub">Visualizing reporting lines and departmental structures</div></div>
+    <div class="flex-row" style="gap:10px;">
+      <div class="icon-btn-group" style="display:flex;background:#fff;border:1px solid var(--border);border-radius:8px;padding:2px;">
+        <button class="icon-btn" onclick="zoomOC(-0.1)" title="Zoom Out" style="border:none;"><i data-lucide="minus-circle" size="16"></i></button>
+        <div id="oc-zoom-label" style="font-size:.7rem;font-weight:800;width:45px;display:flex;align-items:center;justify-content:center;color:var(--muted);border-left:1px solid var(--border);border-right:1px solid var(--border);">100%</div>
+        <button class="icon-btn" onclick="zoomOC(0.1)" title="Zoom In" style="border:none;"><i data-lucide="plus-circle" size="16"></i></button>
+        <button class="icon-btn" onclick="resetOC()" title="Reset Chart" style="border:none;color:var(--primary);"><i data-lucide="refresh-cw" size="14"></i></button>
+      </div>
+      <button class="btn btn-primary"><i data-lucide="printer" size="14"></i> Export PDF</button>
+    </div>
+  </div>
+  <div class="oc-blueprint" id="oc-blueprint-area">
+    <div class="oc-container" id="oc-zoom-container" style="transform-origin:top center;transition:transform .2s ease-out;">
+      <ul class="oc-tree" id="oc-tree-root">
+        <li>
+          <div class="oc-node oc-ceo">
+            <div class="oc-node-header"><span class="oc-id">E-001</span><span class="badge badge-success" style="font-size:8px;">Active</span></div>
+            <div class="oc-node-body"><div class="oc-node-avatar">AB</div><div class="oc-node-info"><div class="oc-node-name">Abebe Bikila</div><div class="oc-node-role">Chief Executive Officer</div></div></div>
+            <div class="oc-node-footer">Executive Board</div>
+          </div>
+          <ul>
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-012</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#eff6ff;color:#3b82f6;">SJ</div><div class="oc-node-info"><div class="oc-node-name">Sara Jenkins</div><div class="oc-node-role">Operations Dir.</div></div></div>
+              </div>
+              <ul>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Daniel Smith</div><div class="oc-node-role">Logistics Mgr</div></div></li>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Helen Gebre</div><div class="oc-node-role">Ops Supervisor</div></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fdf2f2;color:#ef4444;">MK</div><div class="oc-node-info"><div class="oc-node-name">Michael Kassa</div><div class="oc-node-role">Technical Dir.</div></div></div>
+              </div>
+              <ul>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Kevin Vark</div><div class="oc-node-role">Lead Engineer</div></div></li>
+                <li><div class="oc-node oc-staff"><div class="oc-node-name">Yared Tolla</div><div class="oc-node-role">QA Specialist</div></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="oc-node oc-mgr">
+                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fdf2f2;color:#ef4444;">MK</div><div class="oc-node-info"><div class="oc-node-name">Michael Kassa</div><div class="oc-node-role">Technical Dir.</div></div></div>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── DEPARTMENTS ── -->
+<div class="page" id="p-departments">
+  <div class="page-header"><div><div class="page-title">Departments</div><div class="page-sub">Manage all organizational units</div></div><button class="btn btn-primary" onclick="openDeptModal()"><i data-lucide="plus" size="13"></i>Add Department</button></div>
+  <div id="tbl-departments"></div>
+</div>
+
+<!-- ── JOB POSITIONS ── -->
+<div class="page" id="p-job-positions">
+  <div class="page-header"><div><div class="page-title">Job Positions</div><div class="page-sub">Define job information</div></div><button class="btn btn-primary" onclick="openJobModal()"><i data-lucide="plus" size="13"></i>New Position</button></div>
+  <div id="tbl-job-positions"></div>
+</div>
+
+<!-- ── BRANCH OFFICES ── -->
+<div class="page" id="p-branch-offices">
+  <div class="page-header"><div><div class="page-title">Branch Offices</div><div class="page-sub">All locations and regional offices</div></div><button class="btn btn-primary" onclick="openBranchModal()"><i data-lucide="plus" size="13"></i>Add Branch</button></div>
+  <div id="tbl-branch-offices"></div>
+</div>
+
+<!-- ── EMPLOYEE DIRECTORY ── -->
+<div class="page" id="p-employee-directory">
+  <div class="page-header">
+    <div><div class="page-title">Employee Profile</div><div class="page-sub">1,248 employees across all branches</div></div>
+    <div class="flex-row"><select class="sel"><option>All Departments</option><option>Engineering</option><option>Sales</option><option>HR</option><option>Finance</option></select><button class="btn btn-primary"><i data-lucide="user-plus" size="13"></i>Add Employee</button></div>
+  </div>
+  <div id="tbl-employees"></div>
+</div>
+
+<!-- ── EMPLOYMENT TYPES ── -->
+<div class="page" id="p-employment-types">
+  <div class="page-header"><div><div class="page-title">Employment Types</div><div class="page-sub">Configure contract and employment categories</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Type</button></div>
+  <div id="tbl-employment-types"></div>
+</div>
+
+<!-- ── PROBATION TRACKER ── -->
+<div class="page" id="p-probation-tracker">
+  <div class="page-header"><div><div class="page-title">Probation Tracker</div><div class="page-sub">Monitor and confirm probationary employees</div></div><button class="btn btn-primary"><i data-lucide="check-circle" size="13"></i>Confirm Selected</button></div>
+  <div id="tbl-probation"></div>
+</div>
+
+<!-- ── CONTRACT RENEWALS ── -->
+<div class="page" id="p-contract-renewals">
+  <div class="page-header"><div><div class="page-title">Contract Renewals</div><div class="page-sub">Expiring and up-for-renewal contracts</div></div><button class="btn btn-primary"><i data-lucide="refresh-cw" size="13"></i>Bulk Renew</button></div>
+  <div id="tbl-contract-renewals"></div>
+</div>
+
+<!-- ── FORMER EMPLOYEES ── -->
+<div class="page" id="p-former-employees">
+  <div class="page-header"><div><div class="page-title">Former Employees</div><div class="page-sub">Manage and view information for former employees</div></div></div>
+  <div id="tbl-former-employees"></div>
+</div>
+
+<!-- ── ATTACHMENT VAULT ── -->
+<div class="page" id="p-document-vault">
+  <div class="page-header"><div><div class="page-title">Attachment Vault & Compliance</div><div class="page-sub">Tracking mandatory company-specific documents for all personnel</div></div></div>
+  <div class="stats-row stats-4 mb-4">
+    <div class="stat-card" style="border-left:4px solid var(--primary);"><div class="stat-label">Global Compliance</div><div class="stat-value">72.4%</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--danger);"><div class="stat-label">Missing Critical Files</div><div class="stat-value">48</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--warning);"><div class="stat-label">Expiring Soon</div><div class="stat-value">12</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--success);"><div class="stat-label">Verified This Week</div><div class="stat-value">156</div></div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="ml-auto flex-row">
+        <span style="font-size:.7rem;color:var(--muted);font-weight:600;">LEGEND:</span>
+        <span style="font-size:.65rem;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--success);"></span>Uploaded</span>
+        <span style="font-size:.65rem;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#e2e8f0;border:1px dashed #cbd5e1;"></span>Missing</span>
+      </div>
+    </div>
+    <div id="vault-matrix-container"></div>
+  </div>
+</div>
+
+<!-- ── ASSET TRACKING ── -->
+<div class="page" id="p-asset-tracking">
+  <div class="page-header" style="margin-bottom:24px;">
+    <div><div class="page-title" style="letter-spacing:-.02em;font-weight:800;">Asset Registry</div><div class="page-sub">Centralized inventory and resource assignment</div></div>
+    <div class="as-search-wrapper">
+      <i data-lucide="search" size="15" class="as-search-icon"></i>
+      <input type="text" placeholder="Search by name, ID or custodian..." class="as-search-input" id="as-search-filter">
+      <button class="btn btn-primary btn-sm as-add-btn"><i data-lucide="plus" size="14"></i>Add New</button>
+    </div>
+  </div>
+  <div class="as-stream-header">
+    <div style="padding-left:16px;">System ID</div><div>Asset Name</div><div>Current Custodian</div>
+    <div>Prev. Custodian</div><div>Serial / Ref</div><div>Location</div>
+    <div style="text-align:right;padding-right:16px;">Commands</div>
+  </div>
+  <div id="asset-stream-container" class="asset-stream"></div>
+  <div id="as-pagination" class="pagination" style="margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"></div>
+</div>
+
+<!-- ── JOB VACANCIES ── -->
+<div class="page" id="p-job-vacancies">
+  <div class="page-header">
+    <div><div class="page-title">Job Vacancies</div><div class="page-sub">Positions across all departments</div></div>
+    <div class="flex-row"><select class="sel"><option>All Status</option><option>Open</option><option>On Hold</option><option>Filled</option></select><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Post Vacancy</button></div>
+  </div>
+  <div id="tbl-vacancies"></div>
+</div>
+
+<!-- ── CANDIDATES ── -->
+<div class="page" id="p-candidates">
+  <div class="page-header"><div><div class="page-title">Job Applicant's List</div><div class="page-sub">Track applicants through hiring stages</div></div><div class="flex-row"><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Candidate</button></div></div>
+  <div id="tbl-candidates"></div>
+</div>
+
+<!-- ── INTERVIEW TRACKER ── -->
+<div class="page" id="p-interview-tracker">
+  <div class="page-header"><div><div class="page-title">Interview Tracker</div><div class="page-sub">Schedule and track interview outcomes</div></div><button class="btn btn-primary"><i data-lucide="calendar-plus" size="13"></i>Schedule Interview</button></div>
+  <div id="tbl-interviews"></div>
+</div>
+
+<!-- ── SHIFT MANAGEMENT ── -->
+<div class="page" id="p-shift-management">
+  <div class="page-header"><div><div class="page-title">Shift Management</div><div class="page-sub">Configure and assign work shifts</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Create Shift</button></div>
+  <div id="tbl-shifts"></div>
+</div>
+
+<!-- ── DAILY ATTENDANCE ── -->
+<div class="page" id="p-daily-attendance">
+  <div class="page-header"><div><div class="page-title">Daily Attendance</div><div class="page-sub">Today — March 25, 2026</div></div><input type="date" value="2026-03-25" class="sel" style="font-family:inherit;"></div>
+  <div class="stats-row stats-4 mb-4">
+    <div class="stat-card"><div class="stat-label">Present</div><div class="stat-value" style="color:var(--success);">1,148</div></div>
+    <div class="stat-card"><div class="stat-label">Absent</div><div class="stat-value" style="color:var(--danger);">53</div></div>
+    <div class="stat-card"><div class="stat-label">On Leave</div><div class="stat-value" style="color:var(--warning);">47</div></div>
+    <div class="stat-card"><div class="stat-label">Late Arrivals</div><div class="stat-value" style="color:var(--info);">18</div></div>
+  </div>
+  <div id="tbl-attendance"></div>
+</div>
+
+<!-- ── OVERTIME REQUESTS ── -->
+<div class="page" id="p-overtime-requests">
+  <div class="page-header"><div><div class="page-title">Overtime Requests</div><div class="page-sub">Review and approve OT submissions</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Submit OT Request</button></div>
+  <div id="tbl-overtime"></div>
+</div>
+
+<!-- ── ATTENDANCE REPORTS ── -->
+<div class="page" id="p-attendance-reports">
+  <div class="page-header"><div><div class="page-title">Attendance Reports</div><div class="page-sub">Monthly attendance summaries</div></div><select class="sel"><option>March 2026</option><option>February 2026</option><option>January 2026</option></select></div>
+  <div id="tbl-attendance-reports"></div>
+</div>
+
+<!-- ── LEAVE TYPES ── -->
+<div class="page" id="p-leave-types">
+  <div class="page-header"><div><div class="page-title">Leave Types</div><div class="page-sub">Configure leave categories and entitlements</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Leave Type</button></div>
+  <div id="tbl-leave-types"></div>
+</div>
+
+<!-- ── LEAVE REQUESTS ── -->
+<div class="page" id="p-leave-requests">
+  <div class="page-header">
+    <div><div class="page-title">Leave Requests</div><div class="page-sub">Pending and approved leave applications</div></div>
+    <div class="flex-row"><select class="sel"><option>All Status</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>New Request</button></div>
+  </div>
+  <div id="tbl-leave-requests"></div>
+</div>
+
+<!-- ── LEAVE ENTITLEMENT ── -->
+<div class="page" id="p-leave-entitlement">
+  <div class="page-header"><div><div class="page-title">Leave Entitlement</div><div class="page-sub">Per-employee leave balance and policy</div></div></div>
+  <div id="tbl-leave-entitlement"></div>
+</div>
+
+<!-- ── MEDICAL CLAIMS ── -->
+<div class="page" id="p-medical-claims">
+  <div class="page-header"><div><div class="page-title">Medical Claims</div><div class="page-sub">Process and track employee medical reimbursements</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>New Claim</button></div>
+  <div id="tbl-medical"></div>
+</div>
+
+<!-- ── TRAINING NEEDS ── -->
+<div class="page" id="p-training-needs">
+  <div class="page-header"><div><div class="page-title">Training Needs Analysis</div><div class="page-sub">Identify skill gaps across the organization</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add TNA</button></div>
+  <div id="tbl-training-needs"></div>
+</div>
+
+<!-- ── COURSE CATALOG ── -->
+<div class="page" id="p-course-catalog">
+  <div class="page-header"><div><div class="page-title">Course Catalog</div><div class="page-sub">Available training programs and modules</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Course</button></div>
+  <div id="tbl-courses"></div>
+</div>
+
+<!-- ── TRAINING SCHEDULE ── -->
+<div class="page" id="p-training-schedule">
+  <div class="page-header"><div><div class="page-title">Training Schedule</div><div class="page-sub">Upcoming sessions and enrollment</div></div><button class="btn btn-primary"><i data-lucide="calendar-plus" size="13"></i>Schedule Session</button></div>
+  <div id="tbl-training-schedule"></div>
+</div>
+
+<!-- ── LEARNING HISTORY ── -->
+<div class="page" id="p-learning-history">
+  <div class="page-header"><div><div class="page-title">Learning History</div><div class="page-sub">Completed training records per employee</div></div></div>
+  <div id="tbl-learning-history"></div>
+</div>
+
+<!-- ── KPI SETUP ── -->
+<div class="page" id="p-kpi-setup">
+  <div class="page-header"><div><div class="page-title">KPI Setup</div><div class="page-sub">Define key performance indicators and weights</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add KPI</button></div>
+  <div id="tbl-kpis"></div>
+</div>
+
+<!-- ── PERFORMANCE REVIEWS ── -->
+<div class="page" id="p-performance-reviews">
+  <div class="page-header"><div><div class="page-title">Performance Reviews</div><div class="page-sub">Q1 2026 review cycle</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Start Review</button></div>
+  <div id="tbl-reviews"></div>
+</div>
+
+<!-- ── 360 FEEDBACK ── -->
+<div class="page" id="p-360-feedback">
+  <div class="page-header"><div><div class="page-title">360° Feedback</div><div class="page-sub">Peer, manager and subordinate evaluations</div></div><button class="btn btn-primary"><i data-lucide="send" size="13"></i>Send Feedback Form</button></div>
+  <div id="tbl-360"></div>
+</div>
+
+<!-- ── SUCCESSION PLANNING ── -->
+<div class="page" id="p-succession-planning">
+  <div class="page-header"><div><div class="page-title">Succession Planning</div><div class="page-sub">Identify and develop future leaders</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Succession Plan</button></div>
+  <div id="tbl-succession"></div>
+</div>
+
+<!-- ── PERFORMANCE REPORTS ── -->
+<div class="page" id="p-performance-reports">
+  <div class="page-header"><div><div class="page-title">Performance Reports</div><div class="page-sub">Aggregated performance analytics</div></div></div>
+  <div id="tbl-perf-reports"></div>
+</div>
+
+<!-- ── PROMOTE / DEMOTE ── -->
+<div class="page" id="p-Promote/Demote">
+  <div class="page-header"><div><div class="page-title">Promote/Demote</div><div class="page-sub">Employee promotion requests and approvals</div></div><button class="btn btn-primary"><i data-lucide="trending-up" size="13"></i>Initiate Change</button></div>
+  <div id="tbl-Promote/Demote"></div>
+</div>
+
+<!-- ── TRANSFERS ── -->
+<div class="page" id="p-transfers">
+  <div class="page-header"><div><div class="page-title">Department Transfers</div><div class="page-sub">Interdepartmental and branch transfers</div></div><button class="btn btn-primary"><i data-lucide="arrow-right-left" size="13"></i>Request Transfer</button></div>
+  <div id="tbl-transfers-dept"></div>
+</div>
+
+<!-- ── DISCIPLINARY ACTIONS ── -->
+<div class="page" id="p-disciplinary-actions">
+  <div class="page-header"><div><div class="page-title">Disciplinary Actions</div><div class="page-sub">Warnings, suspensions and formal actions</div></div><button class="btn btn-danger"><i data-lucide="alert-triangle" size="13"></i>Record Action</button></div>
+  <div id="tbl-disciplinary"></div>
+</div>
+
+<!-- ── GRIEVANCES ── -->
+<div class="page" id="p-grievances">
+  <div class="page-header"><div><div class="page-title">Grievance Management</div><div class="page-sub">Employee complaints and resolution tracking</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>File Grievance</button></div>
+  <div id="tbl-grievances"></div>
+</div>
+
+<!-- ── TERMINATION ── -->
+<div class="page" id="p-termination">
+  <div class="page-header"><div><div class="page-title">Separation & Exit</div><div class="page-sub">Manage employee offboarding</div></div><button class="btn btn-danger"><i data-lucide="user-minus" size="13"></i>Initiate Separation</button></div>
+  <div class="stats-row stats-3 mb-4">
+    <div class="stat-card"><div class="stat-label">Turnover Rate (YTD)</div><div class="stat-value">4.2%</div></div>
+    <div class="stat-card"><div class="stat-label">In Offboarding</div><div class="stat-value" style="color:var(--warning);">8</div></div>
+    <div class="stat-card"><div class="stat-label">Exits This Month</div><div class="stat-value">12</div></div>
+  </div>
+  <div id="tbl-termination"></div>
+</div>
+
+<!-- ── EXIT CLEARANCE ── -->
+<div class="page" id="p-exit-clearance">
+  <div class="page-header"><div><div class="page-title">Exit Clearance</div><div class="page-sub">Asset return and department sign-offs</div></div><button class="btn btn-secondary"><i data-lucide="printer" size="13"></i>Print Clearance Form</button></div>
+  <div id="tbl-clearance"></div>
+</div>
+
+<!-- ── HR ANALYTICS ── -->
+<div class="page" id="p-hr-analytics">
+  <div class="page-header"><div><div class="page-title">HR Analytics</div><div class="page-sub">Executive workforce intelligence dashboard</div></div></div>
+  <div class="stats-row stats-4">
+    <div class="stat-card"><div class="stat-label">Headcount</div><div class="stat-value">1,248</div><div class="stat-change stat-up">↑ 12 this month</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Tenure</div><div class="stat-value">3.4 yrs</div><div class="stat-change stat-up">↑ vs 3.1 last year</div></div>
+    <div class="stat-card"><div class="stat-label">Gender Ratio</div><div class="stat-value">54/46</div><div class="stat-change" style="color:var(--muted);">M/F ratio</div></div>
+    <div class="stat-card"><div class="stat-label">Eng. Score</div><div class="stat-value">7.8/10</div><div class="stat-change stat-up">↑ 0.3 vs Q4</div></div>
+  </div>
+  <div class="dash-chart-row mt-4">
+    <div class="card"><div class="card-header"><div class="card-title">Hire vs. Attrition Trend</div></div><div class="card-body" style="height:220px;"><canvas id="chart-hire-attrition"></canvas></div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Headcount by Age Group</div></div><div class="card-body" style="height:220px;"><canvas id="chart-age"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ── CUSTOM REPORTS ── -->
+<div class="page" id="p-custom-reports">
+  <div class="page-header"><div><div class="page-title">Custom Reports</div><div class="page-sub">Build your own HR reports</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>New Report</button></div>
+  <div class="card"><div class="card-body">
+    <div class="form-grid fg-3">
+      <div class="form-group"><label>Report Name</label><input placeholder="e.g. Q1 Headcount by Grade"></div>
+      <div class="form-group"><label>Module</label><select><option>Employees</option><option>Payroll</option><option>Attendance</option><option>Leave</option><option>Performance</option></select></div>
+      <div class="form-group"><label>Date Range</label><input type="date"></div>
+    </div>
+    <div style="margin-top:16px;"><button class="btn btn-primary"><i data-lucide="play" size="13"></i>Generate Preview</button></div>
+  </div></div>
+</div>
+
+<!-- ── USER MANAGEMENT ── -->
+<div class="page" id="p-user-management">
+  <div class="page-header"><div><div class="page-title">User Management</div><div class="page-sub">System accounts and access control</div></div><button class="btn btn-primary"><i data-lucide="user-plus" size="13"></i>Invite User</button></div>
+  <div id="tbl-users"></div>
+</div>
+
+<!-- ── ROLES & PERMISSIONS ── -->
+<div class="page" id="p-roles-permissions">
+  <div class="page-header"><div><div class="page-title">Roles & Permissions</div><div class="page-sub">Define access levels per system role</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Create Role</button></div>
+  <div class="roles-layout">
+    <div class="card"><div class="card-body" style="padding:10px;">
+      <div class="section-label" style="padding:0 8px;">System Roles</div>
+      <div id="role-pills">
+        <div class="role-pill active" onclick="selectRole(this,'Super Admin')">Super Admin</div>
+        <div class="role-pill" onclick="selectRole(this,'HR Manager')">HR Manager</div>
+        <div class="role-pill" onclick="selectRole(this,'Finance Officer')">Finance Officer</div>
+        <div class="role-pill" onclick="selectRole(this,'Department Head')">Department Head</div>
+        <div class="role-pill" onclick="selectRole(this,'Recruiter')">Recruiter</div>
+        <div class="role-pill" onclick="selectRole(this,'Employee')">Employee (Self-Service)</div>
+      </div>
+    </div></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Permissions: <span id="active-role-name" style="color:var(--primary);">Super Admin</span></div><button class="btn btn-sm btn-primary">Save Changes</button></div>
+      <div class="card-body" style="padding:0;"><div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Module</th><th style="text-align:center;">View</th><th style="text-align:center;">Create</th><th style="text-align:center;">Edit</th><th style="text-align:center;">Delete</th><th style="text-align:center;">Approve</th></tr></thead>
+        <tbody>
+          <tr><td>Employee Profile</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;">—</td></tr>
+          <tr><td>Payroll</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td></tr>
+          <tr><td>Recruitment</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox"></td><td style="text-align:center;"><input type="checkbox" checked></td></tr>
+          <tr><td>Leave Management</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox"></td><td style="text-align:center;"><input type="checkbox" checked></td></tr>
+          <tr><td>Performance</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td></tr>
+          <tr><td>System Settings</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;">—</td></tr>
+          <tr><td>Audit Logs</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;">—</td><td style="text-align:center;">—</td><td style="text-align:center;">—</td><td style="text-align:center;">—</td></tr>
+          <tr><td>Reports & Analytics</td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox" checked></td><td style="text-align:center;"><input type="checkbox"></td><td style="text-align:center;">—</td></tr>
+        </tbody>
+      </table></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AUDIT LOGS ── -->
+<div class="page" id="p-audit-logs">
+  <div class="page-header">
+    <div><div class="page-title">Audit Logs</div><div class="page-sub">Complete system activity trail</div></div>
+    <div class="flex-row"><select class="sel"><option>All Actions</option><option>Create</option><option>Update</option><option>Delete</option><option>Login</option></select></div>
+  </div>
+  <div id="tbl-audit"></div>
+</div>
+
+  </div><!-- /content-area -->
+</main>
+
+<!-- ══════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════ -->
+
+<!-- MODAL: ADD DEPARTMENT -->
+<div class="modal-overlay" id="modal-add-dept" onclick="closeDeptModal(event)">
+  <div class="modal-box" style="max-width:500px;overflow:visible;">
+    <div class="modal-header">
+      <div><div style="font-size:1rem;font-weight:800;">Add New Department</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Create a new organizational unit</div></div>
+      <button class="icon-btn" onclick="closeDeptModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body" style="overflow:visible;">
+      <div class="form-grid fg-2">
+        <div class="form-group" style="grid-column:span 2;"><label>Department Name *</label><input id="dept-name" placeholder="e.g. Engineering"></div>
+        <div class="form-group" style="position:relative;">
+          <label>Head of Department</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-dept-head" placeholder="Type name to search..." onfocus="showAsDrop('as-drop-dept-head')" oninput="filterAsDrop('as-input-dept-head','as-drop-dept-head')">
+            <div class="as-combo-results" id="as-drop-dept-head"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <select id="dept-location"><option value="">Select...</option><option>Addis Ababa</option><option>Mekelle</option><option>Adama</option><option>Remote</option></select>
+        </div>
+        <div class="form-group" style="grid-column:span 2;"><label>Status</label><select id="dept-status"><option>Active</option><option>Inactive</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDeptModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDepartment()"><i data-lucide="check" size="13"></i>Create Department</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD JOB POSITION -->
+<div class="modal-overlay" id="modal-add-job-position" onclick="closeJobModal(event)">
+  <div class="modal-box" style="max-width:500px;overflow:visible;">
+    <div class="modal-header">
+      <div><div style="font-size:1rem;font-weight:800;">Add New Job Position</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Define a new role and headcount requirements</div></div>
+      <button class="icon-btn" onclick="closeJobModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body" style="overflow:visible;">
+      <div class="form-grid fg-2">
+        <div class="form-group" style="grid-column:span 2;"><label>Job Title *</label><input id="job-title" placeholder="e.g. Senior Software Engineer"></div>
+        <div class="form-group" style="position:relative;grid-column:span 2;">
+          <label>Department</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-job-dept" placeholder="Search department..." onfocus="showAsDrop('as-drop-job-dept')" oninput="filterAsDrop('as-input-job-dept','as-drop-job-dept')">
+            <div class="as-combo-results" id="as-drop-job-dept"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeJobModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveJobPosition()"><i data-lucide="check" size="13"></i>Create Position</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD BRANCH OFFICE -->
+<div class="modal-overlay" id="modal-add-branch" onclick="closeBranchModal(event)">
+  <div class="modal-box" style="max-width:500px;overflow:visible;">
+    <div class="modal-header">
+      <div><div style="font-size:1rem;font-weight:800;">Add New Branch</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Register a new corporate location</div></div>
+      <button class="icon-btn" onclick="closeBranchModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body" style="overflow:visible;">
+      <div class="form-grid fg-2">
+        <div class="form-group"><label>Branch Name *</label><input id="branch-name" placeholder="e.g. East Hub"></div>
+        <div class="form-group"><label>City</label><input id="branch-city" placeholder="e.g. Adama"></div>
+        <div class="form-group" style="position:relative;">
+          <label>Branch Manager</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-branch-mgr" placeholder="Search manager..." onfocus="showAsDrop('as-drop-branch-mgr')" oninput="filterAsDrop('as-input-branch-mgr','as-drop-branch-mgr')">
+            <div class="as-combo-results" id="as-drop-branch-mgr"></div>
+          </div>
+        </div>
+        <div class="form-group" style="grid-column:span 2;"><label>Status</label><select id="branch-status"><option>Active</option><option>Inactive</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeBranchModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBranch()"><i data-lucide="check" size="13"></i>Create Branch</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REGISTER NEW ASSET -->
+<div class="modal-overlay" id="modal-add-asset" onclick="closeAssetModal(event)">
+  <div class="modal-box" style="max-width:460px;overflow:visible;">
+    <div class="modal-header">
+      <div><div style="font-size:1.1rem;font-weight:800;">Register New Asset</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Assign inventory to the system registry</div></div>
+      <button class="icon-btn" onclick="closeAssetModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body" style="overflow:visible;">
+      <div class="form-grid">
+        <div class="form-group"><label>Asset Name</label><input type="text" id="as-new-name" placeholder="e.g. MacBook Pro 14"></div>
+        <div class="form-group" style="position:relative;">
+          <label>Custodian</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-custodian" placeholder="Type name to search..." onfocus="showAsDrop('as-drop-custodian')" oninput="filterAsDrop('as-input-custodian','as-drop-custodian')">
+            <div class="as-combo-results" id="as-drop-custodian"></div>
+          </div>
+        </div>
+        <div class="form-group"><label>Serial / Reference</label><input type="text" id="as-new-serial" placeholder="e.g. SN-88293-X"></div>
+        <div class="form-group" style="position:relative;">
+          <label>Location / Branch</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-location" placeholder="Type branch name..." onfocus="showAsDrop('as-drop-location')" oninput="filterAsDrop('as-input-location','as-drop-location')">
+            <div class="as-combo-results" id="as-drop-location"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAssetModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewAsset()">Save Asset</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REASSIGN ASSET -->
+<div class="modal-overlay" id="modal-reassign-asset" onclick="closeReassignModal(event)">
+  <div class="modal-box" style="max-width:440px;overflow:visible;">
+    <div class="modal-header">
+      <div><div style="font-size:1.1rem;font-weight:800;">Reassign Asset</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Transfer ownership to another employee</div></div>
+      <button class="icon-btn" onclick="closeReassignModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body" style="overflow:visible;">
+      <div class="flex-col" style="gap:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="info-tile"><label class="tile-label">Asset to Transfer</label><div id="reassign-display-name" class="tile-val">---</div></div>
+          <div class="info-tile"><label class="tile-label">Current Custodian</label><div id="reassign-display-curr" class="tile-val">---</div></div>
+        </div>
+        <div class="divider" style="margin:8px 0;"></div>
+        <div class="form-group" style="position:relative;">
+          <label style="font-weight:700;color:var(--primary);">Select New Custodian</label>
+          <div class="as-combo-container">
+            <input type="text" id="as-input-reassign" placeholder="Search for new owner..." onfocus="showAsDrop('as-drop-reassign')" oninput="filterAsDrop('as-input-reassign','as-drop-reassign')">
+            <div class="as-combo-results" id="as-drop-reassign"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeReassignModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveReassignment()"><i data-lucide="check-circle" size="14"></i>Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT COMPANY PROFILE -->
+<div class="modal-overlay" id="modal-edit-company" onclick="closeEditCompanyModal(event)">
+  <div class="modal-box" style="max-width:800px;">
+    <div class="modal-header">
+      <div><div style="font-size:1.1rem;font-weight:800;color:var(--text);">Update Company Information</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Modify legal, system, and contact master data</div></div>
+      <button class="icon-btn" onclick="closeEditCompanyModal()"><i data-lucide="x" size="15"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid fg-2">
+        <div style="grid-column:span 2;"><div class="section-label" style="margin-top:0;">Legal & Statutory</div></div>
+        <div class="form-group"><label>Legal Name</label><input type="text" id="edit-legal-name" value="HRM Enterprises PLC"></div>
+        <div class="form-group"><label>Entity Type</label><input type="text" id="edit-entity-type" value="Private Limited"></div>
+        <div class="form-group"><label>TIN Number</label><input type="text" id="edit-tin" value="0019283746"></div>
+        <div class="form-group"><label>VAT Reg.</label><input type="text" id="edit-vat" value="9928374-VAT-01"></div>
+        <div style="grid-column:span 2;"><div class="section-label">System Locales</div></div>
+        <div class="form-group"><label>Reporting Currency</label><select id="edit-currency"><option>ETB (Birr)</option><option>USD ($)</option><option>EUR (€)</option></select></div>
+        <div class="form-group"><label>Work Week</label><input type="text" id="edit-workweek" value="Mon — Fri"></div>
+        <div style="grid-column:span 2;"><div class="section-label">Communication & Address</div></div>
+        <div class="form-group"><label>Corporate Email</label><input type="email" id="edit-email" value="corp@hrm.com"></div>
+        <div class="form-group"><label>Phone Number</label><input type="text" id="edit-phone" value="+251 11 667 89"></div>
+        <div class="form-group" style="grid-column:span 2;"><label>Head Office Address</label><textarea id="edit-address" style="min-height:60px;">Ras Desta Damtew St, Kirkos Sub-City, Woreda 01, Addis Ababa, Ethiopia</textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeEditCompanyModal()">Discard Changes</button>
+      <button class="btn btn-primary" onclick="saveCompanyProfile()"><i data-lucide="save" size="14"></i>Update Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     EXTERNAL LIBRARIES — loaded at end of body so they
+     don't block HTML parsing; the inline script below
+     runs after them since they're synchronous here.
+══════════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+// ————————————————————————————————————————————————————————————
+// 1. INITIALIZATION & ICONS
+// ————————————————————————————————————————————————————————————
+lucide.createIcons();
+
+// ————————————————————————————————————————————————————————————
+// 2. NAVIGATION & SIDEBAR LOGIC
+// ————————————————————————————————————————————————————————————
+let sidebarCollapsed = false;
+const isMobile = () => window.innerWidth <= 768;
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('main-content');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggleIcon = document.getElementById('toggle-icon');
+
+  if (isMobile()) {
+    const isOpen = sidebar.classList.contains('mobile-open');
+    if (isOpen) {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('visible');
+    } else {
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('visible');
+    }
+  } else {
+    sidebarCollapsed = !sidebarCollapsed;
+    sidebar.classList.toggle('collapsed', sidebarCollapsed);
+    mainContent.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+    toggleIcon.setAttribute('data-lucide', sidebarCollapsed ? 'panel-left-open' : 'menu');
+    lucide.createIcons();
+    if (sidebarCollapsed) {
+      document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+      document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
+    }
+  }
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+}
+
+function toggleNav(el, id) {
+  if (sidebarCollapsed && !isMobile()) { toggleSidebar(); }
+  const sub = document.getElementById(id);
+  const isOpen = sub.classList.contains('open');
+  
+  // Close others
+  document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
+  document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+
+  if (!isOpen) {
+    el.classList.add('open');
+    sub.classList.add('open');
+  }
+}
+
+function goPage(pageId, el) {
+  // Update UI State
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + pageId).classList.add('active');
+
+  document.querySelectorAll('.sub-link, .dash-link').forEach(l => l.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Breadcrumb
+  const rawText = el ? (el.querySelector('span')?.innerText || el.innerText) : "Dashboard";
+  document.getElementById('page-title').innerText = rawText;
+
+  if (isMobile()) closeMobileSidebar();
+  
+  // Initialize specific page logic
+  if (pageId === 'document-vault') renderVaultMatrix();
+  if (pageId === 'asset-tracking') renderAssetStream();
+}
+
+// ————————————————————————————————————————————————————————————
+// 3. DATA REPOSITORY (MOCK DATA)
+// ————————————————————————————————————————————————————————————
+const DATA = {
+  employees: [
+    { id: 'E-101', name: 'Abebe Bikila', dept: 'Executive', role: 'CEO', status: 'Active', joined: '2010-10-12' },
+    { id: 'E-102', name: 'Sara Jenkins', dept: 'Operations', role: 'Director', status: 'Active', joined: '2015-03-20' },
+    { id: 'E-103', name: 'Michael Kassa', dept: 'Technical', role: 'Director', status: 'Active', joined: '2016-11-02' },
+    { id: 'E-104', name: 'Helen Gebre', dept: 'Operations', role: 'Supervisor', status: 'On Leave', joined: '2018-01-15' },
+    { id: 'E-105', name: 'Yared Tolla', dept: 'Technical', role: 'QA Lead', status: 'Probation', joined: '2024-01-10' }
+  ],
+  assets: [
+    { id: 'AST-099', name: 'MacBook Pro 14"', custodian: 'Sara Jenkins', prev: 'Michael Kassa', ref: 'SN-992834', loc: 'Addis HQ' },
+    { id: 'AST-104', name: 'Dell Latitude 5420', custodian: 'Helen Gebre', prev: 'Unassigned', ref: 'DELL-XP-02', loc: 'Mekelle' },
+    { id: 'AST-202', name: 'iPad Air 5th Gen', custodian: 'Yared Tolla', prev: 'Sarah J.', ref: 'APL-PAD-88', loc: 'Addis HQ' }
+  ],
+  departments: [
+    { name: 'Executive', head: 'Abebe Bikila', staff: 5, status: 'Active' },
+    { name: 'Engineering', head: 'Michael Kassa', staff: 42, status: 'Active' },
+    { name: 'Sales & Marketing', head: 'Lydia Solomon', staff: 18, status: 'Active' }
+  ]
+};
+
+// ————————————————————————————————————————————————————————————
+// 4. TABLE RENDERER ENGINE
+// ————————————————————————————————————————————————————————————
+function renderTable(containerId, headers, rows, type = 'standard') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  let html = `<div class="card"><div class="table-wrap"><table class="tbl"><thead><tr>`;
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += `<th>Actions</th></tr></thead><tbody>`;
+
+  rows.forEach(row => {
+    html += `<tr>`;
+    Object.values(row).forEach(val => {
+      if (val === 'Active' || val === 'Present') html += `<td><span class="badge badge-success">${val}</span></td>`;
+      else if (val === 'On Leave' || val === 'Probation') html += `<td><span class="badge badge-warning">${val}</span></td>`;
+      else html += `<td>${val}</td>`;
+    });
+    html += `<td><div class="flex-row"><button class="btn btn-xs btn-secondary"><i data-lucide="edit-2" size="12"></i></button></div></td></tr>`;
+  });
+
+  html += `</tbody></table></div></div>`;
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+// ————————————————————————————————————————————————————————————
+// 5. ASSET TRACKING SPECIAL LOGIC
+// ————————————————————————————————————————————————————————————
+function renderAssetStream() {
+  const container = document.getElementById('asset-stream-container');
+  container.innerHTML = DATA.assets.map(as => `
+    <div class="asset-stripe">
+      <div class="as-id">${as.id}</div>
+      <div class="as-name">${as.name}</div>
+      <div class="as-custodian-curr">${as.custodian}</div>
+      <div class="as-custodian-prev">${as.prev}</div>
+      <div class="as-ref-text">${as.ref}</div>
+      <div class="as-location-text">${as.loc}</div>
+      <div class="as-actions">
+        <button class="as-icon-btn edit-btn" onclick="openReassignModal('${as.id}', '${as.name}', '${as.custodian}')"><i data-lucide="repeat" size="14"></i></button>
+        <button class="as-icon-btn"><i data-lucide="more-vertical" size="14"></i></button>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+// ————————————————————————————————————————————————————————————
+// 6. DOCUMENT VAULT MATRIX
+// ————————————————————————————————————————————————————————————
+function renderVaultMatrix() {
+  const container = document.getElementById('vault-matrix-container');
+  const docs = ['ID/Pass', 'Contract', 'NDA', 'Degree', 'Health'];
+  
+  let html = `<div class="table-wrap"><table class="tbl"><thead><tr><th>Employee</th>`;
+  docs.forEach(d => html += `<th style="text-align:center;">${d}</th>`);
+  html += `</tr></thead><tbody>`;
+
+  DATA.employees.forEach((emp, idx) => {
+    html += `<tr><td><div class="flex-row"><div class="avatar avatar-sm">${emp.name.charAt(0)}</div><div><b>${emp.name}</b><br><small>${emp.id}</small></div></div></td>`;
+    docs.forEach((d, dIdx) => {
+      const isFilled = (idx + dIdx) % 3 !== 0; // Mock logic
+      html += `<td style="text-align:center;"><div class="vault-slot ${isFilled ? 'filled' : 'empty'}"><i data-lucide="${isFilled ? 'check' : 'plus'}" size="12"></i></div></td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div>`;
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+// ————————————————————————————————————————————————————————————
+// 7. ORG CHART ZOOM LOGIC
+// ————————————————————————————————————————————————————————————
+let ocZoom = 1;
+function zoomOC(delta) {
+  ocZoom = Math.max(0.4, Math.min(1.5, ocZoom + delta));
+  document.getElementById('oc-zoom-container').style.transform = `scale(${ocZoom})`;
+  document.getElementById('oc-zoom-label').innerText = Math.round(ocZoom * 100) + '%';
+}
+function resetOC() { ocZoom = 1; zoomOC(0); }
+
+// ————————————————————————————————————————————————————————————
+// 8. DASHBOARD CHARTS (CHART.JS)
+// ————————————————————————————————————————————————————————————
+function initCharts() {
+  const ctx = document.getElementById('chart-headcount-dept')?.getContext('2d');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Technical', 'Operations', 'Sales', 'HR', 'Finance', 'Logistics'],
+        datasets: [{
+          label: 'Employees',
+          data: [420, 310, 180, 45, 65, 120],
+          backgroundColor: '#15b201',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+      }
+    });
+  }
+}
+
+// ————————————————————————————————————————————————————————————
+// 9. MODAL HANDLERS
+// ————————————————————————————————————————————————————————————
+function openEditCompanyModal() { document.getElementById('modal-edit-company').classList.add('open'); }
+function closeEditCompanyModal(e) { if(!e || e.target.classList.contains('modal-overlay') || e.target.closest('.icon-btn')) document.getElementById('modal-edit-company').classList.remove('open'); }
+
+function openReassignModal(id, name, current) {
+  document.getElementById('reassign-display-name').innerText = name;
+  document.getElementById('reassign-display-curr').innerText = current;
+  document.getElementById('modal-reassign-asset').classList.add('open');
+}
+function closeReassignModal() { document.getElementById('modal-reassign-asset').classList.remove('open'); }
+
+// Dashboard Pulse Refresh
+function triggerRefresh(btn) {
+  const icon = btn.querySelector('i');
+  const text = document.getElementById('refresh-text');
+  icon.classList.add('spin');
+  text.innerText = "Syncing...";
+  setTimeout(() => {
+    icon.classList.remove('spin');
+    text.innerText = "Refresh";
+  }, 1200);
+}
+
+// ————————————————————————————————————————————————————————————
+// 10. APP ENTRY POINT
+// ————————————————————————————————————————————————————————————
+document.addEventListener('DOMContentLoaded', () => {
+  // Initial Table Renders
+  renderTable('tbl-employees', ['ID', 'Name', 'Dept', 'Role', 'Status', 'Joined'], DATA.employees);
+  renderTable('tbl-departments', ['Name', 'Head', 'Staff Count', 'Status'], DATA.departments);
+  
+  // Dashboard Chart
+  initCharts();
+
+  // Handle outside clicks for Asset Autocomplete (combos)
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.as-combo-container')) {
+      document.querySelectorAll('.as-combo-results').forEach(r => r.classList.remove('active'));
+    }
+  });
+});
+
+/** Generic Autocomplete Logic */
+function showAsDrop(id) { 
+  document.querySelectorAll('.as-combo-results').forEach(r => r.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); 
+  filterAsDrop('', id); // Show all initially
+}
+
+function filterAsDrop(inputIdx, dropId) {
+  const val = inputIdx ? document.getElementById(inputIdx).value.toLowerCase() : "";
+  const drop = document.getElementById(dropId);
+  // Mock data for dropdown
+  const list = ['Abebe Bikila', 'Sara Jenkins', 'Michael Kassa', 'Helen Gebre', 'Lydia Solomon'];
+  const filtered = list.filter(i => i.toLowerCase().includes(val));
+  
+  drop.innerHTML = filtered.map(name => `<div class="as-res-item" onclick="selectAsItem('${inputIdx}','${dropId}','${name}')">${name}</div>`).join('');
+}
+
+function selectAsItem(inputId, dropId, val) {
+  if(inputId) document.getElementById(inputId).value = val;
+  document.getElementById(dropId).classList.remove('active');
+}
+</script>
+</body>
+</html>
