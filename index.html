@@ -892,16 +892,24 @@ input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:po
           <p class="input-group-sub">Establish the primary legal identity and demographic profile for the master record.</p>
         </div>
         <div class="identity-master-wrapper">
-          <div class="avatar-upload-zone">
-            <div class="avatar-frame" id="avatar-preview-box">
-              <i data-lucide="user" size="40" style="color:#cbd5e1;" id="placeholder-icon"></i>
-              <img id="avatar-img-output" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
-            </div>
-            <label for="avatar-upload" class="btn btn-secondary btn-xs" style="cursor:pointer;border-radius:20px;padding:5px 15px;">
-              <i data-lucide="camera" size="12"></i> Upload Photo
-            </label>
-            <input type="file" id="avatar-upload" hidden accept="image/*" onchange="previewAvatar(this)">
-          </div>
+         <div class="avatar-upload-zone">
+  <!-- We put the label around everything so the whole area is clickable -->
+  <label for="avatar-upload" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+    
+    <div class="avatar-frame" id="avatar-preview-box">
+      <i data-lucide="user" size="40" style="color:#cbd5e1;" id="placeholder-icon"></i>
+      <img id="avatar-img-output" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
+    </div>
+    
+    <div class="btn btn-secondary btn-xs" style="border-radius:20px; padding:5px 15px;">
+      <i data-lucide="camera" size="12"></i> Upload Photo
+    </div>
+
+  </label>
+  
+  <!-- This is the hidden actual file picker -->
+  <input type="file" id="avatar-upload" hidden accept="image/*" onchange="previewAvatar(this)">
+</div>
           <div class="identity-fields-container">
             <div class="name-grid-row">
               <div class="form-group"><label>First Name *</label><input type="text" class="form-ctrl master-req" id="o-fname" placeholder="Ex: Abebe"></div>
