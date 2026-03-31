@@ -438,6 +438,7 @@ input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:po
 .step-dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;transition:all .3s}
 .step-dot.active{background:var(--primary);width:24px;border-radius:4px}
 .form-header-pro{padding-bottom:24px;margin-bottom:32px;border-bottom:1px solid #f1f5f9}
+.field-error { border-color: var(--danger) !important; background-color: var(--danger-bg) !important; }
 </style>
 </head>
 <body>
@@ -930,7 +931,7 @@ input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:po
           <div class="form-group"><label>Employment Type *</label><select class="form-ctrl master-req" id="o-etype"><option value="">Select...</option><option>Full-Time</option><option>Contract</option></select></div>
           <div class="form-group"><label>Joined Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
           <div class="form-group"><label>Reporting To</label><input type="text" class="form-ctrl" placeholder="Search Manager..."></div>
-          <div class="form-group"><label>Cost Center</label><input type="text" class="form-ctrl" value="CC-001"></div>
+           
         </div>
       </section>
       <section id="ob-step-4" class="form-section-content">
@@ -953,7 +954,7 @@ input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:po
           <div class="form-group"><label>Emergency Phone *</label><input type="tel" class="form-ctrl master-req" id="o-ephone"></div>
         </div>
       </section>
-      <div style="margin-top:60px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);">
+      <div style="margin-top:60px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);">
         <button class="btn btn-secondary" id="ob-prev" onclick="moveOnboarding(-1)" style="visibility:hidden;"><i data-lucide="chevron-left" size="14"></i> Previous</button>
         <div class="dot-progress">
           <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -1798,8 +1799,28 @@ window.addEventListener('mousedown',e=>{if(!e.target.closest('.as-combo-containe
 // ── ONBOARDING WIZARD ──
 let currentObStep=1;
 const totalObSteps=5;
-function moveOnboarding(dir){const t=currentObStep+dir;if(t>=1&&t<=totalObSteps)jumpToStep(t);}
+// 1. Blocks Next Button + Highlights Missing
+// 1. Blocks 'Next' & toggles the red highlight class
+function moveOnboarding(dir){
+  if(dir>0){
+    const cur=[...document.querySelectorAll(`#ob-step-${currentObStep} .master-req`)];
+    let ok=true; 
+    cur.forEach(i=>{ 
+      const isBad = !i.value.trim();
+      i.classList.toggle('field-error', isBad); 
+      if(isBad) ok=false;
+    });
+    if(!ok) return; 
+  }
+  const t=currentObStep+dir; if(t>=1&&t<=totalObSteps) jumpToStep(t);
+}
+
+// 2. Blocks side-nav jumps if current section is invalid
 function jumpToStep(step){
+  if(step > currentObStep) {
+    const cur=[...document.querySelectorAll(`#ob-step-${currentObStep} .master-req`)];
+    if(cur.some(i=>!i.value.trim())) { moveOnboarding(1); return; }
+  }
   currentObStep=step;
   document.querySelectorAll('#p-add-employee .form-section-content').forEach(s=>s.classList.remove('active'));
   document.getElementById(`ob-step-${step}`).classList.add('active');
@@ -1818,22 +1839,22 @@ function jumpToStep(step){
   validateMasterRecord();
   lcIcons(document.getElementById('p-add-employee'));
 }
+
+// 3. Real-time Button States & auto-clears red highlights
 function validateMasterRecord(){
-  const required=document.querySelectorAll('#p-add-employee .master-req');
-  let filled=0;
-  required.forEach(el=>{
-    if(el.value&&el.value.trim()!==''){filled++;el.style.borderColor='#e2e8f0';}
-    else if(currentObStep===totalObSteps)el.style.borderColor='rgba(220,38,38,.2)';
-  });
-  const commitBtn=document.getElementById('btn-save-master');
-  const valText=document.getElementById('master-val-text');
-  const allFilled=filled===required.length;
-  commitBtn.disabled=!allFilled;
-  commitBtn.style.opacity=allFilled?'1':'0.4';
-  commitBtn.style.cursor=allFilled?'pointer':'not-allowed';
-  valText.innerHTML=allFilled?'<i data-lucide="check-circle" size="12"></i> Integrity Verified':`* ${required.length-filled} fields required to commit`;
-  valText.style.color=allFilled?'var(--success)':'var(--danger)';
-  lcIcons(valText);
+  const all=[...document.querySelectorAll('#p-add-employee .master-req')], cur=[...document.querySelectorAll(`#ob-step-${currentObStep} .master-req`)];
+  const allOk=all.every(i=>i.value.trim()), stepOk=cur.every(i=>i.value.trim());
+  const commit=document.getElementById('btn-save-master'), next=document.getElementById('ob-next'), val=document.getElementById('master-val-text');
+  
+  if(next){ next.style.opacity=stepOk?'1':'0.4'; next.style.cursor=stepOk?'pointer':'not-allowed'; }
+  commit.disabled=!allOk; commit.style.opacity=allOk?'1':'0.4';
+  
+  val.innerHTML=allOk?'<i data-lucide="check-circle" size="12"></i> Verified':`* Required fields missing`;
+  val.style.color=allOk?'var(--success)':'var(--danger)';
+  
+  // Clear red highlight as user types
+  all.forEach(i=>{ if(i.value.trim()) i.classList.remove('field-error'); });
+  lcIcons(val);
 }
 document.querySelectorAll('#p-add-employee input, #p-add-employee select, #p-add-employee textarea').forEach(input=>input.addEventListener('input',validateMasterRecord));
 function saveNewEmployee(){
