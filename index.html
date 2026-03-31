@@ -1570,23 +1570,37 @@ function toggleNav(el, id) {
   el.classList.toggle('open', !isOpen);
   sub.classList.toggle('open', !isOpen);
 }
-
 function goPage(id, el) {
+  // 1. Save the current page ID to the URL hash
+  window.location.hash = id;
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pg = document.getElementById('p-' + id);
   if (pg) pg.classList.add('active');
-  document.getElementById('page-title').textContent = el ? el.textContent.trim() : 'Dashboard';
+
+  // 2. If 'el' is not provided (on refresh), find the sidebar element automatically
+  if (!el) {
+    el = document.querySelector(`.sub-link[onclick*="'${id}'"], .dash-link[onclick*="'${id}'"]`);
+  }
+
+  document.getElementById('page-title').textContent = el ? el.textContent.trim() : id.replace(/-/g, ' ');
+  
   document.querySelectorAll('.sub-link, .dash-link').forEach(l => l.classList.remove('active'));
   if (el) el.classList.add('active');
+  
   document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('parent-active'));
+  
   const parentSub = el && el.closest('.submenu');
   if (parentSub) {
     const trigger = document.querySelector(`.nav-trigger[onclick*="${parentSub.id}"]`);
-    if (trigger) trigger.classList.add('parent-active');
-  } else {
-    document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
-    document.querySelectorAll('.nav-trigger').forEach(t => t.classList.remove('open'));
+    if (trigger) {
+      trigger.classList.add('parent-active');
+      // Also ensure the submenu is visible on refresh
+      parentSub.classList.add('open');
+      trigger.classList.add('open');
+    }
   }
+
   initPage(id);
   if (isMobile()) closeMobileSidebar();
 }
@@ -1959,8 +1973,8 @@ function initPage(id){
     case 'dashboard':initDashboard();break;
     case 'org-chart':initOrgChart();break;
     case 'departments':buildTable('tbl-departments',{columns:[{key:'name',label:'Department Name'},{key:'head',label:'Head of Dept'},{key:'emp',label:'Employees'},{key:'loc',label:'Location'},{key:'status',label:'Status'},ac],rows:gen(32,i=>({code:`D${String(i+1).padStart(3,'0')}`,name:depts[i%depts.length]+' '+(i>=10?String.fromCharCode(65+Math.floor(i/10)):''),head:names[i%names.length],emp:randInt(20,150),loc:['New York','Atlanta','San Jose','Chicago','Boston'][i%5],status:statusBadge.active}))});break;
-    case 'job-positions':buildTable('tbl-job-positions',{columns:[{key:'title',label:'Job Title'},{key:'dept',label:'Department'},{key:'count',label:'Headcount'},ac],rows:gen(28,i=>({code:`JP${String(i+1).padStart(3,'0')}`,title:['Software Engineer','Sales Manager','HR Business Partner','Finance Analyst','Product Manager','UX Designer','DevOps Engineer','Data Scientist','Legal Counsel','Support Lead'][i%10],dept:rand(depts),grade:['L1','L2','L3','L4','M1','M2','S1','S2'][i%8],min:fmtMoney(randInt(40,80)*1000),max:fmtMoney(randInt(80,150)*1000),count:randInt(2,40)}))});break;
-    case 'branch-offices':buildTable('tbl-branch-offices',{columns:[{key:'code',label:'Code'},{key:'name',label:'Branch Name'},{key:'city',label:'City'},{key:'manager',label:'Branch Manager'},{key:'emp',label:'Staff'},{key:'status',label:'Status'},ac],rows:gen(12,i=>({code:`BR${String(i+1).padStart(2,'0')}`,name:['HQ','North','South','East','West','APAC','EMEA','LATAM','Canada','Australia','UK','Singapore'][i]+' Office',city:['New York','Chicago','Atlanta','Boston','San Jose','Singapore','London','São Paulo','Toronto','Sydney','Manchester','Tokyo'][i],manager:names[i%names.length],emp:randInt(30,320),status:statusBadge.active}))});break;
+    case 'job-positions':buildTable('tbl-job-positions',{columns:[{key:'title',label:'Job Title'},{key:'dept',label:'Department'},{key:'count',label:'Headcount'},ac],rows:gen(28,i=>({  title:['Software Engineer','Sales Manager','HR Business Partner','Finance Analyst','Product Manager','UX Designer','DevOps Engineer','Data Scientist','Legal Counsel','Support Lead'][i%10],dept:rand(depts),grade:['L1','L2','L3','L4','M1','M2','S1','S2'][i%8],min:fmtMoney(randInt(40,80)*1000),max:fmtMoney(randInt(80,150)*1000),count:randInt(2,40)}))});break;
+    case 'branch-offices':buildTable('tbl-branch-offices',{columns:[ {key:'name',label:'Branch Name'},{key:'city',label:'City'},{key:'manager',label:'Branch Manager'},{key:'emp',label:'Staff'},{key:'status',label:'Status'},ac],rows:gen(12,i=>({ name:['HQ','North','South','East','West','APAC','EMEA','LATAM','Canada','Australia','UK','Singapore'][i]+' Office',city:['New York','Chicago','Atlanta','Boston','San Jose','Singapore','London','São Paulo','Toronto','Sydney','Manchester','Tokyo'][i],manager:names[i%names.length],emp:randInt(30,320),status:statusBadge.active}))});break;
     case 'employee-directory':buildTable('tbl-employees',{columns:[{key:'id',label:'Emp ID'},{key:'fname',label:'First Name'},{key:'mname',label:'Middle Name'},{key:'lname',label:'Last Name'},{key:'uname',label:'Username'},{key:'gender',label:'Gender'},{key:'dob',label:'Date of Birth'},{key:'hire',label:'Hired Date'},{key:'status',label:'Status'},{key:'marital',label:'Marital Status'},{key:'phone',label:'Phone'},{key:'email',label:'Email'},{key:'dept',label:'Department'},{key:'position',label:'Job Position'},{key:'type',label:'Emp Type'},{key:'probation',label:'Probation Date'},{key:'termDate',label:'Termination Date'},{key:'termReason',label:'Termination Reason'},{key:'bank',label:'Bank Account'},{key:'created',label:'Created At'},ac],rows:gen(60,i=>{const isActive=i%8!==0,fn=names[i%names.length].split(' ')[0],ln=names[i%names.length].split(' ')[1];return{id:`E${String(i+1).padStart(4,'0')}`,fname:fn,mname:['A.','M.','D.','S.','K.'][i%5],lname:ln,uname:(fn[0]+ln).toLowerCase()+randInt(10,99),gender:i%2===0?'Male':'Female',dob:`19${randInt(70,99)}-${String(randInt(1,12)).padStart(2,'0')}-${String(randInt(1,28)).padStart(2,'0')}`,hire:`202${randInt(0,5)}-${String(randInt(1,12)).padStart(2,'0')}-${String(randInt(1,28)).padStart(2,'0')}`,status:isActive?statusBadge.active:statusBadge.inactive,marital:['Single','Married','Divorced','Widowed'][i%4],phone:`+1 555-${randInt(100,999)}-${randInt(1000,9999)}`,email:`${fn.toLowerCase()}.${ln.toLowerCase()}@hrm.com`,dept:rand(depts),position:['Software Engineer','Project Manager','HR Specialist','Accountant','Sales Lead'][i%5],type:i%4===0?'Contract':'Full-Time',probation:`2026-06-${String(randInt(1,28)).padStart(2,'0')}`,termDate:isActive?'—':`2026-02-${String(randInt(1,28)).padStart(2,'0')}`,termReason:isActive?'—':['Resigned','Contract Ended','Performance'][i%3],bank:`BE${randInt(10,99)} 0000 ${randInt(1000,9999)} ${randInt(10,99)}`,created:'2025-01-10 08:30'};})});break;
     case 'employment-types':buildTable('tbl-employment-types',{columns:[{key:'code',label:'Code'},{key:'name',label:'Type Name'},{key:'desc',label:'Description'},{key:'count',label:'Employees'},ac],rows:[{code:'FT',name:'Permanent / Full-Time',desc:'Regular employee with full benefits',benefits:'Yes',count:912},{code:'CT',name:'Fixed-Term Contract',desc:'Time-bound employment agreement',benefits:'Partial',count:248},{code:'PT',name:'Part-Time',desc:'Less than 40 hours per week',benefits:'Partial',count:55},{code:'IN',name:'Internship',desc:'Student or graduate trainee',benefits:'No',count:33},{code:'TM',name:'Temporary / Casual',desc:'Short-term project-based',benefits:'No',count:0}]});break;
     case 'probation-tracker':buildTable('tbl-probation',{columns:[{key:'id',label:'Emp ID'},{key:'name',label:'Employee'},{key:'dept',label:'Dept'},{key:'start',label:'Probation Start'},{key:'end',label:'Probation End'},{key:'days',label:'Days Left'},ac],rows:gen(22,i=>({id:`E${String(i+100).padStart(4,'0')}`,name:names[i%names.length],dept:rand(depts),start:`Jan ${randInt(5,20)}, 2026`,end:`Apr ${randInt(5,20)}, 2026`,days:randInt(0,50),status:i<8?b('warning','Ending Soon'):b('info','Active')}))});break;
@@ -2004,9 +2018,24 @@ function initPage(id){
 }
 
 // ── STARTUP: single icon pass on the static DOM ──
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded', () => {
   lcIcons();
-  initPage('dashboard');
+  
+  // Check if there is a page ID in the URL hash (e.g., #employee-directory)
+  const currentHash = window.location.hash.replace('#', '');
+  
+  // If a hash exists and the page element exists, go to that page. Otherwise, default to dashboard.
+  if (currentHash && document.getElementById('p-' + currentHash)) {
+    goPage(currentHash);
+  } else {
+    goPage('dashboard');
+  }
+});
+window.addEventListener('hashchange', () => {
+  const currentHash = window.location.hash.replace('#', '');
+  if (currentHash) {
+    goPage(currentHash);
+  }
 });
 //sorting algorithm for all tables
 // ── UPDATED PAGINATED TABLE BUILDER (NO SORT ON ACTIONS) ──
