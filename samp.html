@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YDY HRM Enterprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://unpkg.com">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#15b201;--primary-light:#f1fcf0;--primary-dark:#0f8a00;--sidebar-w:268px;--header-h:60px;--bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--success:#16a34a;--success-bg:#dcfce7;--warning:#d97706;--warning-bg:#fef3c7;--danger:#dc2626;--danger-bg:#fee2e2;--info:#0891b2;--info-bg:#cffafe;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);--shadow-md:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.05);--transition:.28s cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:20px;border:1px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--primary);border:0 solid transparent}
+.sidebar-scroll:hover::-webkit-scrollbar-thumb,.content-area:hover::-webkit-scrollbar-thumb,.table-wrap:hover::-webkit-scrollbar-thumb,.modal-box:hover::-webkit-scrollbar-thumb{background:#cbd5e1}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover,.content-area::-webkit-scrollbar-thumb:hover,.table-wrap::-webkit-scrollbar-thumb:hover,.modal-box::-webkit-scrollbar-thumb:hover{background:var(--primary)!important}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:200;transition:width var(--transition),transform var(--transition);overflow:visible}
+.sidebar-brand{height:var(--header-h);padding:0 16px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:.95rem;color:var(--primary);border-bottom:1px solid var(--border);letter-spacing:-.01em;flex-shrink:0;white-space:nowrap;overflow:hidden}
+.brand-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.sidebar-brand-text{overflow:hidden;white-space:nowrap;transition:opacity var(--transition),width var(--transition)}
+.sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 10px 20px}
+.nav-label{padding:14px 10px 5px;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden}
+.nav-group{margin-bottom:1px}
+.nav-trigger{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;color:#334155;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .15s,color .15s;user-select:none;white-space:nowrap}
+.nav-trigger:hover,.nav-trigger.parent-active{background:var(--primary-light)!important;color:var(--primary)!important}
+.nav-trigger.open{background:transparent;color:var(--text)}
+.nav-trigger-left{display:flex;align-items:center;gap:8px;overflow:hidden}
+.nav-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:var(--muted);flex-shrink:0;transition:all .15s}
+.nav-trigger.open .nav-icon{background:#f1f5f9;color:var(--muted)}
+.nav-trigger:hover .nav-icon,.nav-active .nav-icon,.nav-trigger.parent-active .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
+.chevron{transition:transform .2s;color:#94a3b8;flex-shrink:0}
+.nav-trigger.open .chevron{transform:rotate(90deg);color:var(--primary)}
+.submenu{overflow:hidden;max-height:0;transition:max-height .3s ease;padding-left:10px}
+.submenu.open{max-height:1000px}
+.sub-link{display:flex;align-items:center;gap:8px;padding:7px 10px;color:var(--muted);font-size:.77rem;font-weight:500;border-radius:6px;cursor:pointer;transition:all .15s;margin-bottom:1px;white-space:nowrap}
+.sub-link:hover{color:var(--primary);background:#f8fafc}
+.sub-link.active{color:var(--primary)!important;background:var(--primary-light);font-weight:700}
+.sub-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.sub-link.active .sub-dot{background:var(--primary)}
+.dash-link{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;color:#334155;transition:all .15s;white-space:nowrap}
+.dash-link:hover,.dash-link.active{background:var(--primary-light);color:var(--primary)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgb(0,0,0);z-index:199;opacity:0;transition:opacity var(--transition)}
+.sidebar-overlay.visible{opacity:1}
+.sidebar.collapsed{width:78px!important;overflow:visible!important}
+.sidebar.collapsed .sidebar-brand{background:#fff!important;border-bottom:1px solid #1e293b!important}
+.sidebar.collapsed .sidebar-scroll{background:var(--surface)!important;overflow-y:auto!important;overflow-x:hidden!important;height:calc(100vh - var(--header-h))}
+.sidebar.collapsed .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+.sidebar.collapsed .nav-icon{background:#f1f5f9!important;color:var(--muted)!important;margin:0 auto}
+.sidebar.collapsed .nav-trigger:hover .nav-icon,.sidebar.collapsed .dash-link:hover .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
+.sidebar.collapsed .nav-trigger,.sidebar.collapsed .dash-link{margin:4px 8px;padding:10px 0;justify-content:flex-start}
+.sidebar.collapsed .nav-trigger-left{gap:0}
+.sidebar.collapsed .nav-icon{margin:0 auto;width:32px;height:32px}
+.sidebar.collapsed .sidebar-brand-text,.sidebar.collapsed .nav-label,.sidebar.collapsed span,.sidebar.collapsed .chevron{display:none!important}
+.sidebar.collapsed .dash-link:hover::after{display:none!important}
+.sidebar.collapsed .nav-group::after{content:'';position:absolute;top:0;right:-15px;width:20px;height:100%;z-index:5;display:none}
+@media(min-width:769px){
+  .sidebar.collapsed .submenu{display:none!important}
+  .sidebar.collapsed .dash-link:hover .nav-trigger-left span{display:block!important;position:fixed;left:78px;width:160px;padding:12px 16px;background:var(--surface);color:var(--text);font-size:.8rem;font-weight:700;border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 10px 10px 0;box-shadow:15px 10px 40px rgba(0,0,0,.15);z-index:9999;pointer-events:none;transform:translateX(0)}
+  .sidebar.collapsed .nav-group{position:relative}
+  .sidebar.collapsed .nav-group::after{content:'';position:absolute;top:0;right:-20px;width:25px;height:100%;z-index:10;display:none}
+  .sidebar.collapsed .nav-group:hover::after{display:block;z-index:5}
+  .sidebar.collapsed .nav-group:hover .submenu{display:flex!important;flex-direction:column;position:fixed;left:78px;width:230px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 12px 12px 12px;box-shadow:15px 10px 40px rgba(0,0,0,.15);padding:45px 8px 12px;opacity:1;visibility:visible;z-index:9999;max-height:calc(100vh - 20px)!important;overflow-y:auto!important;margin-left:-1px;transform:translateX(0);transition:opacity .2s ease}
+  .sidebar.collapsed .nav-group:hover .nav-trigger-left span{pointer-events:none;display:block!important;position:fixed;left:78px;z-index:10000;margin-left:-1px;width:222px;padding:12px 16px;background:#fafafa;color:var(--text);font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);border-radius:0 11px 0 0;transform:translateX(0)}
+  .sidebar.collapsed .nav-group:hover .sub-link{display:flex!important;padding:10px 12px!important;color:var(--muted)!important}
+  .sidebar.collapsed .nav-group:hover .sub-link span{display:block!important;font-size:.8rem!important}
+  .sidebar.collapsed .nav-group:hover .sub-dot{display:block!important}
+  .sidebar.collapsed .dash-link:hover::after{content:attr(title);position:fixed;left:85px;background:var(--text);color:#fff;padding:6px 12px;border-radius:6px;font-size:.75rem;white-space:nowrap;z-index:9999}
+  .sidebar.collapsed .nav-group:hover .dash-link span{display:block!important;position:absolute;left:72px;background:var(--text);color:#fff;padding:5px 12px;border-radius:6px;font-size:.75rem}
+}
+.main{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:margin-left var(--transition)}
+.main.sidebar-collapsed{margin-left:78px}
+@media(max-width:768px){.main{margin-left:0!important}}
+.topbar{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.breadcrumb span{color:var(--text);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:8px;background:#f8fafc;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s;position:relative;flex-shrink:0}
+.icon-btn:hover{background:var(--primary-light);color:var(--primary)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+.sidebar-toggle{cursor:pointer;width:34px;height:34px;border-radius:8px;background:#f8fafc;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s;flex-shrink:0}
+.sidebar-toggle:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.topbar-user{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;cursor:pointer;transition:background .15s}
+.topbar-user:hover{background:var(--primary-light)}
+.topbar-user-avatar{width:28px;height:28px;border-radius:7px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
+.topbar-user-info{line-height:1.3}
+.topbar-user-info .u-name{font-size:.75rem;font-weight:700;color:var(--text);white-space:nowrap}
+.topbar-user-info .u-role{font-size:.65rem;color:var(--muted);white-space:nowrap}
+@media(max-width:480px){.topbar-user-info{display:none}.topbar-user{padding:5px}}
+.content-area{flex:1;overflow-y:auto;padding:24px 28px}
+@media(max-width:768px){.content-area{padding:16px}}
+@media(max-width:480px){.content-area{padding:12px}}
+.page{display:none}
+.page.active{display:block}
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:1.1rem;font-weight:800;color:var(--text)}
+.page-sub{font-size:.78rem;color:var(--muted);margin-top:3px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit;white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#f1f5f9;color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#15803d}
+.btn-sm{padding:5px 10px;font-size:.72rem}
+.btn-xs{padding:3px 8px;font-size:.68rem}
+.btn-glass-pro{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(10px);color:white;padding:12px 20px;border-radius:12px;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:8px;transition:all .2s ease;cursor:pointer}
+.btn-glass-pro:hover{background:rgba(255,255,255,.25);transform:translateY(-2px);border-color:rgba(255,255,255,.5)}
+.btn-glass-pro-slim{all:unset;display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:10px;color:white;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(4px)}
+.btn-glass-pro-slim i{opacity:.9}
+.btn-glass-pro-slim:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);transform:translateY(-2px)}
+.btn-glass-pro-slim:active{transform:translateY(0) scale(.97)}
+.btn-edit-glass{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(4px);padding:10px 18px;font-size:.75rem;letter-spacing:.02em;transition:all .2s ease}
+.btn-edit-glass:hover{background:rgba(255,255,255,.3);color:#fff;transform:translateY(-2px)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-body{padding:20px}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:.88rem;font-weight:700;color:var(--text)}
+.stats-row{display:grid;gap:16px;margin-bottom:20px}
+.stats-4{grid-template-columns:repeat(4,1fr)}
+.stats-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1100px){.stats-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stats-4,.stats-3{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.stats-4,.stats-3{grid-template-columns:1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.stat-label{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-size:1.5rem;font-weight:800;color:var(--text);line-height:1}
+.stat-change{font-size:.72rem;margin-top:6px}
+.stat-up{color:var(--success)}
+.stat-icon-wrap{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-flex{display:flex;align-items:center;justify-content:space-between}
+.bento-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:min-content;gap:12px}
+@media(max-width:900px){.bento-grid>[style*="span 5"],.bento-grid>[style*="span 4"],.bento-grid>[style*="span 3"],.bento-grid>[style*="span 7"],.bento-grid>[style*="span 12"]{grid-column:span 12!important}}
+.bento-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column}
+.bento-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fafafa}
+.bento-header i{color:var(--primary)}
+.bento-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.bento-body{padding:16px;flex:1}
+.bento-item{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;transition:transform .2s ease,border-color .2s ease}
+.bento-item:hover{border-color:var(--primary)}
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dotted var(--border);gap:8px}
+.d-row:last-child{border-bottom:none;padding-bottom:0}
+.d-row:first-child{padding-top:0}
+.d-label{font-size:.72rem;color:var(--muted);font-weight:500;flex-shrink:0}
+.d-value{font-size:.78rem;font-weight:700;color:var(--text);text-align:right}
+.table-wrap{overflow-x:auto;position:relative;border-radius:0 0 var(--radius) var(--radius);-webkit-overflow-scrolling:touch}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto}
+table.tbl th{cursor: pointer; user-select: none; transition: background .15s;padding:6px 18px!important;background:#f8fafc;font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;text-align:left}
+table.tbl th:hover { background: #f1f5f9!important; color: var(--primary); }
+.sort-indicator { margin-left: 4px; opacity: 0.5; font-family: monospace; font-size: 10px; }
+table.tbl td{padding:4px 14px!important;font-size:.8rem;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;background-color:var(--surface)}
+table.tbl tr:hover td{background-color:#fcfdfe!important}
+table.tbl th:last-child,table.tbl td:last-child{width:.1%;white-space:nowrap;position:sticky;right:0;z-index:20;border-left:1px solid var(--border);box-shadow:-4px 0 8px -4px rgba(0,0,0,.1)}
+table.tbl th:last-child{background:#f8fafc}
+table.tbl td:last-child{background:var(--surface);text-align:center}
+table.tbl tr:hover td:last-child{background:#fcfdfe!important}
+#tbl-employees table.tbl{width:max-content;min-width:100%}
+#tbl-employees table.tbl td,#tbl-employees table.tbl th{min-width:140px}
+#tbl-employees table.tbl th:first-child,#tbl-employees table.tbl td:first-child{position:sticky;left:0;z-index:21;border-right:1px solid var(--border);background:#f8fafc}
+#tbl-employees table.tbl td:first-child{background:var(--surface)}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.pagination-info{font-size:.75rem;color:var(--muted)}
+.pagination-btns{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pg-btn{min-width:30px;height:30px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s}
+.pg-btn:hover:not(:disabled){background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+.pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700}
+.badge-success{background:var(--success-bg);color:var(--success)}
+.badge-warning{background:var(--warning-bg);color:var(--warning)}
+.badge-danger{background:var(--danger-bg);color:var(--danger)}
+.badge-info{background:var(--info-bg);color:var(--info)}
+.badge-neutral{background:#f1f5f9;color:var(--muted)}
+.badge-primary{background:var(--primary-light);color:var(--primary)}
+.avatar{width:36px;height:36px;border-radius:8px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}
+.avatar-sm{width:28px;height:28px;font-size:.6rem}
+.search-container{width:100%;max-width:400px;position:relative}
+.search-inner{display:flex;align-items:center;height:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 4px 0 14px;transition:all .2s ease;box-shadow:var(--shadow)}
+.search-inner:focus-within{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px var(--primary-light),0 4px 12px rgba(0,0,0,.05)}
+.search-lead-icon{color:var(--muted);width:15px;height:15px;flex-shrink:0;transition:color .2s ease}
+.search-inner:focus-within .search-lead-icon{color:var(--primary)}
+.search-inner input{flex:1;border:none;background:transparent;outline:none;padding:0 10px;font-family:inherit;font-size:.8rem;font-weight:600;color:var(--text)}
+.search-inner input::placeholder{color:var(--muted);font-weight:500}
+.search-actions{display:flex;align-items:center;gap:4px}
+.btn-search-ghost,.btn-search-primary{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:none;transition:all .15s ease}
+.btn-search-ghost i,.btn-search-primary i{width:14px;height:14px}
+.btn-search-ghost{background:transparent;color:var(--muted);opacity:0;visibility:hidden;transform:scale(.9)}
+.btn-search-ghost:hover{background:var(--danger-bg);color:var(--danger)}
+.search-inner:has(input:not(:placeholder-shown)) .btn-search-ghost{opacity:1;visibility:visible;transform:scale(1)}
+.btn-search-primary{background:var(--primary);color:#fff;box-shadow:0 2px 4px rgba(21,178,1,.2)}
+.btn-search-primary:hover{background:var(--primary-dark);transform:translateX(2px)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.sel{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;cursor:pointer}
+.sel:focus{border-color:var(--primary)}
+.form-grid{display:grid;gap:16px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:600px){.fg-2,.fg-3{grid-template-columns:1fr}}
+.form-group label{display:block;font-size:.75rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;transition:border .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff}
+.form-group textarea{resize:vertical;min-height:80px}
+input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
+.oc-blueprint{width:100%;background-color:#f8fafc;background-image:radial-gradient(#e2e8f0 1.5px,transparent 1.5px);background-size:30px 30px;border:1px solid var(--border);border-radius:16px;padding:40px 20px 20px;overflow:auto;display:flex;justify-content:center;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.02);min-height:500px;align-items:flex-start;cursor:grab;user-select:none}
+.oc-blueprint:active{cursor:grabbing}
+.oc-container{display:inline-block;text-align:center}
+.oc-tree ul{padding-top:40px;position:relative;display:flex;justify-content:center;padding-left:0}
+.oc-tree li{list-style-type:none;position:relative;padding:40px 10px 0}
+.oc-tree li::before,.oc-tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid #cbd5e1;width:50%;height:40px}
+.oc-tree>li::before,.oc-tree>li::after{display:none!important}
+.oc-tree>li{padding-top:0!important}
+.oc-tree::before{display:none!important}
+.oc-tree li::after{right:auto;left:50%;border-left:2px solid #cbd5e1}
+.oc-tree li:only-child::after,.oc-tree li:only-child::before{display:none}
+.oc-tree li:only-child{padding-top:0}
+.oc-tree li:first-child::before,.oc-tree li:last-child::after{border:0 none}
+.oc-tree li:last-child::before{border-right:2px solid #cbd5e1;border-radius:0 5px 0 0}
+.oc-tree li:first-child::after{border-radius:5px 0 0 0}
+.oc-tree ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid #cbd5e1;width:0;height:40px}
+.oc-node{background:#fff;border:1px solid var(--border);border-radius:14px;width:200px;display:inline-block;position:relative;z-index:10;box-shadow:var(--shadow-md);transition:all .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.oc-node:hover{transform:translateY(-8px);box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);border-color:var(--primary)}
+.oc-node-header{padding:8px 12px;background:#fafafa;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.oc-id{font-size:9px;font-weight:800;color:var(--muted);font-family:'JetBrains Mono'}
+.oc-node-body{padding:15px;display:flex;align-items:center;gap:12px;text-align:left}
+.oc-node-avatar{width:42px;height:42px;border-radius:10px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0}
+.oc-node-info{min-width:0}
+.oc-node-name{font-size:.85rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-node-role{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px}
+.oc-node-footer{padding:6px 12px;background:#f8fafc;font-size:9px;font-weight:700;color:var(--muted);border-top:1px solid #f1f5f9;text-transform:uppercase;letter-spacing:.05em}
+.oc-ceo{border-top:4px solid #0f172a;width:220px}
+.oc-mgr{border-top:4px solid var(--primary)}
+.oc-staff{border-top:4px solid #cbd5e1;width:200px;padding:12px}
+.oc-staff .oc-node-name{font-size:.75rem;text-align:center;width:100%}
+.oc-staff .oc-node-role{font-size:.6rem;text-align:center;width:100%}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:14px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:none}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.modal-body{padding:20px 24px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid var(--border);flex-wrap:wrap}
+.db-hero-banner{background:linear-gradient(135deg,#15b201 0%,#0f8a00 100%);border-radius:20px;padding:20px;color:white;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;box-shadow:0 10px 30px -10px rgba(21,178,1,.3)}
+.db-hero-banner::before{content:"";position:absolute;inset:0;opacity:.1;background-image:radial-gradient(circle at 2px 2px,white 1px,transparent 0);background-size:24px 24px}
+.db-hero-content,.qa-stack-v2{position:relative;z-index:10}
+.db-hero-content{position:relative;z-index:1}
+.db-hero-title{font-size:1.75rem;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.db-hero-sub{font-size:.85rem;opacity:.9;font-weight:500}
+.db-quick-actions{display:flex;gap:12px;position:relative;z-index:1}
+.db-hero-center-img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:100%;width:auto;max-height:140px;pointer-events:none;z-index:1;opacity:.5;transition:height .3s ease}
+@media(max-width:900px){.db-hero-center-img{opacity:.2;max-height:80px}}
+@media(max-width:600px){.db-hero-center-img{display:none}}
+.db-actions-wrapper{display:flex;flex-direction:column;align-items:flex-end;gap:8px;position:relative;z-index:1}
+.qa-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.9);margin-bottom:4px}
+.qa-stack-v2{display:flex;flex-direction:column;align-items:center;gap:10px}
+.qa-mini-header{display:flex;align-items:center;gap:10px;width:100%}
+.qa-mini-label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.85);white-space:nowrap}
+.qa-mini-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)}
+.qa-button-row{display:flex;gap:8px}
+.stat-ribbon-art{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:rgba(15,23,42,.08);border-radius:12px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(15,23,42,.05)}
+@media(max-width:1024px){.stat-ribbon-art{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+.art-card{position:relative;min-height:92px;padding:16px 24px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;transition:all .6s cubic-bezier(.22,1,.36,1);overflow:hidden;cursor:pointer}
+.art-card:hover{background:color-mix(in srgb,var(--accent-color) 4%,#fff)}
+.art-card::after{content:"";position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--accent-color);transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.22,1,.36,1);opacity:.6}
+.art-card:hover::after{transform:scaleX(1);transform-origin:left}
+.art-label{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.18em;margin-bottom:8px}
+.art-main-row{display:flex;justify-content:space-between;align-items:flex-end}
+.art-value{font-size:32px;font-weight:200;color:#0f172a;letter-spacing:-.05em;line-height:.8}
+.art-meta-group{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.art-indicator{font-size:11px;font-weight:800;color:var(--accent-color);letter-spacing:.02em;margin-bottom:2px}
+.art-subtext{font-size:11px;font-weight:500;color:#64748b;text-transform:capitalize;line-height:1.2}
+.art-headcount{--accent-color:#10b981}
+.art-units{--accent-color:#3b82f6}
+.art-leave{--accent-color:#f59e0b}
+.art-expired{--accent-color:#ef4444}
+.art-missing{--accent-color:#6366f1}
+@media(max-width:640px){.db-hero-center-img{height:60%;opacity:.3}.art-card{padding:20px;height:auto}.art-value{font-size:28px}}
+.bento-container{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch;width:100%}
+.bento-container>*{grid-column:span 1!important}
+@media(max-width:1100px){.bento-container{grid-template-columns:1fr}}
+@media(max-width:1200px){.chart-main-wrap,.activity-side-wrap{grid-column:span 2}}
+@media(max-width:768px){.db-hero-banner{flex-direction:column;align-items:flex-start;gap:20px;padding:20px!important}.bento-container{grid-template-columns:1fr}.chart-main-wrap,.activity-side-wrap{grid-column:span 1}.qa-button-row{flex-wrap:wrap;justify-content:center}}
+.chart-main-wrap{padding:20px}
+.activity-side-wrap{background:var(--surface);border:1px solid var(--border);border-radius:20px;display:flex;flex-direction:column;max-height:420px;overflow:hidden;box-shadow:var(--shadow)}
+.pulse-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#fafafa}
+.pulse-label{font-size:.75rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.05em}
+.live-indicator{width:8px;height:8px;background:var(--primary);border-radius:50%;position:relative}
+.live-indicator::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--primary);animation:pulse-ring 1.5s cubic-bezier(.455,.03,.515,.955) infinite}
+@keyframes pulse-ring{0%{transform:scale(.3);opacity:1}80%,100%{transform:scale(1.5);opacity:0}}
+.hr-pulse-feed{padding:12px;overflow-y:auto;flex:1;scrollbar-width:thin}
+.pulse-item{padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:10px;border:1px solid transparent;transition:all .2s ease}
+.pulse-item:hover{background:#fff;border-color:var(--border);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pulse-type{font-size:.6rem;font-weight:800;text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-bottom:6px;display:inline-block}
+.type-asset{background:#e0f2fe;color:#0369a1}
+.type-prob{background:#fef3c7;color:#92400e}
+.type-crit{background:#fee2e2;color:#991b1b}
+.type-hire{background:#dcfce7;color:#166534}
+.pulse-content{font-size:.75rem;font-weight:600;color:var(--text);line-height:1.4}
+.pulse-ts{font-size:.65rem;color:var(--muted);margin-top:6px;display:block;font-family:'JetBrains Mono',monospace}
+.refresh-pill{all:unset;display:flex;align-items:center;gap:6px;padding:5px 12px;background:#fff;border:1px solid var(--border);border-radius:100px;color:var(--muted);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;transition:all .2s ease;user-select:none}
+.refresh-pill:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);box-shadow:0 2px 8px -2px rgba(21,178,1,.15)}
+.refresh-pill:active{transform:translateY(1px) scale(.96)}
+.refresh-pill i{transition:transform .2s ease}
+.activity-item{position:relative;padding:12px 16px;background:#f8fafc;border-radius:12px;border-left:4px solid var(--border);margin-bottom:12px;transition:transform .2s ease,box-shadow .2s ease;cursor:default}
+.activity-item:hover{transform:translateX(4px);background:#fff;box-shadow:var(--shadow)}
+.activity-item.success{border-left-color:var(--success)}
+.activity-item.warning{border-left-color:var(--warning)}
+.activity-item.danger{border-left-color:var(--danger)}
+.activity-item.info{border-left-color:var(--info)}
+.activity-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.activity-module-tag{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.activity-time{font-size:.65rem;color:#94a3b8;font-family:'JetBrains Mono',monospace}
+.activity-title{font-size:.75rem;font-weight:700;color:var(--text);display:block}
+.activity-desc{font-size:.7rem;color:var(--muted);line-height:1.4;margin-top:2px}
+.log-container{display:flex;flex-direction:column;gap:12px;height:100%}
+.no-activity{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;opacity:.6;padding:40px 0}
+.stat-v6-label{font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat-v6-value{font-size:1.8rem;font-weight:800;color:var(--text);margin:4px 0}
+.stat-v6-trend{font-size:.7rem;font-weight:700;display:flex;align-items:center;gap:4px}
+.as-search-wrapper{display:flex;align-items:center;background:#fff;padding:4px 4px 4px 14px;border-radius:10px;border:1px solid var(--border);flex:1;max-width:460px;box-shadow:var(--shadow)}
+.as-search-icon{color:var(--muted);flex-shrink:0}
+.as-search-input{border:none;background:transparent;padding:8px 12px;font-size:.8rem;outline:none;flex:1;font-family:inherit;color:var(--text);min-width:0}
+.as-add-btn{height:32px;padding:0 12px;white-space:nowrap;flex-shrink:0}
+.as-stream-header,.asset-stripe{display:grid;grid-template-columns:110px 1.4fr 1fr 1fr 1fr 1.2fr 120px;align-items:center}
+@media(max-width:900px){.as-stream-header,.asset-stripe{grid-template-columns:90px 1fr 1fr 90px}.as-stream-header>*:nth-child(n+5),.asset-stripe>*:nth-child(n+5){display:none}}
+@media(max-width:580px){.as-stream-header,.asset-stripe{grid-template-columns:80px 1fr 80px}.as-stream-header>*:nth-child(n+4),.asset-stripe>*:nth-child(n+4){display:none}}
+.as-stream-header{padding:12px 0;font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.asset-stream{display:flex;flex-direction:column;gap:4px}
+.asset-stripe{background:var(--surface);padding:14px 0;border-radius:10px;border:1px solid var(--border);transition:all .2s cubic-bezier(.4,0,.2,1)}
+.asset-stripe:hover{background:#fcfdfe;border-color:var(--primary);transform:translateX(4px);box-shadow:-4px 0 0 var(--primary),var(--shadow-md)}
+.as-id{font-size:.75rem;font-weight:600;color:var(--muted);padding-left:16px}
+.as-name{font-size:.8rem;font-weight:700;color:var(--text)}
+.as-custodian-prev{font-size:.78rem;font-weight:500;color:var(--muted);opacity:.7}
+.as-custodian-curr{font-size:.78rem;font-weight:600;color:var(--text)}
+.as-ref-text,.as-location-text{font-size:.75rem;color:var(--muted)}
+.as-actions{display:flex;gap:8px;justify-content:flex-end;padding-right:16px}
+.as-icon-btn{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all .15s;cursor:pointer}
+.as-icon-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.as-icon-btn.edit-btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.as-combo-container{position:relative;width:100%}
+.as-combo-results{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);max-height:180px;overflow-y:auto;z-index:9999;display:none}
+.as-combo-results.active{display:block}
+.as-res-item{padding:10px 14px;font-size:.8rem;font-weight:500;cursor:pointer;color:var(--text);border-bottom:1px solid #f8fafc;transition:all .15s}
+.as-res-item:last-child{border-bottom:none}
+.as-res-item:hover{background:var(--primary-light);color:var(--primary);padding-left:18px}
+.info-tile{background:#f8fafc;border:1px solid var(--border);padding:10px 14px;border-radius:8px}
+.tile-label{display:block;font-size:.62rem;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.03em;margin-bottom:4px}
+.tile-val{font-size:.85rem;font-weight:700;color:var(--text)}
+.vault-slot{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;transition:all .2s}
+.vault-slot.filled{background:var(--success-bg);color:var(--success);border:1px solid #86efac}
+.vault-slot.empty{background:#f8fafc;color:#cbd5e1;border:1px dashed #cbd5e1}
+.vault-slot.expired{background:var(--danger-bg);color:var(--danger);border:1px solid #fca5a5}
+.vault-slot:hover{transform:scale(1.1);filter:brightness(.9)}
+.master-profile-wrapper{height:calc(100vh - var(--header-h) - 48px);display:flex;flex-direction:column;gap:16px}
+.profile-identity-bar{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);flex-shrink:0}
+.profile-main-grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto 1fr;gap:16px;min-height:0}
+.data-card{background:#fff;border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.span-v-2{grid-row:span 2}
+.card-label-strip{padding:12px 16px;border-bottom:1px solid var(--border);background:#f8fafc;display:flex;align-items:center;gap:8px}
+.card-label-strip i{color:var(--primary)}
+.card-label-strip span{font-size:.65rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.05em}
+.card-content{padding:0;display:flex;flex-direction:column;overflow-y:auto}
+.data-entry{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f1f5f9}
+.data-entry:last-child{border-bottom:none}
+.de-label{font-size:.7rem;font-weight:600;color:var(--muted)}
+.de-value{font-size:.8rem;font-weight:700;color:#0f172a;text-align:right}
+.de-value.mono{font-family:'JetBrains Mono',monospace;color:var(--primary-dark)}
+.mini-table{width:100%;border-collapse:collapse}
+.mini-table th{text-align:left;font-size:.6rem;color:var(--muted);padding:10px 16px;background:#fafafa;text-transform:uppercase}
+.mini-table td{font-size:.75rem;padding:10px 16px;border-bottom:1px solid #f1f5f9;color:var(--text);font-weight:600}
+@media(max-width:1024px){.master-profile-wrapper{height:auto;overflow:visible}.profile-main-grid{grid-template-columns:1fr;grid-template-rows:auto}.span-v-2{grid-row:auto}}
+.dash-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:768px){.dash-chart-row{grid-template-columns:1fr}}
+.brand-strip{grid-column:span 12;background:var(--primary);color:#fff;padding:16px 24px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.roles-layout{display:grid;grid-template-columns:220px 1fr;gap:20px}
+@media(max-width:768px){.roles-layout{grid-template-columns:1fr}}
+.role-pill{padding:9px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s}
+.role-pill:hover{background:#f1f5f9;color:var(--text)}
+.role-pill.active{background:var(--primary-light);color:var(--primary)}
+.filter-bar{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.section-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 12px}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.flex-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.flex-col{display:flex;flex-direction:column;gap:8px}
+.ml-auto{margin-left:auto}
+.mt-4{margin-top:16px}.mt-3{margin-top:12px}.mt-2{margin-top:8px}.mb-4{margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);position:fixed;height:100vh;width:280px!important;z-index:1000;transition:transform .3s ease-in-out}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .main{margin-left:0!important}
+  .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none}
+  .sidebar-overlay.visible{display:block}
+  .sidebar.mobile-open .sidebar-brand-text,.sidebar.mobile-open .nav-label,.sidebar.mobile-open span,.sidebar.mobile-open .chevron{display:block!important}
+  .sidebar.mobile-open .nav-trigger,.sidebar.mobile-open .dash-link{justify-content:space-between!important;padding:9px 10px!important}
+  .sidebar.mobile-open .nav-icon{margin:0!important}
+  .sidebar.collapsed.mobile-open{width:280px!important;background:var(--surface)!important}
+}
+.form-section-content{display:none}
+.form-section-content.active{display:block}
+input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:pointer}
+#p-add-employee .role-pill{padding:12px 16px;margin-bottom:4px;border-radius:8px;font-size:.8rem;border-left:3px solid transparent}
+#p-add-employee .role-pill.active{background:var(--primary-light);color:var(--primary);border-left:3px solid var(--primary);font-weight:700}
+.onboard-grid{display:grid;grid-template-columns:300px 1fr;background:var(--surface);border-radius:20px;border:1px solid var(--border);box-shadow:var(--shadow-md);overflow:hidden;min-height:650px}
+.onboard-sidebar{background:#fcfdfe;border-right:1px solid var(--border);padding:32px 24px;display:flex;flex-direction:column}
+.onboard-content{padding:48px;overflow-y:auto;background:#fff;display:flex;flex-direction:column}
+.step-pro{display:flex;align-items:center;gap:16px;padding:14px;border-radius:12px;cursor:pointer;transition:all .2s;color:var(--muted);font-weight:600;font-size:.82rem;margin-bottom:4px}
+.step-pro.active{background:var(--primary-light);color:var(--primary)}
+.step-pro.done{color:var(--text)}
+.step-idx{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;background:#f1f5f9;color:#94a3b8;transition:all .3s;flex-shrink:0}
+.step-pro.active .step-idx{background:var(--primary);color:#fff;box-shadow:0 4px 10px rgba(21,178,1,.3)}
+.step-pro.done .step-idx{background:var(--success);color:#fff}
+.input-group-label{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.input-group-sub{font-size:.78rem;color:var(--muted);margin-bottom:24px}
+.form-ctrl{background:#fff!important;border:1.5px solid #e2e8f0!important;border-radius:10px!important;padding:10px 14px!important;font-size:.85rem!important;width:100%;transition:all .2s}
+.form-ctrl:focus{border-color:var(--primary)!important;box-shadow:0 0 0 4px var(--primary-light)!important;outline:none}
+.dot-progress{display:flex;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:#e2e8f0;transition:all .3s}
+.dot.active{background:var(--primary);width:20px;border-radius:10px}
+@media(max-width:992px){.onboard-grid{grid-template-columns:1fr;height:auto}.onboard-sidebar{border-right:none;border-bottom:1px solid var(--border);padding:20px}#onboard-nav-list{display:flex;overflow-x:auto;gap:8px;padding-bottom:10px}.step-pro{flex-shrink:0;margin-bottom:0;white-space:nowrap}.onboard-content{padding:24px}}
+@media(max-width:640px){.identity-flex-container{flex-direction:column;align-items:center!important;gap:20px!important}.profile-upload-wrapper{width:100%;display:flex;flex-direction:column;align-items:center}.fg-2,.fg-3{grid-template-columns:1fr!important}}
+.identity-master-wrapper{display:flex;gap:40px;align-items:flex-start;background:#fcfdfe;padding:30px;border-radius:18px;border:1px solid #eef2f6}
+.avatar-upload-zone{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.avatar-frame{width:130px;height:130px;border-radius:24px;background:#fff;border:2px dashed #cbd5e1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:all .3s ease;box-shadow:var(--shadow)}
+.avatar-frame:hover{border-color:var(--primary);background:var(--primary-light)}
+.identity-fields-container{flex:1;display:flex;flex-direction:column;gap:24px}
+.name-grid-row{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:12px}
+.demo-grid-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.form-group label{font-size:.68rem!important;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin-bottom:6px}
+.identity-divider{height:1px;background:linear-gradient(90deg,#eef2f6 0%,transparent 100%);margin:5px 0}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;transition:all .3s}
+.step-dot.active{background:var(--primary);width:24px;border-radius:4px}
+.form-header-pro{padding-bottom:24px;margin-bottom:32px;border-bottom:1px solid #f1f5f9}
+.field-error { border-color: var(--danger) !important; background-color: var(--danger-bg) !important; }
+.review-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.review-sec { background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border); }
+.review-sec-title { font-size: .65rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.review-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: .78rem; }
+.review-row:last-child { border-bottom: none; }
+.rev-label { color: var(--muted); font-weight: 500; }
+.rev-val { color: var(--text); font-weight: 700; }
+@media(max-width:600px){ .review-container { grid-template-columns: 1fr; } }
+.role-pill-v2{padding:12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:#fff;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.role-pill-v2:hover,.role-pill-v2.active{border-color:var(--primary);background:var(--primary-light)}
+.role-pill-v2.active i{color:var(--primary)}
+.switch{position:relative;display:inline-block;width:32px;height:18px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#e2e8f0;transition:.2s;border-radius:20px}
+.slider:before{position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;background:#fff;transition:.2s;border-radius:50%}
+input:checked+.slider{background:var(--primary)}
+input:checked+.slider:before{transform:translateX(14px)}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i data-lucide="layers" size="16"></i></div>
+    <span class="sidebar-brand-text">YDY Systems</span>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="nav-group">
+      <div class="dash-link active" onclick="goPage('dashboard',this)" title="Dashboard">
+        <div class="nav-trigger-left">
+          <div class="nav-icon"><i data-lucide="layout-dashboard" size="15"></i></div>
+          <span>Dashboard</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-label">Organization</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-org')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="building-2" size="15"></i></div><span>Company &amp; Structure</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-org">
+        <div class="sub-link" onclick="goPage('company-profile',this)"><span class="sub-dot"></span><span>Company Profile</span></div>
+        <div class="sub-link" onclick="goPage('org-chart',this)"><span class="sub-dot"></span><span>Organization Chart</span></div>
+        <div class="sub-link" onclick="goPage('departments',this)"><span class="sub-dot"></span><span>Departments</span></div>
+        <div class="sub-link" onclick="goPage('job-positions',this)"><span class="sub-dot"></span><span>Job Positions</span></div>
+        <div class="sub-link" onclick="goPage('branch-offices',this)"><span class="sub-dot"></span><span>Branch Offices</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-emp')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="users" size="15"></i></div><span>Employees</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-emp">
+        <div class="sub-link" onclick="goPage('employee-directory',this)"><span class="sub-dot"></span><span>Employee Profile</span></div>
+        <div class="sub-link" onclick="goPage('employment-types',this)"><span class="sub-dot"></span><span>Employment Types</span></div>
+        <div class="sub-link" onclick="goPage('probation-tracker',this)"><span class="sub-dot"></span><span>Probation Tracker</span></div>
+        <div class="sub-link" onclick="goPage('contract-renewals',this)"><span class="sub-dot"></span><span>Contract Renewals</span></div>
+        <div class="sub-link" onclick="goPage('former-employees',this)"><span class="sub-dot"></span><span>Former employees</span></div>
+        <div class="sub-link" onclick="goPage('document-vault',this)"><span class="sub-dot"></span><span>Attachment Vault</span></div>
+        <div class="sub-link" onclick="goPage('asset-tracking',this)"><span class="sub-dot"></span><span>Asset Tracking</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-rec')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="user-plus" size="15"></i></div><span>Talent Acquisition</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-rec">
+        <div class="sub-link" onclick="goPage('job-vacancies',this)"><span class="sub-dot"></span><span>Add Job Vacancies</span></div>
+        <div class="sub-link" onclick="goPage('candidates',this)"><span class="sub-dot"></span><span>Job Applicant's List</span></div>
+        <div class="sub-link" onclick="goPage('interview-tracker',this)"><span class="sub-dot"></span><span>Interview Tracker</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-move')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="arrow-right-left" size="15"></i></div><span>Employee Movement</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-move">
+        <div class="sub-link" onclick="goPage('Promote/Demote',this)"><span class="sub-dot"></span><span>Promote/Demote</span></div>
+        <div class="sub-link" onclick="goPage('transfers',this)"><span class="sub-dot"></span><span>Department Transfers</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Operations</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-att')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="clock" size="15"></i></div><span>Attendance</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-att">
+        <div class="sub-link" onclick="goPage('shift-management',this)"><span class="sub-dot"></span><span>Shift Management</span></div>
+        <div class="sub-link" onclick="goPage('daily-attendance',this)"><span class="sub-dot"></span><span>Daily Attendance</span></div>
+        <div class="sub-link" onclick="goPage('overtime-requests',this)"><span class="sub-dot"></span><span>Overtime Requests</span></div>
+        <div class="sub-link" onclick="goPage('attendance-reports',this)"><span class="sub-dot"></span><span>Attendance Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-leave')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="calendar-days" size="15"></i></div><span>Leave Management</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-leave">
+        <div class="sub-link" onclick="goPage('leave-types',this)"><span class="sub-dot"></span><span>Leave Types</span></div>
+        <div class="sub-link" onclick="goPage('leave-requests',this)"><span class="sub-dot"></span><span>Leave Requests</span></div>
+        <div class="sub-link" onclick="goPage('leave-entitlement',this)"><span class="sub-dot"></span><span>Leave Entitlement</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-ben')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="heart-pulse" size="15"></i></div><span>Benefits</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-ben">
+        <div class="sub-link" onclick="goPage('medical-claims',this)"><span class="sub-dot"></span><span>Medical Claims</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-comp')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="shield-alert" size="15"></i></div><span>Compliance &amp; Exit</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-comp">
+        <div class="sub-link" onclick="goPage('disciplinary-actions',this)"><span class="sub-dot"></span><span>Disciplinary Actions</span></div>
+        <div class="sub-link" onclick="goPage('grievances',this)"><span class="sub-dot"></span><span>Resignations</span></div>
+        <div class="sub-link" onclick="goPage('termination',this)"><span class="sub-dot"></span><span>Separation &amp; Exit</span></div>
+        <div class="sub-link" onclick="goPage('exit-clearance',this)"><span class="sub-dot"></span><span>Exit Clearance</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Growth &amp; Data</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-train')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="graduation-cap" size="15"></i></div><span>Training &amp; Dev</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-train">
+        <div class="sub-link" onclick="goPage('training-needs',this)"><span class="sub-dot"></span><span>Training Needs Analysis</span></div>
+        <div class="sub-link" onclick="goPage('training-schedule',this)"><span class="sub-dot"></span><span>Training Schedule</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-perf')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="trending-up" size="15"></i></div><span>Performance</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-perf">
+        <div class="sub-link" onclick="goPage('performance-reviews',this)"><span class="sub-dot"></span><span>Performance Reviews</span></div>
+        <div class="sub-link" onclick="goPage('360-feedback',this)"><span class="sub-dot"></span><span>360° Feedback</span></div>
+        <div class="sub-link" onclick="goPage('performance-reports',this)"><span class="sub-dot"></span><span>Performance Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-label">Analytics &amp; System</div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-rep')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="bar-chart-3" size="15"></i></div><span>Reports &amp; Analytics</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-rep">
+        <div class="sub-link" onclick="goPage('hr-analytics',this)"><span class="sub-dot"></span><span>HR Analytics</span></div>
+        <div class="sub-link" onclick="goPage('custom-reports',this)"><span class="sub-dot"></span><span>Custom Reports</span></div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-trigger" onclick="toggleNav(this,'m-sys')">
+        <div class="nav-trigger-left"><div class="nav-icon"><i data-lucide="settings-2" size="15"></i></div><span>System Admin</span></div>
+        <i data-lucide="chevron-right" size="13" class="chevron"></i>
+      </div>
+      <div class="submenu" id="m-sys">
+        <div class="sub-link" onclick="goPage('user-management',this)"><span class="sub-dot"></span><span>User Management</span></div>
+        <div class="sub-link" onclick="goPage('roles-permissions',this)"><span class="sub-dot"></span><span>Roles &amp; Permissions</span></div>
+        <div class="sub-link" onclick="goPage('audit-logs',this)"><span class="sub-dot"></span><span>Audit Logs</span></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main" id="main-content">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" aria-label="Toggle Sidebar">
+        <i data-lucide="menu" size="16" id="toggle-icon"></i>
+      </button>
+      <div class="breadcrumb">
+        <i data-lucide="home" size="13"></i>
+        <span>/</span>
+        <span id="page-title">Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="icon-btn"><i data-lucide="bell" size="15"></i><span class="notif-dot"></span></div>
+      <div class="icon-btn"><i data-lucide="help-circle" size="15"></i></div>
+      <div class="topbar-user">
+        <div class="topbar-user-avatar">AD</div>
+        <div class="topbar-user-info">
+          <div class="u-name">Admin User</div>
+          <div class="u-role">Super Administrator</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-area" id="content-area">
+
+<!-- DASHBOARD -->
+<div class="page active" id="p-dashboard">
+  <header class="db-hero-banner" style="padding:16px 28px;min-height:auto;position:relative;">
+    <div class="db-hero-content">
+      <h1 class="db-hero-title" style="font-size:1.5rem;">Dashboard Intelligence</h1>
+      <p class="db-hero-sub">Organization performance is at peak efficiency.</p>
+    </div>
+    <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
+    <div class="qa-stack-v2">
+      <div class="qa-mini-header">
+        <span class="qa-mini-line"></span>
+        <span class="qa-mini-label">Quick Actions</span>
+        <span class="qa-mini-line"></span>
+      </div>
+      <div class="qa-button-row">
+        <button class="btn-glass-pro-slim" onclick="goPage('employee-directory',this)"><i data-lucide="user-plus" size="14"></i><span>New Hire</span></button>
+        <button class="btn-glass-pro-slim" onclick="goPage('leave-requests',this)"><i data-lucide="calendar" size="14"></i><span>Leaves</span></button>
+        <button class="btn-glass-pro-slim" onclick="goPage('hr-analytics',this)"><i data-lucide="bar-chart-3" size="14"></i><span>Analytics</span></button>
+      </div>
+    </div>
+  </header>
+  <div class="stat-ribbon-art">
+    <div class="art-card art-headcount"><span class="art-label">Headcount</span><div class="art-main-row"><span class="art-value">1,248</span><div class="art-meta-group"><span class="art-indicator">↑ 12</span><span class="art-subtext">Monthly Growth</span></div></div></div>
+    <div class="art-card art-units"><span class="art-label">Departments</span><div class="art-main-row"><span class="art-value">07</span><div class="art-meta-group"><span class="art-indicator">Active</span><span class="art-subtext">Internal Units</span></div></div></div>
+    <div class="art-card art-leave"><span class="art-label">On Leave</span><div class="art-main-row"><span class="art-value">47</span><div class="art-meta-group"><span class="art-indicator">Staff</span><span class="art-subtext"> Outbound</span></div></div></div>
+    <div class="art-card art-expired"><span class="art-label">Expiring</span><div class="art-main-row"><span class="art-value">18</span><div class="art-meta-group"><span class="art-indicator">Critical</span><span class="art-subtext">Contract Review</span></div></div></div>
+    <div class="art-card art-missing"><span class="art-label">Compliance</span><div class="art-main-row"><span class="art-value">48</span><div class="art-meta-group"><span class="art-indicator">Missing</span><span class="art-subtext">Vault Files</span></div></div></div>
+  </div>
+  <div class="bento-container">
+    <div class="card" style="padding:24px;border-radius:20px;background:#fff;">
+      <div class="card-header" style="border:none;padding:0 0 20px 0;">
+        <div>
+          <div class="card-title" style="font-size:1.15rem;color:#0f172a;font-weight:800;">Headcount Distribution</div>
+          <div class="page-sub">Departmental workload and personnel breakdown</div>
+        </div>
+      </div>
+      <div style="height:240px;width:100%;"><canvas id="chart-headcount-dept"></canvas></div>
+    </div>
+    <div class="activity-side-wrap" style="max-height:445px;border-radius:20px;">
+      <div class="pulse-header">
+        <div class="pulse-label"><div class="live-indicator"></div>Recent activities</div>
+        <button class="refresh-pill" onclick="triggerRefresh(this)">
+          <i data-lucide="refresh-cw" size="12"></i><span id="refresh-text">Refresh</span>
+        </button>
+      </div>
+      <div class="hr-pulse-feed">
+        <div class="pulse-item"><span class="pulse-type type-asset">Inventory</span><div class="pulse-content">MacBook Pro 14" (AST-99) assigned to <b>Sarah Jenkins</b></div><span class="pulse-ts">Just now</span></div>
+        <div class="pulse-item"><span class="pulse-type type-crit">Compliance</span><div class="pulse-content">NDA missing for <b>4 employees</b> in Engineering.</div><span class="pulse-ts">12m ago</span></div>
+        <div class="pulse-item"><span class="pulse-type type-hire">Talent</span><div class="pulse-content">New application received for <b>Senior UI Designer</b>.</div><span class="pulse-ts">45m ago</span></div>
+        <div class="pulse-item"><span class="pulse-type type-prob">Probation</span><div class="pulse-content"><b>John Doe</b> completed 90-day review period.</div><span class="pulse-ts">2h ago</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPANY PROFILE -->
+<div class="page" id="p-company-profile">
+  <div class="master-profile-wrapper">
+    <header class="db-hero-banner" style="padding:16px 28px;min-height:auto;position:relative;">
+      <div class="db-hero-content">
+        <h1 class="db-hero-title" style="font-size:1.5rem;">YDY HRM Enterprise Ltd.</h1>
+        <p class="db-hero-sub">Corporate Registry</p>
+      </div>
+      <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
+      <button class="btn-glass-pro-slim" onclick="openEditCompanyModal(this)"><i data-lucide="edit" size="14"></i><span>Update records</span></button>
+    </header>
+    <div class="profile-main-grid">
+      <div class="data-card span-v-2">
+        <div class="card-label-strip"><i data-lucide="file-text" size="14"></i><span>Legal &amp; Incorporation</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Legal Name</span><span class="de-value">YDY HRM Enterprise Ltd.</span></div>
+          <div class="data-entry"><span class="de-label">Trading Name</span><span class="de-value">YDY Systems</span></div>
+          <div class="data-entry"><span class="de-label">Entity Type</span><span class="de-value">Private Ltd. Co</span></div>
+          <div class="data-entry"><span class="de-label">Incorporate Date</span><span class="de-value">12 Oct 2010</span></div>
+          <div class="data-entry"><span class="de-label">Registration No.</span><span class="de-value mono">MT/AA/14/667/09</span></div>
+          <div class="data-entry"><span class="de-label">Capital (Authorized)</span><span class="de-value">50,000,000 ETB</span></div>
+          <div class="data-entry"><span class="de-label">Issued By</span><span class="de-value">Min. of Trade</span></div>
+          <div class="data-entry"><span class="de-label">Country</span><span class="de-value">Ethiopia</span></div>
+          <div class="data-entry"><span class="de-label">Life Span</span><span class="de-value">Perpetual</span></div>
+        </div>
+      </div>
+      <div class="data-card span-v-2">
+        <div class="card-label-strip"><i data-lucide="shield-check" size="14"></i><span>Tax &amp; Regulatory DNA</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Tax ID (TIN)</span><span class="de-value mono">0019283746</span></div>
+          <div class="data-entry"><span class="de-label">VAT Reg Number</span><span class="de-value mono">9928374-VAT-01</span></div>
+          <div class="data-entry"><span class="de-label">Pension Code (ER)</span><span class="de-value mono">P-99283-746-X</span></div>
+          <div class="data-entry"><span class="de-label">Trade License No.</span><span class="de-value mono">01/01/14/19283</span></div>
+          <div class="data-entry"><span class="de-label">Tax Office</span><span class="de-value">Large Taxpayers (LTO)</span></div>
+          <div class="data-entry"><span class="de-label">Filing Frequency</span><span class="de-value">Monthly</span></div>
+          <div class="data-entry"><span class="de-label">Audit Status</span><span class="de-value" style="color:var(--success)">Current (2025)</span></div>
+          <div class="data-entry"><span class="de-label">License Renewal</span><span class="de-value">30 June 2026</span></div>
+          <div class="data-entry"><span class="de-label">Compliance Grade</span><span class="de-value">A+ Rating</span></div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="card-label-strip"><i data-lucide="globe" size="14"></i><span>System &amp; Treasury</span></div>
+        <div class="card-content">
+          <div class="data-entry"><span class="de-label">Main Bank</span><span class="de-value">CBE</span></div>
+          <div class="data-entry"><span class="de-label">Account (Primary)</span><span class="de-value mono">1000192837465</span></div>
+          <div class="data-entry"><span class="de-label">Base Currency</span><span class="de-value">ETB (Birr)</span></div>
+          <div class="data-entry"><span class="de-label">Fiscal Start</span><span class="de-value">Hamle 01</span></div>
+          <div class="data-entry"><span class="de-label">Timezone</span><span class="de-value">UTC+3 (EAT)</span></div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="card-label-strip"><i data-lucide="map-pin" size="14"></i><span>Branch Directory</span></div>
+        <div class="card-content">
+          <table class="mini-table">
+            <thead><tr><th>Branch</th><th>Location</th><th>Staff</th></tr></thead>
+            <tbody>
+              <tr><td>Headquarters</td><td>Addis Ababa</td><td>840</td></tr>
+              <tr><td>Northern Hub</td><td>Mekelle</td><td>120</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORG CHART -->
+<div class="page" id="p-org-chart">
+  <div class="page-header">
+    <div><div class="page-title">Organizational Hierarchy</div><div class="page-sub">Departmental structure and reporting lines across all divisions</div></div>
+    <div class="flex-row" style="gap:10px;">
+      <div class="icon-btn-group" style="display:flex;background:#fff;border:1px solid var(--border);border-radius:8px;padding:2px;">
+        <button class="icon-btn" onclick="zoomOC(-0.1)" title="Zoom Out" style="border:none;"><i data-lucide="minus-circle" size="16"></i></button>
+        <div id="oc-zoom-label" style="font-size:.7rem;font-weight:800;width:45px;display:flex;align-items:center;justify-content:center;color:var(--muted);border-left:1px solid var(--border);border-right:1px solid var(--border);">100%</div>
+        <button class="icon-btn" onclick="zoomOC(0.1)" title="Zoom In" style="border:none;"><i data-lucide="plus-circle" size="16"></i></button>
+        <button class="icon-btn" onclick="resetOC()" title="Reset Chart" style="border:none;color:var(--primary);"><i data-lucide="refresh-cw" size="14"></i></button>
+      </div>
+      <button class="btn btn-primary"><i data-lucide="printer" size="14"></i> Export PDF</button>
+    </div>
+  </div>
+  <div class="oc-blueprint" id="oc-blueprint-area">
+    <div class="oc-container" id="oc-zoom-container" style="transform-origin:top center;transition:transform .2s ease-out;">
+      <ul class="oc-tree" id="oc-tree-root">
+        <li>
+          <!-- CORPORATE ROOT -->
+          <div class="oc-node oc-ceo">
+            <div class="oc-node-header"><span class="oc-id">CORP-HQ</span><span class="badge badge-success" style="font-size:8px;">Active</span></div>
+            <div class="oc-node-body"><div class="oc-node-avatar" style="background:#0f172a;color:#fff;font-size:.7rem;">YDY</div><div class="oc-node-info"><div class="oc-node-name">YDY Systems</div><div class="oc-node-role">Corporate Headquarters</div></div></div>
+            <div class="oc-node-footer">1,248 Staff · 2 Branches</div>
+          </div>
+          <ul>
+            <!-- EXECUTIVE OFFICE -->
+            <li>
+              <div class="oc-node oc-mgr" style="border-top:4px solid #6366f1;">
+                <div class="oc-node-header"><span class="oc-id">DIV-EXE</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#eef2ff;color:#6366f1;">EX</div><div class="oc-node-info"><div class="oc-node-name">Executive Office</div><div class="oc-node-role">Strategic Leadership</div></div></div>
+                <div class="oc-node-footer">12 Staff</div>
+              </div>
+              <ul>
+                <li><div class="oc-node oc-staff" style="border-top:3px solid #6366f1;"><div class="oc-node-name">Internal Audit</div><div class="oc-node-role">Compliance &amp; Oversight · 6 Staff</div></div></li>
+                <li><div class="oc-node oc-staff" style="border-top:3px solid #6366f1;"><div class="oc-node-name">Legal &amp; Compliance</div><div class="oc-node-role">Regulatory Affairs · 6 Staff</div></div></li>
+              </ul>
+            </li>
+            <!-- OPERATIONS DIVISION -->
+            <li>
+              <div class="oc-node oc-mgr" style="border-top:4px solid #0891b2;">
+                <div class="oc-node-header"><span class="oc-id">DIV-OPS</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#cffafe;color:#0891b2;">OP</div><div class="oc-node-info"><div class="oc-node-name">Operations Division</div><div class="oc-node-role">Core Product &amp; Technology</div></div></div>
+                <div class="oc-node-footer">597 Staff</div>
+              </div>
+              <ul>
+                <!-- Engineering -->
+                <li>
+                  <div class="oc-node oc-mgr" style="border-top:4px solid #15b201;">
+                    <div class="oc-node-header"><span class="oc-id">DEPT-ENG</span></div>
+                    <div class="oc-node-body"><div class="oc-node-avatar" style="background:#f1fcf0;color:#15b201;">EN</div><div class="oc-node-info"><div class="oc-node-name">Engineering</div><div class="oc-node-role">Software &amp; Systems · 485 Staff</div></div></div>
+                  </div>
+                  <ul>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #15b201;"><div class="oc-node-name">Software Development</div><div class="oc-node-role">Frontend · Backend · Mobile · 310</div></div></li>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #15b201;"><div class="oc-node-name">QA &amp; Testing</div><div class="oc-node-role">Quality Assurance · 95 Staff</div></div></li>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #15b201;"><div class="oc-node-name">DevOps &amp; Infrastructure</div><div class="oc-node-role">Cloud · CI/CD · 80 Staff</div></div></li>
+                  </ul>
+                </li>
+                <!-- Product -->
+                <li>
+                  <div class="oc-node oc-mgr" style="border-top:4px solid #8b5cf6;">
+                    <div class="oc-node-header"><span class="oc-id">DEPT-PRD</span></div>
+                    <div class="oc-node-body"><div class="oc-node-avatar" style="background:#ede9fe;color:#8b5cf6;">PD</div><div class="oc-node-info"><div class="oc-node-name">Product &amp; Design</div><div class="oc-node-role">UX · Research · Roadmap · 112</div></div></div>
+                  </div>
+                </li>
+              </ul>
+            </li>
+            <!-- BUSINESS DIVISION -->
+            <li>
+              <div class="oc-node oc-mgr" style="border-top:4px solid #d97706;">
+                <div class="oc-node-header"><span class="oc-id">DIV-BIZ</span></div>
+                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fef3c7;color:#d97706;">BZ</div><div class="oc-node-info"><div class="oc-node-name">Business Division</div><div class="oc-node-role">Revenue &amp; Support Functions</div></div></div>
+                <div class="oc-node-footer">351 Staff</div>
+              </div>
+              <ul>
+                <!-- Sales -->
+                <li>
+                  <div class="oc-node oc-mgr" style="border-top:4px solid #ef4444;">
+                    <div class="oc-node-header"><span class="oc-id">DEPT-SAL</span></div>
+                    <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fee2e2;color:#ef4444;">SM</div><div class="oc-node-info"><div class="oc-node-name">Sales &amp; Marketing</div><div class="oc-node-role">Revenue Growth · 195 Staff</div></div></div>
+                  </div>
+                  <ul>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #ef4444;"><div class="oc-node-name">Sales</div><div class="oc-node-role">Enterprise &amp; SMB · 130 Staff</div></div></li>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #ef4444;"><div class="oc-node-name">Marketing</div><div class="oc-node-role">Brand &amp; Digital · 65 Staff</div></div></li>
+                  </ul>
+                </li>
+                <!-- Finance -->
+                <li>
+                  <div class="oc-node oc-mgr" style="border-top:4px solid #0891b2;">
+                    <div class="oc-node-header"><span class="oc-id">DEPT-FIN</span></div>
+                    <div class="oc-node-body"><div class="oc-node-avatar" style="background:#cffafe;color:#0891b2;">FA</div><div class="oc-node-info"><div class="oc-node-name">Finance &amp; Accounting</div><div class="oc-node-role">Treasury &amp; Reporting · 110 Staff</div></div></div>
+                  </div>
+                </li>
+                <!-- HR -->
+                <li>
+                  <div class="oc-node oc-mgr" style="border-top:4px solid #ec4899;">
+                    <div class="oc-node-header"><span class="oc-id">DEPT-HR</span></div>
+                    <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fce7f3;color:#ec4899;">HR</div><div class="oc-node-info"><div class="oc-node-name">Human Resources</div><div class="oc-node-role">People &amp; Culture · 46 Staff</div></div></div>
+                  </div>
+                  <ul>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #ec4899;"><div class="oc-node-name">Talent Acquisition</div><div class="oc-node-role">Recruitment · 16 Staff</div></div></li>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #ec4899;"><div class="oc-node-name">Compensation &amp; Benefits</div><div class="oc-node-role">Payroll &amp; Welfare · 18 Staff</div></div></li>
+                    <li><div class="oc-node oc-staff" style="border-top:3px solid #ec4899;"><div class="oc-node-name">HR Operations</div><div class="oc-node-role">Admin &amp; Compliance · 12 Staff</div></div></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DEPARTMENTS -->
+<div class="page" id="p-departments">
+  <div class="page-header"><div><div class="page-title">Departments</div><div class="page-sub">Manage all organizational units</div></div><button class="btn btn-primary" onclick="openDeptModal()"><i data-lucide="plus" size="13"></i>Add Department</button></div>
+  <div id="tbl-departments"></div>
+</div>
+
+<!-- JOB POSITIONS -->
+<div class="page" id="p-job-positions">
+  <div class="page-header"><div><div class="page-title">Job Positions</div><div class="page-sub">Define job information</div></div><button class="btn btn-primary" onclick="openJobModal()"><i data-lucide="plus" size="13"></i>New Position</button></div>
+  <div id="tbl-job-positions"></div>
+</div>
+
+<!-- BRANCH OFFICES -->
+<div class="page" id="p-branch-offices">
+  <div class="page-header"><div><div class="page-title">Branch Offices</div><div class="page-sub">All locations and regional offices</div></div><button class="btn btn-primary" onclick="openBranchModal()"><i data-lucide="plus" size="13"></i>Add Branch</button></div>
+  <div id="tbl-branch-offices"></div>
+</div>
+
+<!-- EMPLOYEE DIRECTORY -->
+<div class="page" id="p-employee-directory">
+  <div class="page-header">
+    <div><div class="page-title">Employee Profile</div><div class="page-sub">1,248 employees across all branches</div></div>
+    <div class="flex-row"><select class="sel"><option>All Departments</option><option>Engineering</option><option>Sales</option><option>HR</option><option>Finance</option></select>
+    <button class="btn btn-primary" onclick="goPage('add-employee', this)"><i data-lucide="user-plus" size="13"></i>Add Employee</button></div>
+  </div>
+  <div id="tbl-employees"></div>
+</div>
+
+<!-- ADD NEW EMPLOYEE -->
+<div class="page" id="p-add-employee">
+  <div class="page-header" style="margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button class="sidebar-toggle" onclick="goPage('employee-directory')"><i data-lucide="arrow-left" size="16"></i></button>
+      <div>
+        <div class="page-title" style="font-size:1.4rem;letter-spacing:-0.02em;">Onboard Personnel <span style="color:var(--muted);font-weight:400;">/ Master Data</span></div>
+        <p class="page-sub">Establish formal organizational records and legal compliance identities.</p>
+      </div>
+    </div>
+    <div class="flex-row">
+       <button class="btn btn-secondary" onclick="goPage('employee-directory')">Discard Draft</button>
+       <button class="btn btn-primary" id="btn-save-master" style="padding:10px 28px;opacity:0.4;cursor:not-allowed;" disabled onclick="saveNewEmployee()">
+         <i data-lucide="shield-check" size="16"></i> Commit Record
+       </button>
+    </div>
+  </div>
+  <div class="onboard-grid">
+    <aside class="onboard-sidebar">
+      <div style="margin-bottom:32px;">
+        <div style="font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Master Record Progress</div>
+        <div style="height:4px;background:#e2e8f0;border-radius:10px;overflow:hidden;">
+          <div id="master-progress-line" style="width:20%;height:100%;background:var(--primary);transition:width .4s ease;"></div>
+        </div>
+      </div>
+      <nav id="onboard-nav-list">
+        <div class="step-pro active" data-step="1" onclick="jumpToStep(1)"><div class="step-idx">1</div><span>Identity</span></div>
+        <div class="step-pro" data-step="2" onclick="jumpToStep(2)"><div class="step-idx">2</div><span>Contact</span></div>
+        <div class="step-pro" data-step="3" onclick="jumpToStep(3)"><div class="step-idx">3</div><span>Employment</span></div>
+        <div class="step-pro" data-step="4" onclick="jumpToStep(4)"><div class="step-idx">4</div><span>Finance</span></div>
+        <div class="step-pro" data-step="5" onclick="jumpToStep(5)"><div class="step-idx">5</div><span>Compliance</span></div>
+        <div class="step-pro" data-step="6" onclick="jumpToStep(6)"><div class="step-idx">6</div><span>Review</span></div>
+        <div style="margin-top:auto;padding:20px;background:#fff;border:1px solid var(--border);border-radius:16px;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--text);">Integrity Check</div>
+          <div id="master-val-text" style="font-size:.65rem;color:var(--danger);margin-top:6px;font-weight:600;">* Missing Required Fields</div>
+        </div>
+      </nav>
+    </aside>
+    <main class="onboard-content">
+      <section id="ob-step-1" class="form-section-content active">
+        <div class="form-header-pro">
+          <div class="input-group-label">Personal Identity</div>
+          <p class="input-group-sub">Establish the primary legal identity and demographic profile for the master record.</p>
+        </div>
+        <div class="identity-master-wrapper">
+         <div class="avatar-upload-zone">
+  <label for="avatar-upload" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+    <div class="avatar-frame" id="avatar-preview-box">
+      <i data-lucide="user" size="40" style="color:#cbd5e1;" id="placeholder-icon"></i>
+      <img id="avatar-img-output" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
+    </div>
+    <div class="btn btn-secondary btn-xs" style="border-radius:20px; padding:5px 15px;">
+      <i data-lucide="camera" size="12"></i> Upload Photo
+    </div>
+  </label>
+  <input type="file" id="avatar-upload" hidden accept="image/*" onchange="previewAvatar(this)">
+</div>
+          <div class="identity-fields-container">
+            <div class="name-grid-row">
+              <div class="form-group"><label>First Name *</label><input type="text" class="form-ctrl master-req" id="o-fname" placeholder="Ex: Abebe"></div>
+              <div class="form-group"><label>Middle Name</label><input type="text" class="form-ctrl" id="o-mname" placeholder="Ex: Bikila"></div>
+              <div class="form-group"><label>Last Name *</label><input type="text" class="form-ctrl master-req" id="o-lname" placeholder="Ex: Gebre"></div>
+            </div>
+            <div class="identity-divider"></div>
+            <div class="demo-grid-row">
+              <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-ctrl master-req" id="o-dob"></div>
+              <div class="form-group"><label>Gender *</label><select class="form-ctrl master-req" id="o-gender"><option value="">Select...</option><option>Male</option><option>Female</option></select></div>
+              <div class="form-group"><label>Nationality *</label><input type="text" class="form-ctrl master-req" id="o-nat" value="Ethiopian"></div>
+            </div>
+            <div class="demo-grid-row">
+              <div class="form-group"><label>Marital Status</label><select class="form-ctrl" id="o-marital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
+              <div class="form-group" style="grid-column:span 2;"><label>Place of Birth (City/Region)</label><input type="text" class="form-ctrl" id="o-pob" placeholder="Enter city or region"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="ob-step-2" class="form-section-content">
+        <div class="input-group-label">Contact Channels</div>
+        <p class="input-group-sub">Global reachability and residential records.</p>
+        <div class="form-grid fg-2">
+          <div class="form-group"><label>Personal Phone *</label><input type="tel" class="form-ctrl master-req" id="o-phone"></div>
+          <div class="form-group"><label>Personal Email *</label><input type="email" class="form-ctrl master-req" id="o-email"></div>
+          <div class="form-group" style="grid-column:span 2;"><label>Permanent Address *</label><textarea class="form-ctrl master-req" id="o-addr" style="min-height:80px;"></textarea></div>
+          <div class="form-group"><label>City *</label><input type="text" class="form-ctrl master-req" id="o-city" value="Addis Ababa"></div>
+          <div class="form-group"><label>Postal Code</label><input type="text" class="form-ctrl" id="o-zip" value="1000"></div>
+        </div>
+      </section>
+      <section id="ob-step-3" class="form-section-content">
+        <div class="input-group-label">Employment Placement</div>
+        <p class="input-group-sub">Mapping the position within the corporate structure.</p>
+        <div class="form-grid fg-3">
+          <div class="form-group"><label>Department *</label><select class="form-ctrl master-req" id="o-dept"><option value="">Select...</option><option>Engineering</option><option>Finance</option><option>HR</option></select></div>
+          <div class="form-group"><label>Job Position *</label><select class="form-ctrl master-req" id="o-pos"><option value="">Select...</option><option>Senior Dev</option><option>Analyst</option></select></div>
+          <div class="form-group"><label>Employment Type *</label><select class="form-ctrl master-req" id="o-etype"><option value="">Select...</option><option>Full-Time</option><option>Contract</option></select></div>
+          <div class="form-group"><label>Joined Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+          <div class="form-group"><label>Reporting To</label><input type="text" class="form-ctrl" placeholder="Search Manager..."></div>
+        </div>
+      </section>
+      <section id="ob-step-4" class="form-section-content">
+        <div class="input-group-label">Financial &amp; Treasury</div>
+        <p class="input-group-sub">Payroll disbursement and statutory tax records.</p>
+        <div class="form-grid fg-2">
+          <div class="form-group"><label>Basic Salary (ETB) *</label><input type="number" class="form-ctrl master-req" id="o-sal"></div>
+          <div class="form-group"><label>Tax ID (TIN) *</label><input type="text" class="form-ctrl master-req" id="o-tin"></div>
+          <div class="form-group"><label>Bank Name *</label><select class="form-ctrl master-req" id="o-bank"><option value="">Select Bank...</option><option>CBE</option><option>Awash</option><option>Abyssinia</option></select></div>
+          <div class="form-group"><label>Account Number *</label><input type="text" class="form-ctrl master-req" id="o-acc"></div>
+        </div>
+      </section>
+      <section id="ob-step-5" class="form-section-content">
+        <div class="input-group-label">Compliance &amp; Legal</div>
+        <p class="input-group-sub">Final verification and emergency contact data.</p>
+        <div class="form-grid fg-2">
+          <div class="form-group"><label>ID Type *</label><select class="form-ctrl master-req" id="o-idtype"><option>National ID</option><option>Passport</option></select></div>
+          <div class="form-group"><label>ID Number *</label><input type="text" class="form-ctrl master-req" id="o-idno"></div>
+          <div class="form-group"><label>Emergency Contact *</label><input type="text" class="form-ctrl master-req" id="o-ename"></div>
+          <div class="form-group"><label>Emergency Phone *</label><input type="tel" class="form-ctrl master-req" id="o-ephone"></div>
+        </div>
+      </section>
+      <section id="ob-step-6" class="form-section-content">
+        <div class="form-header-pro">
+          <div class="input-group-label">Final Review</div>
+          <p class="input-group-sub">Please verify all information before committing the master record to the database.</p>
+        </div>
+        <div id="summary-render-area" class="review-container"></div>
+      </section>
+     <div style="margin-top:60px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:20px;">
+  <button class="btn btn-secondary" id="ob-prev" onclick="moveOnboarding(-1)" style="visibility:hidden;"><i data-lucide="chevron-left" size="14"></i> Previous</button>
+  <div id="ob-step-nav-center">
+    <div class="dot-progress" id="ob-dots">
+      <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+    <button class="btn btn-success" id="btn-save-master-bottom" style="display:none; padding:10px 30px;" onclick="saveNewEmployee()">
+      <i data-lucide="user-plus" size="16"></i> Add Employee
+    </button>
+  </div>
+  <button class="btn btn-primary" id="ob-next" onclick="moveOnboarding(1)" style="padding:10px 24px;">Next Step <i data-lucide="chevron-right" size="14"></i></button>
+</div>
+    </main>
+  </div>
+</div>
+
+<!-- EMPLOYMENT TYPES -->
+<div class="page" id="p-employment-types">
+  <div class="page-header"><div><div class="page-title">Employment Types</div><div class="page-sub">Configure contract and employment categories</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Type</button></div>
+  <div id="tbl-employment-types"></div>
+</div>
+
+<!-- PROBATION TRACKER -->
+<div class="page" id="p-probation-tracker">
+  <div class="page-header"><div><div class="page-title">Probation Tracker</div><div class="page-sub">Monitor and confirm probationary employees</div></div><button class="btn btn-primary"><i data-lucide="check-circle" size="13"></i>Confirm Selected</button></div>
+  <div id="tbl-probation"></div>
+</div>
+
+<!-- CONTRACT RENEWALS -->
+<div class="page" id="p-contract-renewals">
+  <div class="page-header"><div><div class="page-title">Contract Renewals</div><div class="page-sub">Expiring and up-for-renewal contracts</div></div><button class="btn btn-primary"><i data-lucide="refresh-cw" size="13"></i>Bulk Renew</button></div>
+  <div id="tbl-contract-renewals"></div>
+</div>
+
+<!-- FORMER EMPLOYEES -->
+<div class="page" id="p-former-employees">
+  <div class="page-header"><div><div class="page-title">Former Employees</div><div class="page-sub">Separation history and offboarding records</div></div></div>
+  <div id="tbl-former-employees"></div>
+</div>
+
+<!-- ATTACHMENT VAULT -->
+<div class="page" id="p-document-vault">
+  <div class="page-header"><div><div class="page-title">Attachment Vault &amp; Compliance</div><div class="page-sub">Tracking mandatory company-specific documents for all personnel</div></div></div>
+  <div class="stats-row stats-4 mb-4">
+    <div class="stat-card" style="border-left:4px solid var(--primary);"><div class="stat-label">Global Compliance</div><div class="stat-value">72.4%</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--danger);"><div class="stat-label">Missing Critical Files</div><div class="stat-value">48</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--warning);"><div class="stat-label">Expiring Soon</div><div class="stat-value">12</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--success);"><div class="stat-label">Verified This Week</div><div class="stat-value">156</div></div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="ml-auto flex-row">
+        <span style="font-size:.7rem;color:var(--muted);font-weight:600;">LEGEND:</span>
+        <span style="font-size:.65rem;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--success);"></span>Uploaded</span>
+        <span style="font-size:.65rem;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#e2e8f0;border:1px dashed #cbd5e1;"></span>Missing</span>
+      </div>
+    </div>
+    <div id="vault-matrix-container"></div>
+  </div>
+</div>
+
+<!-- ASSET TRACKING -->
+<div class="page" id="p-asset-tracking">
+  <div class="page-header" style="margin-bottom:24px;">
+    <div><div class="page-title" style="letter-spacing:-.02em;font-weight:800;">Asset Registry</div><div class="page-sub">Centralized inventory and resource assignment</div></div>
+    <div class="as-search-wrapper">
+      <i data-lucide="search" size="15" class="as-search-icon"></i>
+      <input type="text" placeholder="Search by name, ID or custodian..." class="as-search-input" id="as-search-filter">
+      <button class="btn btn-primary btn-sm as-add-btn"><i data-lucide="plus" size="14"></i>Add New</button>
+    </div>
+  </div>
+  <div class="as-stream-header">
+    <div style="padding-left:16px;">System ID</div><div>Asset Name</div><div>Current Custodian</div>
+    <div>Prev. Custodian</div><div>Serial / Ref</div><div>Location</div>
+    <div style="text-align:right;padding-right:16px;">Commands</div>
+  </div>
+  <div id="asset-stream-container" class="asset-stream"></div>
+  <div id="as-pagination" class="pagination" style="margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"></div>
+</div>
+
+<!-- JOB VACANCIES -->
+<div class="page" id="p-job-vacancies">
+  <div class="page-header">
+    <div><div class="page-title">Job Vacancies</div><div class="page-sub">Positions across all departments</div></div>
+    <div class="flex-row"><select class="sel"><option>All Status</option><option>Open</option><option>On Hold</option><option>Filled</option></select><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Post Vacancy</button></div>
+  </div>
+  <div id="tbl-vacancies"></div>
+</div>
+
+<!-- CANDIDATES -->
+<div class="page" id="p-candidates">
+  <div class="page-header"><div><div class="page-title">Job Applicant's List</div><div class="page-sub">Track applicants through hiring stages</div></div><div class="flex-row"><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Candidate</button></div></div>
+  <div id="tbl-candidates"></div>
+</div>
+
+<!-- INTERVIEW TRACKER -->
+<div class="page" id="p-interview-tracker">
+  <div class="page-header"><div><div class="page-title">Interview Tracker</div><div class="page-sub">Schedule and track interview outcomes</div></div><button class="btn btn-primary"><i data-lucide="calendar-plus" size="13"></i>Schedule Interview</button></div>
+  <div id="tbl-interviews"></div>
+</div>
+
+<!-- SHIFT MANAGEMENT -->
+<div class="page" id="p-shift-management">
+  <div class="page-header"><div><div class="page-title">Shift Management</div><div class="page-sub">Configure and assign work shifts</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Create Shift</button></div>
+  <div id="tbl-shifts"></div>
+</div>
+</body>
+</html>
