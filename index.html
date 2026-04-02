@@ -208,8 +208,26 @@ table.tbl tr:hover td:last-child{background:#fcfdfe!important}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);background:#fff}
 .form-group textarea{resize:vertical;min-height:80px}
 input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
-.oc-blueprint{width:100%;background-color:#f8fafc;background-image:radial-gradient(#e2e8f0 1.5px,transparent 1.5px);background-size:30px 30px;border:1px solid var(--border);border-radius:16px;padding:40px 20px 20px;overflow:auto;display:flex;justify-content:center;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.02);min-height:500px;align-items:flex-start;cursor:grab;user-select:none}
+.oc-blueprint{width:100%;background-color:#f8fafc;background-image:radial-gradient(#e2e8f0 1.5px,transparent 1.5px);background-size:30px 30px;border:1px solid var(--border);border-radius:16px;padding:40px 20px 20px;overflow:auto;justify-content:center;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.02);min-height:500px;align-items:flex-start;cursor:grab;user-select:none;-webkit-overflow-scrolling: touch;display: block; text-align: center;}
 .oc-blueprint:active{cursor:grabbing}
+
+/* Mobile specific layout (Screens smaller than 768px) */
+@media (max-width: 768px) {
+   .oc-tree ul {display: flex; flex-direction: column;  align-items: center;padding-top: 0;   }
+    .oc-tree li { padding: 20px 0 0 0 !important; display: block; }
+    .oc-tree li::before,.oc-tree li::after,.oc-tree ul::before { display: none !important; }
+     .oc-tree li:not(:only-child)::after { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e1; width: 0; height: 20px;}
+    /* Adjust Node sizes for mobile */
+    .oc-node {width: 240px; max-width: 90vw;
+    }
+    /* Submenu (Staff/Positions) adjustments */
+    .submenu-jobs { flex-direction: column !important; align-items: center; gap: 8px !important; padding-top: 10px !important; }
+    .oc-staff {  width: 200px !important;  }
+    /* Ensure the zoom container doesn't shrink too small automatically */
+    #oc-zoom-container { transform: none !important;   display: inline-block;}    
+    /* Hide zoom controls on mobile as they interfere with touch */
+    .icon-btn-group { display: none !important; }
+}
 .oc-container{display:inline-block;text-align:center}
 .oc-tree ul{padding-top:40px;position:relative;display:flex;justify-content:center;padding-left:0}
 .oc-tree li{list-style-type:none;position:relative;padding:40px 10px 0}
@@ -234,7 +252,7 @@ input[type="checkbox"]{accent-color:var(--primary);width:15px;height:15px;cursor
 .oc-node-name{font-size:.85rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .oc-node-role{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px}
 .oc-node-footer{padding:6px 12px;background:#f8fafc;font-size:9px;font-weight:700;color:var(--muted);border-top:1px solid #f1f5f9;text-transform:uppercase;letter-spacing:.05em}
-.oc-ceo{border-top:4px solid #0f172a;width:220px}
+.oc-ceo{border-top:4px solid #0f172a; width: 4000px;}
 .oc-mgr{border-top:4px solid var(--primary)}
 .oc-staff{border-top:4px solid #cbd5e1;width:170px;padding:12px}
 .oc-staff .oc-node-name{font-size:.75rem;text-align:center;width:100%}
@@ -456,6 +474,50 @@ input[type="radio"]{accent-color:var(--primary);width:18px;height:18px;cursor:po
 .slider:before{position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;background:#fff;transition:.2s;border-radius:50%}
 input:checked+.slider{background:var(--primary)}
 input:checked+.slider:before{transform:translateX(14px)}
+/* Social Media Hover Animation */
+.social-link-row {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.social-link-row:hover {
+  background: var(--primary-light) !important; /* Your theme's light green */
+  border-color: var(--primary) !important;       /* Your theme's solid green */
+  transform: translateX(6px);                   /* Simple slide right effect */
+}
+/* Submenu job positions styling */
+.submenu-jobs {
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  position: relative;
+}
+
+.submenu-jobs li {
+  list-style: none;
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.submenu-jobs li::before,
+.submenu-jobs li::after {
+  display: none !important;
+}
+
+.oc-staff {
+  transition: all 0.2s ease;
+}
+
+.oc-staff:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary) !important;
+  box-shadow: var(--shadow-md);
+}
+
 </style>
 </head>
 <body>
@@ -701,9 +763,12 @@ input:checked+.slider:before{transform:translateX(14px)}
 </div>
 
 <!-- COMPANY PROFILE -->
+<!-- COMPANY PROFILE - RESTORED STRIP EDITION -->
 <div class="page" id="p-company-profile">
   <div class="master-profile-wrapper">
-    <header class="db-hero-banner" style="padding:16px 28px;min-height:auto;position:relative;">
+    
+    <!-- RESTORED ORIGINAL STRIP -->
+    <header class="db-hero-banner" style="padding:16px 28px; min-height:auto; position:relative; margin-bottom:20px;">
       <div class="db-hero-content">
         <h1 class="db-hero-title" style="font-size:1.5rem;">YDY HRM Enterprise Ltd.</h1>
         <p class="db-hero-sub">Corporate Registry</p>
@@ -711,65 +776,134 @@ input:checked+.slider:before{transform:translateX(14px)}
       <img src="assets/bgt.png" class="db-hero-center-img" alt="Banner Illustration">
       <button class="btn-glass-pro-slim" onclick="openEditCompanyModal(this)"><i data-lucide="edit" size="14"></i><span>Update records</span></button>
     </header>
-    <div class="profile-main-grid">
-      <div class="data-card span-v-2">
-        <div class="card-label-strip"><i data-lucide="file-text" size="14"></i><span>Legal & Incorporation</span></div>
-        <div class="card-content">
-          <div class="data-entry"><span class="de-label">Legal Name</span><span class="de-value">YDY HRM Enterprise Ltd.</span></div>
-          <div class="data-entry"><span class="de-label">Trading Name</span><span class="de-value">YDY Systems</span></div>
-          <div class="data-entry"><span class="de-label">Entity Type</span><span class="de-value">Private Ltd. Co</span></div>
-          <div class="data-entry"><span class="de-label">Incorporate Date</span><span class="de-value">12 Oct 2010</span></div>
-          <div class="data-entry"><span class="de-label">Registration No.</span><span class="de-value mono">MT/AA/14/667/09</span></div>
-          <div class="data-entry"><span class="de-label">Capital (Authorized)</span><span class="de-value">50,000,000 ETB</span></div>
-          <div class="data-entry"><span class="de-label">Issued By</span><span class="de-value">Min. of Trade</span></div>
-          <div class="data-entry"><span class="de-label">Country</span><span class="de-value">Ethiopia</span></div>
-          <div class="data-entry"><span class="de-label">Life Span</span><span class="de-value">Perpetual</span></div>
-        </div>
+
+    <!-- Replace the existing profile-main-grid content with this -->
+<div class="profile-main-grid" style="grid-template-columns: repeat(3, 1fr); gap:16px;">
+  
+  <div class="data-card span-v-2">
+    <div class="card-label-strip">
+      <i data-lucide="file-text" size="14"></i>
+      <span>Legal & Incorporation</span>
+    </div>
+    <div class="card-content">
+      <!-- Added IDs here -->
+      <div class="data-entry"><span class="de-label">CEO </span><span class="de-value">YDY Systems</span></div>
+      <div class="data-entry"><span class="de-label">Legal Name</span><span class="de-value" id="display-legal-name">YDY HRM Enterprise Ltd.</span></div>
+      <div class="data-entry"><span class="de-label">Trading Name</span><span class="de-value">YDY Systems</span></div>
+      <div class="data-entry"><span class="de-label">Entity Type</span><span class="de-value" id="display-entity-type">Private Ltd. Co</span></div>
+      <div class="data-entry"><span class="de-label">Establishment Date</span><span class="de-value">12 Oct 2010</span></div>
+      <div class="data-entry"><span class="de-label">Registration No.</span><span class="de-value mono">MT/AA/14/667/09</span></div>
+      <div class="data-entry"><span class="de-label">Tax ID (TIN)</span><span class="de-value mono" id="display-tin">0019283746</span></div>
+      <div class="data-entry"><span class="de-label">VAT Reg Number</span><span class="de-value mono" id="display-vat">9928374-VAT-01</span></div>
+      <div class="data-entry"><span class="de-label">Trade License No.</span><span class="de-value">01/01/14/19283</span></div>
+    </div>
+  </div>
+
+  <div class="data-card">
+    <div class="card-label-strip">
+      <i data-lucide="gavel" size="14"></i>
+      <span>Operational Policies</span>
+    </div>
+    <div class="card-content">
+      <div class="data-entry">
+        <span class="de-label">Standard Work Week</span>
+        <span class="badge badge-primary" id="display-workweek">Mon — Fri (40 hrs)</span>
       </div>
-      <div class="data-card span-v-2">
-        <div class="card-label-strip"><i data-lucide="shield-check" size="14"></i><span>Tax & Regulatory DNA</span></div>
-        <div class="card-content">
-          <div class="data-entry"><span class="de-label">Tax ID (TIN)</span><span class="de-value mono">0019283746</span></div>
-          <div class="data-entry"><span class="de-label">VAT Reg Number</span><span class="de-value mono">9928374-VAT-01</span></div>
-          <div class="data-entry"><span class="de-label">Pension Code (ER)</span><span class="de-value mono">P-99283-746-X</span></div>
-          <div class="data-entry"><span class="de-label">Trade License No.</span><span class="de-value mono">01/01/14/19283</span></div>
-          <div class="data-entry"><span class="de-label">Tax Office</span><span class="de-value">Large Taxpayers (LTO)</span></div>
-          <div class="data-entry"><span class="de-label">Filing Frequency</span><span class="de-value">Monthly</span></div>
-          <div class="data-entry"><span class="de-label">Audit Status</span><span class="de-value" style="color:var(--success)">Current (2025)</span></div>
-          <div class="data-entry"><span class="de-label">License Renewal</span><span class="de-value">30 June 2026</span></div>
-          <div class="data-entry"><span class="de-label">Compliance Grade</span><span class="de-value">A+ Rating</span></div>
-        </div>
+      <div class="data-entry">
+        <span class="de-label">Probation Period</span>
+        <span class="de-value">90 Days / 3 Months</span>
       </div>
-      <div class="data-card">
-        <div class="card-label-strip"><i data-lucide="globe" size="14"></i><span>System & Treasury</span></div>
-        <div class="card-content">
-          <div class="data-entry"><span class="de-label">Main Bank</span><span class="de-value">CBE</span></div>
-          <div class="data-entry"><span class="de-label">Account (Primary)</span><span class="de-value mono">1000192837465</span></div>
-          <div class="data-entry"><span class="de-label">Base Currency</span><span class="de-value">ETB (Birr)</span></div>
-          <div class="data-entry"><span class="de-label">Fiscal Start</span><span class="de-value">Hamle 01</span></div>
-          <div class="data-entry"><span class="de-label">Timezone</span><span class="de-value">UTC+3 (EAT)</span></div>
-        </div>
-      </div>
-      <div class="data-card">
-        <div class="card-label-strip"><i data-lucide="map-pin" size="14"></i><span>Branch Directory</span></div>
-        <div class="card-content">
-          <table class="mini-table">
-            <thead><tr><th>Branch</th><th>Location</th><th>Staff</th></tr></thead>
-            <tbody>
-              <tr><td>Headquarters</td><td>Addis Ababa</td><td>840</td></tr>
-              <tr><td>Northern Hub</td><td>Mekelle</td><td>120</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="data-entry">
+        <span class="de-label">Retirement Policy</span>
+        <span class="de-value">Statutory (60 Years)</span>
       </div>
     </div>
   </div>
-</div>
 
+  <div class="data-card">
+    <div class="card-label-strip">
+      <i data-lucide="landmark" size="14"></i>
+      <span>System & Treasury</span>
+    </div>
+    <div class="card-content">
+      <div class="data-entry"><span class="de-label">Main Bank</span><span class="de-value">CBE (Commercial)</span></div>
+      <div class="data-entry"><span class="de-label">Account (Primary)</span><span class="de-value mono">1000192837465</span></div>
+      <div class="data-entry"><span class="de-label">Base Currency</span><span class="de-value" id="display-currency">ETB (Birr)</span></div>
+      <div class="data-entry"><span class="de-label">Fiscal Start</span><span class="de-value">Hamle 01 (July 08)</span></div>
+    </div>
+  </div>
+
+  <div class="data-card">
+    <div class="card-label-strip">
+      <i data-lucide="globe" size="14"></i>
+      <span>Digital Identity</span>
+    </div>
+    <div class="card-content">
+      <div class="data-entry">
+        <span class="de-label">Official Website</span>
+        <a href="#" class="de-value" style="color:var(--primary); text-decoration:none; font-weight:700;">www.ydy-hrm.com <i data-lucide="external-link" size="10"></i></a>
+      </div>
+      <div class="data-entry">
+        <span class="de-label">Helpdesk Email</span>
+        <span class="de-value" id="display-email">support@ydyhrm.com</span>
+      </div>
+      <div class="data-entry">
+        <span class="de-label">Corporate Phone</span>
+        <span class="de-value" id="display-phone">+251 11 667 89</span>
+      </div>
+      <!-- SOFTWARE VERSION: No ID added here, so it won't be updated -->
+      <div class="data-entry" style="background:var(--primary-light); margin:12px; border-radius:10px; border:1px solid var(--primary);">
+        <span class="de-label" style="color:var(--primary-dark); font-weight:800;">Software Version</span>
+        <span class="de-value mono" style="font-weight:800;">v1.0.0-YDY</span>
+      </div>
+    </div>
+  </div>
+  <!-- SOCIAL MEDIA HANDLES CARD -->
+<div class="data-card">
+  <div class="card-label-strip">
+    <i data-lucide="share-2" size="14"></i>
+    <span>Social Media Handles</span>
+  </div>
+  <div class="card-content" style="padding:12px 16px;">
+    <div class="flex-col" style="gap:10px;">
+      
+      <!-- LinkedIn -->
+      <div class="flex-row social-link-row" style="justify-content:space-between; padding:8px 12px; background:#f8fafc; border-radius:8px; border:1px solid var(--border);">
+        <div class="flex-row" style="gap:10px; color:#0077b5;">
+          <i data-lucide="linkedin" size="16"></i> 
+          <span style="font-size:.7rem; font-weight:700; color:var(--text);">LinkedIn</span>
+        </div>
+        <span style="font-size:.65rem; color:var(--muted);">/ydy-systems</span>
+      </div>
+
+      <!-- Twitter / X -->
+      <div class="flex-row social-link-row" style="justify-content:space-between; padding:8px 12px; background:#f8fafc; border-radius:8px; border:1px solid var(--border);">
+        <div class="flex-row" style="gap:10px; color:#1DA1F2;">
+          <i data-lucide="telegram" size="16"></i> 
+          <span style="font-size:.7rem; font-weight:700; color:var(--text);">Telegram</span>
+        </div>
+        <span style="font-size:.65rem; color:var(--muted);">@YDY_Systems</span>
+      </div>
+
+      <!-- Facebook -->
+      <div class="flex-row social-link-row" style="justify-content:space-between; padding:8px 12px; background:#f8fafc; border-radius:8px; border:1px solid var(--border);">
+        <div class="flex-row" style="gap:10px; color:#1877f2;">
+          <i data-lucide="facebook" size="16"></i> 
+          <span style="font-size:.7rem; font-weight:700; color:var(--text);">Facebook</span>
+        </div>
+        <span style="font-size:.65rem; color:var(--muted);">/YDY.Enterprise</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+  </div>
+</div>
 <!-- ORG CHART -->
 <div class="page" id="p-org-chart">
   <div class="page-header">
-    <div><div class="page-title">Organizational Hierarchy</div><div class="page-sub">Visualizing reporting lines and departmental structures</div></div>
+    <div><div class="page-title">Organizational Hierarchy</div><div class="page-sub">Department structure with job positions and headcount</div></div>
     <div class="flex-row" style="gap:10px;">
       <div class="icon-btn-group" style="display:flex;background:#fff;border:1px solid var(--border);border-radius:8px;padding:2px;">
         <button class="icon-btn" onclick="zoomOC(-0.1)" title="Zoom Out" style="border:none;"><i data-lucide="minus-circle" size="16"></i></button>
@@ -784,45 +918,30 @@ input:checked+.slider:before{transform:translateX(14px)}
     <div class="oc-container" id="oc-zoom-container" style="transform-origin:top center;transition:transform .2s ease-out;">
       <ul class="oc-tree" id="oc-tree-root">
         <li>
-          <div class="oc-node oc-ceo">
-            <div class="oc-node-header"><span class="oc-id">E-001</span><span class="badge badge-success" style="font-size:8px;">Active</span></div>
-            <div class="oc-node-body"><div class="oc-node-avatar">AB</div><div class="oc-node-info"><div class="oc-node-name">Abebe Bikila</div><div class="oc-node-role">Chief Executive Officer</div></div></div>
-            <div class="oc-node-footer">Executive Board</div>
+          <div class="oc-node oc-mgr">
+            <div class="oc-node-header">
+              <span class="oc-id">ORGANIZATION</span>
+              <span class="badge badge-primary" style="font-size:8px;">1,248 TOTAL</span>
+            </div>
+            <div class="oc-node-body">
+              <div class="oc-node-avatar" style="background:var(--primary);color:#fff;">
+                <i data-lucide="briefcase-business" size="20"></i>
+              </div>
+              <div class="oc-node-info">
+                <div class="oc-node-name">YDY Systems</div>
+                <div class="oc-node-role">Structure</div>
+              </div>
+            </div>
+            <div class="oc-node-footer">7 Departments</div>
           </div>
-          <ul>
-            <li>
-              <div class="oc-node oc-mgr">
-                <div class="oc-node-header"><span class="oc-id">E-012</span></div>
-                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#eff6ff;color:#3b82f6;">SJ</div><div class="oc-node-info"><div class="oc-node-name">Sara Jenkins</div><div class="oc-node-role">Operations Dir.</div></div></div>
-              </div>
-              <ul>
-                <li><div class="oc-node oc-staff"><div class="oc-node-name">Daniel Smith</div><div class="oc-node-role">Logistics Mgr</div></div></li>
-                <li><div class="oc-node oc-staff"><div class="oc-node-name">Helen Gebre</div><div class="oc-node-role">Ops Supervisor</div></div></li>
-              </ul>
-            </li>
-            <li>
-              <div class="oc-node oc-mgr">
-                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
-                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fdf2f2;color:#ef4444;">MK</div><div class="oc-node-info"><div class="oc-node-name">Michael Kassa</div><div class="oc-node-role">Technical Dir.</div></div></div>
-              </div>
-              <ul>
-                <li><div class="oc-node oc-staff"><div class="oc-node-name">Kevin Vark</div><div class="oc-node-role">Lead Engineer</div></div></li>
-                <li><div class="oc-node oc-staff"><div class="oc-node-name">Yared Tolla</div><div class="oc-node-role">QA Specialist</div></div></li>
-              </ul>
-            </li>
-            <li>
-              <div class="oc-node oc-mgr">
-                <div class="oc-node-header"><span class="oc-id">E-045</span></div>
-                <div class="oc-node-body"><div class="oc-node-avatar" style="background:#fdf2f2;color:#ef4444;">MK</div><div class="oc-node-info"><div class="oc-node-name">Michael Kassa</div><div class="oc-node-role">Technical Dir.</div></div></div>
-              </div>
-            </li>
+          <ul id="dept-tree-container">
+            <!-- Departments with job titles will be inserted here -->
           </ul>
         </li>
       </ul>
     </div>
   </div>
 </div>
-
 <!-- DEPARTMENTS -->
 <div class="page" id="p-departments">
   <div class="page-header"><div><div class="page-title">Departments</div><div class="page-sub">Manage all organizational units</div></div><button class="btn btn-primary" onclick="openDeptModal()"><i data-lucide="plus" size="13"></i>Add Department</button></div>
@@ -1431,30 +1550,48 @@ input:checked+.slider:before{transform:translateX(14px)}
 </div>
 
 <div class="modal-overlay" id="modal-edit-company" onclick="closeEditCompanyModal(event)">
-  <div class="modal-box" style="max-width:800px;">
+  <div class="modal-box" style="max-width:850px;">
     <div class="modal-header">
-      <div><div style="font-size:1.1rem;font-weight:800;color:var(--text);">Update Company Information</div><div style="font-size:.75rem;color:var(--muted);margin-top:3px;">Modify legal, system, and contact master data</div></div>
+      <div><div style="font-size:1.1rem;font-weight:800;">Update Company Information</div></div>
       <button class="icon-btn" onclick="closeEditCompanyModal()"><i data-lucide="x" size="15"></i></button>
     </div>
     <div class="modal-body">
-      <div class="form-grid fg-2">
-        <div style="grid-column:span 2;"><div class="section-label" style="margin-top:0;">Legal & Statutory</div></div>
-        <div class="form-group"><label>Legal Name</label><input type="text" id="edit-legal-name" value="HRM Enterprises PLC"></div>
-        <div class="form-group"><label>Entity Type</label><input type="text" id="edit-entity-type" value="Private Limited"></div>
-        <div class="form-group"><label>TIN Number</label><input type="text" id="edit-tin" value="0019283746"></div>
-        <div class="form-group"><label>VAT Reg.</label><input type="text" id="edit-vat" value="9928374-VAT-01"></div>
-        <div style="grid-column:span 2;"><div class="section-label">System Locales</div></div>
-        <div class="form-group"><label>Reporting Currency</label><select id="edit-currency"><option>ETB (Birr)</option><option>USD ($)</option><option>EUR (€)</option></select></div>
-        <div class="form-group"><label>Work Week</label><input type="text" id="edit-workweek" value="Mon — Fri"></div>
-        <div style="grid-column:span 2;"><div class="section-label">Communication & Address</div></div>
-        <div class="form-group"><label>Corporate Email</label><input type="email" id="edit-email" value="corp@hrm.com"></div>
-        <div class="form-group"><label>Phone Number</label><input type="text" id="edit-phone" value="+251 11 667 89"></div>
-        <div class="form-group" style="grid-column:span 2;"><label>Head Office Address</label><textarea id="edit-address" style="min-height:60px;">Ras Desta Damtew St, Kirkos Sub-City, Woreda 01, Addis Ababa, Ethiopia</textarea></div>
+      <div class="form-grid fg-3">
+        <!-- GROUP 1 -->
+        <div style="grid-column:span 3;"><div class="section-label" style="margin:0; color:var(--primary);">Legal & Incorporation</div></div>
+        <div class="form-group"><label>CEO</label><input type="text" id="edit-ceo"></div>
+        <div class="form-group"><label>Legal Name</label><input type="text" id="edit-legal-name"></div>
+        <div class="form-group"><label>Trading Name</label><input type="text" id="edit-trading-name"></div>
+        <div class="form-group"><label>Entity Type</label><input type="text" id="edit-entity-type"></div>
+        <div class="form-group"><label>Incorporate Date</label><input type="text" id="edit-inc-date"></div>
+        <div class="form-group"><label>Registration No.</label><input type="text" id="edit-reg-no"></div>
+        <div class="form-group"><label>Tax ID (TIN)</label><input type="text" id="edit-tin"></div>
+        <div class="form-group"><label>VAT Reg Number</label><input type="text" id="edit-vat"></div>
+        <div class="form-group"><label>Trade License No.</label><input type="text" id="edit-license"></div>
+
+        <!-- GROUP 2 -->
+        <div style="grid-column:span 3;"><div class="section-label" style="color:var(--primary);">Operational Policies</div></div>
+        <div class="form-group"><label>Standard Work Week</label><input type="text" id="edit-workweek"></div>
+        <div class="form-group"><label>Probation Period</label><input type="text" id="edit-probation"></div>
+        <div class="form-group"><label>Retirement Policy</label><input type="text" id="edit-retirement"></div>
+
+        <!-- GROUP 3 -->
+        <div style="grid-column:span 3;"><div class="section-label" style="color:var(--primary);">System & Treasury</div></div>
+        <div class="form-group"><label>Main Bank</label><input type="text" id="edit-bank"></div>
+        <div class="form-group"><label>Account (Primary)</label><input type="text" id="edit-acc-no"></div>
+        <div class="form-group"><label>Base Currency</label><input type="text" id="edit-currency"></div>
+        <div class="form-group"><label>Fiscal Start</label><input type="text" id="edit-fiscal"></div>
+
+        <!-- GROUP 4 -->
+        <div style="grid-column:span 3;"><div class="section-label" style="color:var(--primary);">Digital Identity</div></div>
+        <div class="form-group"><label>Official Website</label><input type="text" id="edit-website"></div>
+        <div class="form-group"><label>Helpdesk Email</label><input type="email" id="edit-email"></div>
+        <div class="form-group"><label>Corporate Phone</label><input type="text" id="edit-phone"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeEditCompanyModal()">Discard Changes</button>
-      <button class="btn btn-primary" onclick="saveCompanyProfile()"><i data-lucide="save" size="14"></i>Update Profile</button>
+      <button class="btn btn-secondary" onclick="closeEditCompanyModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCompanyProfile()"><i data-lucide="save" size="14"></i>Save Changes</button>
     </div>
   </div>
 </div>
@@ -1647,7 +1784,7 @@ let ocZoom=1.0;
 function zoomOC(delta){const n=ocZoom+delta;if(n>=0.3&&n<=1.5){ocZoom=n;applyOCZoom();}}
 function resetOC(){ocZoom=1.0;applyOCZoom();const bp=document.getElementById('oc-blueprint-area');if(bp)bp.scrollLeft=(bp.scrollWidth-bp.clientWidth)/2;}
 function applyOCZoom(){const c=document.getElementById('oc-zoom-container'),l=document.getElementById('oc-zoom-label');if(c)c.style.transform=`scale(${ocZoom})`;if(l)l.textContent=Math.round(ocZoom*100)+'%';}
-function initOrgChart(){applyOCZoom();initOrgChartDrag();}
+function initOrgChart(){applyOCZoom();initOrgChartDrag();  renderOrgChartDepartments();}
 function initOrgChartDrag(){
   const slider=document.getElementById('oc-blueprint-area');
   if(!slider||slider.dataset.drag)return; slider.dataset.drag='1';
@@ -1942,6 +2079,157 @@ function previewAvatar(input){
 
 // ── PAGE INIT ROUTER ──
 const inited=new Set();
+// Department data
+const departmentsForChart = [  
+  { name: 'Marketing', headcount: 195, manager: 'Helen Gebre' },
+  { name: 'Finance', headcount: 110, manager: 'Daniel Smith' },
+  { name: 'HR', headcount: 82, manager: 'Sarah Lee' }, 
+  { name: 'IT', headcount: 16, manager: 'Kevin Vark' }
+];
+function renderOrgChartDepartments() {
+  const container = document.getElementById('dept-tree-container');
+  if (!container) return;
+  
+  let html = '';
+  departmentsForChart.forEach(dept => {
+    html += `
+      <li>
+        <div class="oc-node oc-mgr">
+          <div class="oc-node-header">
+            <span class="oc-id">${dept.name.toUpperCase()}</span>
+            <span class="badge badge-primary" style="font-size:8px;">${dept.headcount} EMP</span>
+          </div>
+          <div class="oc-node-body">
+            <div class="oc-node-avatar" style="background:var(--primary-light);color:var(--primary);">
+              <i data-lucide="users" size="20"></i>
+            </div>
+            <div class="oc-node-info">
+              <div class="oc-node-name">${dept.name}</div>
+              <div class="oc-node-role">Department</div>
+            </div>
+          </div>
+          <div class="oc-node-footer">
+            ${dept.headcount} Personnel
+          </div>
+        </div>
+      </li>
+    `;
+  });
+  container.innerHTML = html;
+  
+  // Refresh icons
+  setTimeout(() => {
+    if (typeof lcIcons === 'function') lcIcons(container);
+  }, 50);
+}
+function renderOrgChartDepartments() {
+  const container = document.getElementById('dept-tree-container');
+  if (!container) return;
+  
+  // Department data with job titles
+  const departmentsForChart = [  
+    { 
+      name: 'Marketing', 
+      headcount: 195,
+      jobs: [
+        { title: 'Marketing Manager', count: 12 },
+        { title: 'Digital Marketing Specialist', count: 48 },
+        { title: 'Content Creator', count: 35 },
+        { title: 'Social Media Manager', count: 28 },
+        { title: 'Brand Strategist', count: 22 },
+        { title: 'Market Research Analyst', count: 32 },
+        { title: 'PR Specialist', count: 18 }
+      ]
+    },
+    { 
+      name: 'Finance', 
+      headcount: 110,
+      jobs: [
+        { title: 'Finance Manager', count: 8 },
+        { title: 'Senior Accountant', count: 22 },
+        { title: 'Accountant', count: 45 },
+        { title: 'Payroll Specialist', count: 15 },
+        { title: 'Financial Analyst', count: 12 },
+        { title: 'Auditor', count: 8 }
+      ]
+    },
+    { 
+      name: 'HR', 
+      headcount: 82,
+      jobs: [
+        { title: 'HR Manager', count: 5 },
+        { title: 'HR Generalist', count: 28 },
+        { title: 'Recruitment Specialist', count: 18 },
+        { title: 'Training Coordinator', count: 12 },
+        { title: 'Compensation Analyst', count: 9 },
+        { title: 'HR Assistant', count: 10 }
+      ]
+    }, 
+    { 
+      name: 'IT', 
+      headcount: 16,
+      jobs: [
+        { title: 'IT Manager', count: 2 },
+        { title: 'System Administrator', count: 5 },
+        { title: 'Network Engineer', count: 4 },
+        { title: 'Help Desk Support', count: 3 },
+        { title: 'Security Specialist', count: 2 }
+      ]
+    }
+  ];
+  
+  let html = '';
+  departmentsForChart.forEach(dept => {
+    // Build submenu items for job titles
+    let submenuHtml = '';
+    if (dept.jobs && dept.jobs.length > 0) {
+      submenuHtml = '<ul class="submenu-jobs" style="padding-top:20px;">';
+      dept.jobs.forEach(job => {
+        submenuHtml += `
+          <li>
+            <div class="oc-node oc-staff" style="width:160px; border-top:2px solid var(--primary-light);">
+              <div class="oc-node-body" style="padding:12px; text-align:center; flex-direction:column;">
+                <div class="oc-node-name" style="font-size:.75rem; font-weight:700;">${job.title}</div>
+                <div class="oc-node-role" style="font-size:.6rem; margin-top:4px;">${job.count} employees</div>
+              </div>
+            </div>
+          </li>
+        `;
+      });
+      submenuHtml += '</ul>';
+    }
+    
+    html += `
+      <li>
+        <div class="oc-node oc-mgr">
+          <div class="oc-node-header">
+            <span class="oc-id">${dept.name.toUpperCase()}</span>
+            <span class="badge badge-primary" style="font-size:8px;">${dept.headcount} EMP</span>
+          </div>
+          <div class="oc-node-body">
+            <div class="oc-node-avatar" style="background:var(--primary-light);color:var(--primary);">
+              <i data-lucide="users" size="20"></i>
+            </div>
+            <div class="oc-node-info">
+              <div class="oc-node-name">${dept.name}</div>
+              <div class="oc-node-role">Department</div>
+            </div>
+          </div>
+          <div class="oc-node-footer">
+            ${dept.jobs.length} Positions
+          </div>
+        </div>
+        ${submenuHtml}
+      </li>
+    `;
+  });
+  container.innerHTML = html;
+  
+  // Refresh icons
+  setTimeout(() => {
+    if (typeof lcIcons === 'function') lcIcons(container);
+  }, 50);
+}
 function initPage(id){
   if(inited.has(id))return;
   inited.add(id);
