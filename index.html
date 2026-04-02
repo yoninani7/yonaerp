@@ -516,62 +516,207 @@ input:checked+.slider:before{transform:translateX(14px)}
   border-color: var(--primary) !important;
   box-shadow: var(--shadow-md);
 }
-/* FLAWLESS LEDGER STYLES */
+/* REFINED ATTENDANCE SYSTEM */
+.att-meta-bar {
+    display: none; /* Hidden until generated */
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 12px 20px; 
+    background: #fff; 
+    border: 1px solid var(--border); 
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    margin-top: 20px;
+}
+
 .att-ledger-card { 
-    background: #fff; border: 1px solid var(--border); border-radius: 12px; 
-    box-shadow: var(--shadow-md); overflow: hidden; margin-top: 20px; 
+    background: #fff; border: 1px solid var(--border); border-radius: 0 0 12px 12px; 
+    box-shadow: var(--shadow-md); overflow: hidden;
 }
 
-/* Scrollable Container */
+/* FLAWLESS VIEWPORT & SCROLLBAR */
 .att-grid-viewport { 
-    overflow: auto; max-height: calc(100vh - 310px); position: relative; 
-    scrollbar-width: thin; scrollbar-color: var(--primary) transparent;
+    overflow: auto; max-height: calc(100vh - 340px); position: relative; 
+    scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
 }
 
-/* The Table */
-.tbl-ledger { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
+/* Webkit Scrollbar override for consistent grayish look */
+.att-grid-viewport::-webkit-scrollbar { width: 6px; height: 6px; }
+.att-grid-viewport::-webkit-scrollbar-track { background: transparent; }
+.att-grid-viewport::-webkit-scrollbar-thumb { 
+    background: #cbd5e1; border-radius: 10px; border: 1px solid transparent; background-clip: content-box; 
+}
+.att-grid-viewport::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* STICKY COLUMN: Employee Identity */
+/* Sticky Identity Column */
 .sticky-emp { 
     position: sticky; left: 0; background: #fff !important; z-index: 40; 
     width: 260px; min-width: 260px; padding: 12px 16px !important;
     border-right: 2px solid var(--border) !important;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.03); /* Creates depth when scrolling */
 }
 
-/* STICKY HEADER: Dates */
+/* Intersection of sticky headers */
+th.sticky-emp.sticky-head { z-index: 50; background: #f8fafc !important; }
+/* THEME-ALIGNED MATRIX HEADERS */
 .sticky-head { 
-    position: sticky; top: 0; background: #f8fafc; z-index: 30; 
-    height: 60px; text-align: center; border-bottom: 1px solid var(--border);
+    background: #f8fafc !important; /* System-standard header background */
+    border-bottom: 2px solid var(--border) !important;
+    height: 70px; 
+    vertical-align: middle;
 }
 
-/* THE TOP-LEFT CORNER (Identity + Dates intersection) */
-th.sticky-emp.sticky-head { z-index: 50; background: #f1f5f9 !important; }
+/* Date Number (Large & Bold) */
+.ledger-d-num { 
+    font-size: 15px; 
+    font-weight: 800; 
+    color: var(--text); 
+    display: block; 
+    line-height: 1;
+    margin-bottom: 2px;
+}
 
-/* Date Typography */
-.ledger-d-num { font-size: 14px; font-weight: 800; color: var(--text); display: block; margin-bottom: -2px; }
-.ledger-d-day { font-size: 8px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+/* Day Name (Muted, Uppercase, Spaced) */
+.ledger-d-day { 
+    font-size: 9px; 
+    font-weight: 800; 
+    color: var(--muted); 
+    text-transform: uppercase; 
+    letter-spacing: 0.1em; /* Pro spacing */
+}
 
-/* Status Chips (Executive Style) */
-.att-cell { padding: 0 !important; text-align: center; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; }
+/* "Employee Identity" Label Styling */
+.id-label-theme {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding-left: 16px;
+}
+
+/* Today's Column Highlight - Theme Colors */
+.is-today { 
+    background: var(--primary-light) !important; 
+    border-bottom: 3px solid var(--primary) !important; 
+}
+.is-today .ledger-d-num { color: var(--primary); }
+
+/* Column Separator */
+.att-day-col {
+    border-right: 1px solid #f1f5f9;
+}
+/* Legend Badges */
+.att-leg-pill { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.02em; border: 1px solid transparent; }
+.pill-p { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+.pill-h { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.pill-a { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.pill-o { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+/* RESTORED ENTERPRISE TYPOGRAPHY */
+.ledger-d-num { 
+    font-size: 14px; 
+    font-weight: 800; 
+    color: var(--text); 
+    display: block; 
+    line-height: 1; 
+    margin-bottom: 2px;
+}
+.ledger-d-day { 
+    font-size: 8px; 
+    font-weight: 700; 
+    color: var(--muted); 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+/* RESTORED STATUS CHIPS */
 .status-pill {
-    width: 30px; height: 30px; border-radius: 9px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 800; cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 32px; 
+    height: 32px; 
+    border-radius: 10px; /* Modern squircle look */
+    margin: 0 auto;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 11px; 
+    font-weight: 800;
+    transition: all 0.2s ease;
+    cursor: pointer;
     border: 1px solid transparent;
 }
-.status-pill:hover:not(.future) { transform: translateY(-2px) scale(1.1); box-shadow: var(--shadow-md); }
 
-/* Color Palette */
-.st-P .status-pill { background: #dcfce7; color: #15803d; border-color: #bbf7d0; } /* Present */
-.st-A .status-pill { background: #fee2e2; color: #b91c1c; border-color: #fecaca; } /* Absent */
-.st-L .status-pill { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; } /* Leave */
-.st-H .status-pill { background: #fef3c7; color: #92400e; border-color: #fde68a; } /* Sat Half */
-.st-O .status-pill { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; } /* Sun Off */
+/* Color Palette Restoration */
+.st-P .status-pill { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+.st-H .status-pill { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.st-A .status-pill { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.st-L .status-pill { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+.st-O .status-pill { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
 
-.future { opacity: 0.25; cursor: not-allowed; filter: grayscale(1); border: 1.5px dashed #cbd5e1; background: transparent; }
-.is-today { background: var(--primary-light) !important; border-bottom: 2px solid var(--primary) !important; }
+.status-pill:hover:not(.future) { 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+}
+
+/* Header Intersection Polish */
+th.sticky-emp.sticky-head { 
+    background: #f8fafc !important; 
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+}
+/* THEME-ALIGNED DOUBLE-STICKY MATRIX */
+.att-grid-viewport { 
+    overflow: auto; 
+    max-height: calc(100vh - 320px); 
+    position: relative; 
+    scrollbar-width: thin; 
+    scrollbar-color: #cbd5e1 transparent;
+    /* This allows the table headers to pin correctly */
+    border-radius: 0 0 12px 12px;
+}
+
+/* 1. HORIZONTAL STICKINESS (The Dates) */
+.sticky-head { 
+    position: sticky; 
+    top: 0; /* Pins to the top of the viewport */
+    z-index: 30; /* Above the table body rows */
+    background: #f8fafc !important; 
+    height: 70px;
+    border-bottom: 2px solid var(--border) !important;
+}
+
+/* 2. VERTICAL STICKINESS (The Names) */
+.sticky-emp { 
+    position: sticky; 
+    left: 0; /* Pins to the left of the viewport */
+    z-index: 40; /* Higher than the sticky header to stay on top when scrolling sideways */
+    background: #fff !important; 
+    width: 260px; 
+    min-width: 260px; 
+    padding: 12px 16px !important;
+    border-right: 2px solid var(--border) !important;
+    box-shadow: 4px 0 8px rgba(0,0,0,0.02);
+}
+
+/* 3. THE INTERSECTION (The top-left "Employee Identity" cell) */
+th.sticky-emp.sticky-head { 
+    z-index: 50; /* Highest priority: Pins to both top and left */
+    top: 0;
+    left: 0;
+    background: #f8fafc !important; 
+    border-bottom: 2px solid var(--border) !important;
+}
+
+/* Typographic Polish for the Sticky Titles */
+.id-label-theme {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding-left: 12px;
+}
+
+.ledger-d-num { font-size: 15px; font-weight: 800; color: var(--text); display: block; line-height: 1; }
+.ledger-d-day { font-size: 9px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
 </style>
 </head>
 <body>
@@ -1310,30 +1455,70 @@ th.sticky-emp.sticky-head { z-index: 50; background: #f1f5f9 !important; }
     </div>
   </div>
 
-  <!-- CONTROL BAR -->
-  <div class="card" style="padding: 20px; background: #fff; margin-bottom: 20px; display: flex; align-items: flex-end; gap: 16px;">
-    <div class="form-group" style="width: 200px; margin:0">
-      <label>Target Month</label>
-      <select id="att-m-select" class="form-ctrl">
-        <option value="">Select Month...</option>
-        <option value="0">January</option><option value="1">February</option>
-        <option value="2">March</option><option value="3">April</option>
-        <option value="4">May</option><option value="5">June</option>
-        <option value="6">July</option><option value="7">August</option>
-        <option value="8">September</option><option value="9">October</option>
-        <option value="10">November</option><option value="11">December</option>
-      </select>
+  <!-- CONTROL BAR (SELECTORS) --> 
+<div class="card" style="padding: 20px; background: #fff; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+  <div class="form-group" style="width: 180px; margin:0">
+    <label>Target Month</label>
+    <select id="att-m-select" class="form-ctrl">
+      <option value="">Select Month...</option>
+      <option value="0">January</option><option value="1">February</option>
+      <option value="2">March</option><option value="3">April</option>
+      <option value="4">May</option><option value="5">June</option>
+      <option value="6">July</option><option value="7">August</option>
+      <option value="8">September</option><option value="9">October</option>
+      <option value="10">November</option><option value="11">December</option>
+    </select>
+  </div>
+  <div class="form-group" style="width: 110px; margin:0">
+    <label>Fiscal Year</label>
+    <select id="att-y-select" class="form-ctrl">
+      <option value="2025">2025</option>
+      <option value="2026" selected>2026</option>
+    </select>
+  </div>
+  
+  <!-- NEW: Department Filter -->
+  <div class="form-group" style="width: 180px; margin:0">
+    <label>Department</label>
+    <select id="att-dept-select" class="form-ctrl">
+      <option value="All">All Departments</option>
+      <option>Engineering</option>
+      <option>Sales</option>
+      <option>HR</option>
+      <option>Finance</option>
+      <option>Marketing</option>
+      <option>Operations</option>
+      <option>Legal</option>
+      <option>IT</option>
+    </select>
+  </div>
+
+  <!-- NEW: Employee Name Filter -->
+  <div class="form-group" style="width: 200px; margin:0">
+    <label>Employee Name</label>
+    <input type="text" id="att-name-filter" class="form-ctrl" placeholder="Search by name...">
+  </div>
+
+  <button class="btn btn-primary" style="height: 40px; padding: 0 24px" onclick="buildMatrix()">
+    <i data-lucide="layout-grid" size="14"></i> Generate Ledger
+  </button>
+</div>
+
+  <!-- META BAR (LEGEND + COMMIT) - NEW POSITION -->
+  <div id="att-meta-header" class="att-meta-bar">
+    <div class="flex-row" style="gap: 12px;">
+      <span class="att-leg-pill pill-p">P: Present</span>
+      <span class="att-leg-pill pill-h">H: Sat-Half</span>
+      <span class="att-leg-pill pill-a">A: Absent</span>
+      <span class="att-leg-pill pill-o">O: Sunday-Off</span>
     </div>
-    <div class="form-group" style="width: 140px; margin:0">
-      <label>Fiscal Year</label>
-      <select id="att-y-select" class="form-ctrl">
-        <option value="2025">2025</option>
-        <option value="2026">2026</option>
-      </select>
+    <div class="flex-row" style="gap: 12px;">
+      <div class="search-inner" style="width: 220px; height: 32px; box-shadow: none; background: #f8fafc;">
+        <i data-lucide="search" size="12" class="search-lead-icon"></i>
+        <input type="text" placeholder="Filter names..." style="font-size: 0.75rem" oninput="filterAttMatrix(this.value)">
+      </div>
+      <button class="btn btn-success btn-sm" onclick="saveAttendance()"><i data-lucide="save" size="14"></i> Commit to Database</button>
     </div>
-    <button class="btn btn-primary" style="height: 40px; padding: 0 24px" onclick="buildMatrix()">
-      <i data-lucide="layout-grid" size="14"></i> Generate Ledger
-    </button>
   </div>
 
   <!-- THE LEDGER CONTAINER -->
@@ -1344,24 +1529,15 @@ th.sticky-emp.sticky-head { z-index: 50; background: #f1f5f9 !important; }
         <tbody id="ledger-body"></tbody>
       </table>
     </div>
-    
-    <div class="card-footer" style="padding: 15px 24px; background: #fcfdfe; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
-       <div class="flex-row" style="gap: 15px;">
-          <div class="badge badge-success">P: Present</div>
-          <div class="badge badge-warning" style="background:#fef3c7; color:#92400e">H: Sat-Half</div>
-          <div class="badge badge-danger">A: Absent</div>
-          <div class="badge badge-neutral">O: Sunday-Off</div>
-       </div>
-       <button class="btn btn-success btn-sm" onclick="saveAttendance()"><i data-lucide="save" size="14"></i> Commit to Database</button>
-    </div>
   </div>
 
-  <!-- EMPTY STATE -->
-  <div id="ledger-empty" style="padding: 80px 0; text-align: center; color: var(--muted);">
-    <i data-lucide="table-2" size="48" style="opacity: 0.1; margin-bottom: 12px;"></i>
-    <p style="font-weight: 700; font-size: 0.9rem;">Select month and year to generate matrix</p>
+  <!-- EMPTY STATE PROMPT -->
+  <div id="ledger-empty" style="padding: 100px 0; text-align: center; color: var(--muted);">
+    <i data-lucide="calendar-days" size="48" style="opacity: 0.1; margin-bottom: 12px;"></i>
+    <p style="font-weight: 700; font-size: 0.85rem;">Define a fiscal period to visualize the registry</p>
   </div>
 </div>
+
 <!-- LEAVE TYPES -->
 <div class="page" id="p-leave-types">
   <div class="page-header"><div><div class="page-title">Leave Types</div><div class="page-sub">Configure leave categories and entitlements</div></div><button class="btn btn-primary"><i data-lucide="plus" size="13"></i>Add Leave Type</button></div>
@@ -2501,81 +2677,108 @@ function selRole(el, name){
     </tr>`).join('');
   lcIcons(grid);
 }
-
 const ATT_CODES = ['P', 'H', 'A', 'L', 'O'];
-
 function buildMatrix() {
   const m = document.getElementById('att-m-select').value;
   const y = document.getElementById('att-y-select').value;
+  const deptFilter = document.getElementById('att-dept-select').value;
+  const nameFilter = document.getElementById('att-name-filter').value.toLowerCase();
 
   if (m === "" || y === "") {
-    alert("Please select both month and year.");
+    alert("System Check: Please select Month and Year.");
     return;
   }
-
-  // UI State
-  document.getElementById('ledger-container').style.display = 'block';
-  document.getElementById('ledger-empty').style.display = 'none';
 
   const month = parseInt(m);
   const year = parseInt(y);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const now = new Date();
 
-  // 1. Generate Header
-  let headHtml = `<tr><th class="sticky-emp sticky-head" style="text-align:left; font-size:10px; letter-spacing:1px; color:var(--muted)">EMPLOYEE IDENTITY</th>`;
+  // 1. HEADER GENERATION
+  let headHtml = `<tr>
+    <th class="sticky-emp sticky-head">
+      <div class="id-label-theme">Employee Identity</div>
+    </th>`;
+
   for (let d = 1; d <= daysInMonth; d++) {
     const dObj = new Date(year, month, d);
     const dayName = dObj.toLocaleDateString('en-US', { weekday: 'short' });
     const isToday = (d === now.getDate() && month === now.getMonth() && year === now.getFullYear());
     
-    headHtml += `<th class="sticky-head ${isToday ? 'is-today' : ''}" style="width:50px">
-                    <span class="ledger-d-num">${d}</span>
-                    <span class="ledger-d-day">${dayName}</span>
-                 </th>`;
+    headHtml += `
+      <th class="sticky-head att-day-col ${isToday ? 'is-today' : ''}">
+        <span class="ledger-d-num">${d}</span>
+        <span class="ledger-d-day">${dayName}</span>
+      </th>`;
   }
   headHtml += `</tr>`;
   document.getElementById('ledger-head').innerHTML = headHtml;
 
-  // 2. Generate Rows
+  // 2. FILTERED BODY GENERATION
   let bodyHtml = '';
-  // 'names' is your global employee array from the main code
-  names.slice(0, 35).forEach((name, idx) => {
-    const initials = name.split(' ').map(n => n[0]).join('');
-    const empId = `EMP-10${idx + 100}`;
-    
-    bodyHtml += `<tr>
-      <td class="sticky-emp">
-        <div class="flex-row" style="gap:12px">
-          <div class="avatar avatar-sm" style="background:var(--primary-light); color:var(--primary); font-weight:800;">${initials}</div>
-          <div style="line-height:1.2">
-            <div style="font-size:11px; font-weight:800; color:var(--text)">${name}</div>
-            <div style="font-size:9px; color:var(--muted); font-family:'JetBrains Mono'">${empId}</div>
-          </div>
-        </div>
-      </td>`;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dObj = new Date(year, month, d);
-      const isSat = dObj.getDay() === 6;
-      const isSun = dObj.getDay() === 0;
-      const isFuture = dObj > now;
-
-      // Logic: Sat=H, Sun=O, others=P
-      let status = isSat ? 'H' : (isSun ? 'O' : 'P');
-      
-      bodyHtml += `<td class="att-cell st-${status}">
-                    <div class="status-pill ${isFuture ? 'future' : ''}" 
-                         onclick="${isFuture ? '' : 'cycleStatus(this)'}">
-                         ${isFuture ? '' : status}
-                    </div>
-                  </td>`;
-    }
-    bodyHtml += `</tr>`;
+  
+  // Create a subset of names to act as our filtered list
+  const filteredList = names.map((name, idx) => {
+    // We simulate data here: assign specific departments to specific names for testing
+    // In a real app, this data would come from your employee object
+    const assignedDept = depts[idx % depts.length]; 
+    return { name, dept: assignedDept, id: `EMP-10${idx + 100}` };
+  }).filter(emp => {
+    const matchesDept = (deptFilter === 'All' || emp.dept === deptFilter);
+    const matchesName = emp.name.toLowerCase().includes(nameFilter);
+    return matchesDept && matchesName;
   });
 
+  if (filteredList.length === 0) {
+    bodyHtml = `<tr><td colspan="${daysInMonth + 1}" style="text-align:center; padding: 40px; color: var(--muted);">No employees found matching these filters.</td></tr>`;
+  } else {
+    filteredList.forEach((emp) => {
+      const initials = emp.name.split(' ').map(n => n[0]).join('');
+      
+      bodyHtml += `<tr>
+        <td class="sticky-emp">
+          <div class="flex-row" style="gap:10px">
+            <div class="avatar avatar-sm" style="background:var(--primary-light); color:var(--primary); font-size: 10px;">${initials}</div>
+            <div style="line-height:1.2">
+              <div style="font-size:11px; font-weight:800; color:var(--text)">${emp.name}</div>
+              <div style="font-size:9px; color:var(--muted); font-family:'JetBrains Mono'">${emp.id} <span style="opacity:0.6">| ${emp.dept}</span></div>
+            </div>
+          </div>
+        </td>`;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dObj = new Date(year, month, d);
+        const isSat = dObj.getDay() === 6;
+        const isSun = dObj.getDay() === 0;
+        const isFuture = dObj > now;
+        let status = isSat ? 'H' : (isSun ? 'O' : 'P');
+        
+        bodyHtml += `<td class="att-cell st-${status}">
+                      <div class="status-pill ${isFuture ? 'future' : ''}" 
+                           onclick="${isFuture ? '' : 'cycleStatus(this)'}">
+                           ${isFuture ? '' : status}
+                      </div>
+                    </td>`;
+      }
+      bodyHtml += `</tr>`;
+    });
+  }
+
   document.getElementById('ledger-body').innerHTML = bodyHtml;
+  
+  // Show/Hide UI elements
+  document.getElementById('ledger-container').style.display = 'block';
+  document.getElementById('att-meta-header').style.display = 'flex';
+  document.getElementById('ledger-empty').style.display = 'none';
+  
   lcIcons(document.getElementById('p-attendance'));
+}
+function filterAttMatrix(val) {
+  const q = val.toLowerCase();
+  document.querySelectorAll('#ledger-body tr').forEach(row => {
+    const name = row.querySelector('.sticky-emp').textContent.toLowerCase();
+    row.style.display = name.includes(q) ? '' : 'none';
+  });
 }
 
 function cycleStatus(el) {
@@ -2588,6 +2791,7 @@ function cycleStatus(el) {
   parent.classList.add('st-' + next);
   el.textContent = next;
 }
+
 </script>
 </body>
 </html>
