@@ -1601,24 +1601,30 @@ th.sticky-emp.sticky-head {
     <div id="vault-matrix-container"></div>
   </div>
 </div>
-
-<!-- ASSET TRACKING -->
+<!-- ASSET TRACKING   -->
 <div class="page" id="p-asset-tracking">
-  <div class="page-header" style="margin-bottom:24px;">
-    <div><div class="page-title" style="letter-spacing:-.02em;font-weight:800;">Asset Registry</div><div class="page-sub">Centralized inventory and resource assignment</div></div>
-    <div class="as-search-wrapper">
-      <i data-lucide="search" size="15" class="as-search-icon"></i>
-      <input type="text" placeholder="Search by name, ID or custodian..." class="as-search-input" id="as-search-filter">
-      <button class="btn btn-primary btn-sm as-add-btn"><i data-lucide="plus" size="14"></i>Add New</button>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Asset Registry</div>
+      <div class="page-sub">Comprehensive tracking of corporate inventory, valuation, and protection plans</div>
+    </div>
+    <div class="flex-row">
+      <button class="btn btn-secondary"><i data-lucide="layout-grid" size="13"></i> Category list</button>
+      <button class="btn btn-primary" onclick="openAssetModal()">
+        <i data-lucide="plus" size="13"></i> Register New Asset
+      </button>
     </div>
   </div>
-  <div class="as-stream-header">
-    <div style="padding-left:16px;">Item code</div><div>Asset Name</div><div>Current Custodian</div>
-    <div>Prev. Custodian</div><div>Serial / Ref</div><div>Location</div>
-    <div style="text-align:right;padding-right:16px;">Commands</div>
+
+  <!-- Summary Ribbon -->
+  <div class="stats-row stats-4 mb-4">
+    <div class="stat-card" style="border-left:4px solid var(--primary);"><div class="stat-label">Inventory Value</div><div class="stat-value">ETB 4.2M</div></div>
+    <div class="stat-card" style="border-left:4px solid var(--info);"><div class="stat-label">Total Assets</div><div class="stat-value">256</div></div> 
+    <div class="stat-card" style="border-left:4px solid var(--danger);"><div class="stat-label">Total custodians</div><div class="stat-value">03</div></div>
   </div>
-  <div id="asset-stream-container" class="asset-stream"></div>
-  <div id="as-pagination" class="pagination" style="margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;"></div>
+
+  <!-- Standard Table Container -->
+  <div id="tbl-assets"></div>
 </div>
 
 <!-- JOB VACANCIES -->
@@ -2308,31 +2314,7 @@ function initOrgChartDrag(){
   slider.addEventListener('mouseup',()=>down=false);
   slider.addEventListener('mousemove',e=>{if(!down)return;e.preventDefault();slider.scrollLeft=sl-(e.pageX-slider.offsetLeft-sx)*2;slider.scrollTop=st-(e.pageY-slider.offsetTop-sy)*2;});
 }
-
-// ── ASSETS ──
-function initAssets(){
-  const streamContainer=document.getElementById('asset-stream-container');
-  const paginator=document.getElementById('as-pagination');
-  const addBtn=document.querySelector('.as-add-btn');
-  if(addBtn)addBtn.onclick=openAssetModal;
-  if(!streamContainer||streamContainer.dataset.init)return;
-  streamContainer.dataset.init='true';
-  const allAssets=gen(50,i=>({id:`AST-${2000+i}`,name:i%4===0?'MacBook Pro 16"':i%4===1?'Toyota Hilux Fleet':i%4===2?'Executive Desk':'DSLR Camera Kit',prevUser:names[(i+5)%names.length],user:names[i%names.length],serial:`SN-${randInt(10000,99999)}`,location:['Headquarters','Satellite Office','Warehouse A','North Branch'][i%4]}));
-  let currentAsPage=1;
-  const asPerPage=8;
-  function renderAssetPage(page){
-    const start=(page-1)*asPerPage,end=start+asPerPage,slice=allAssets.slice(start,end);
-    streamContainer.innerHTML=slice.map(a=>`<div class="asset-stripe"><div class="as-id">${a.id}</div><div class="as-name">${a.name}</div><div class="as-custodian-curr">${a.user}</div><div class="as-custodian-prev">${a.prevUser}</div><div class="as-ref-text">${a.serial}</div><div class="as-location-text">${a.location}</div><div class="as-actions"><button class="as-icon-btn edit-btn" title="Edit Asset"><i data-lucide="settings-2" size="14"></i></button><button class="as-icon-btn" title="Reassign Asset" onclick="openReassignModal('${a.name}','${a.user}')"><i data-lucide="shuffle" size="14"></i></button></div></div>`).join('');
-    const tp=Math.ceil(allAssets.length/asPerPage);
-    paginator.innerHTML=`<span class="pagination-info">Showing ${start+1}–${Math.min(end,allAssets.length)} of ${allAssets.length} assets</span><div class="pagination-btns"><button class="pg-btn" ${page===1?'disabled':''} id="as-prev">‹</button>${Array.from({length:tp},(_,i)=>`<button class="pg-btn ${i+1===page?'active':''}" data-page="${i+1}">${i+1}</button>`).join('')}<button class="pg-btn" ${page===tp?'disabled':''} id="as-next">›</button></div>`;
-    lcIcons(streamContainer); lcIcons(paginator);
-    document.getElementById('as-prev')?.addEventListener('click',()=>{if(currentAsPage>1)renderAssetPage(--currentAsPage);});
-    document.getElementById('as-next')?.addEventListener('click',()=>{if(currentAsPage<tp)renderAssetPage(++currentAsPage);});
-    paginator.querySelectorAll('.pg-btn[data-page]').forEach(btn=>{btn.onclick=e=>{currentAsPage=parseInt(e.target.dataset.page);renderAssetPage(currentAsPage);};});
-  }
-  renderAssetPage(currentAsPage);
-}
-
+ 
 // ── VAULT MATRIX ──
 const companyRequiredDocs=[{id:'id_card',short:'ID',name:'National ID/Passport'},{id:'contract',short:'CTR',name:'Employment Contract'},{id:'nda',short:'NDA',name:'Non-Disclosure Agreement'},{id:'tax',short:'TAX',name:'Tax Filing (TIN)'},{id:'edu',short:'EDU',name:'Degree/Certificates'},{id:'photo',short:'IMG',name:'Profile Photo'}];
 function initVaultMatrix(){
@@ -2758,7 +2740,47 @@ function initPage(id){
     case 'probation-tracker':buildTable('tbl-probation',{columns:[ {key:'name',label:'Employee'},{key:'dept',label:'Department'},{key:'start',label:'Probation Start'},{key:'end',label:'Probation End'},{key:'days',label:'Days Left'},{key:'status',label:'Probation Status'},ac],rows:gen(22,i=>({ name:names[i%names.length],dept:rand(depts),start:`Jan ${randInt(5,20)}, 2026`,end:`Apr ${randInt(5,20)}, 2026`,days:randInt(0,50),status:i<8?b('warning','Ending Soon'):b('info','Active')}))});break;
     case 'contract-renewals':buildTable('tbl-contract-renewals',{columns:[ {key:'name',label:'Employee'},{key:'dept',label:'Department'} ,{key:'start',label:'Start'},{key:'expiry',label:'Expiry'},{key:'days',label:'Days to Expiry'},{key:'status',label:'Status'},ac],rows:gen(18,i=>({ name:names[i%names.length],dept:rand(depts),start:`Apr ${randInt(1,28)}, 2025`,expiry:`Apr ${randInt(1,28)}, 2026`,days:randInt(-5,90),status:i<3?b('danger','Critical'):i<8?b('warning','Due Soon'):b('success','Active')}))});break;
     case 'former-employees': buildTable('tbl-former-employees', { columns: [ {key:'name',label:'Employee'},{key:'dept',label:'Last Department'},{key:'role',label:'Last Role'},{key:'exitDate',label:'Exit Date'},{key:'type',label:'Reason'},{key:'duration',label:'Duration'},{key:'rehire',label:'Rehire possibility'},ac], rows: gen(25, i => ({  name:names[i%names.length], dept:rand(depts), role:['Manager','Analyst','Dev','Lead'][i%4], exitDate:`Jan ${randInt(1,31)}, 2026`, type:(i%5===2)?b('danger','Terminated'):b('neutral','Resigned'), duration:randInt(1,10)+' yrs', rehire:(i%6===0)?b('danger','No'):b('success','Yes') })) }); break;
-    case 'asset-tracking':initAssets();break;
+    case 'asset-tracking':
+      buildTable('tbl-assets', {
+        columns: [
+          { key: 'id', label: 'Asset Code' },
+          { key: 'name', label: 'Asset Name' },
+          { key: 'cat', label: 'Category' },
+          { key: 'val', label: 'Asset Value' },
+          { key: 'user', label: 'Custodian' },
+          { key: 'war', label: 'Warranty' },
+          { key: 'gua', label: 'Guarantee' }, 
+          { 
+            key: '_', 
+            label: 'Actions', 
+            render: (v, row) => `
+              <div class="flex-row">
+                <button class="btn btn-xs btn-secondary" onclick="openReassignModal('${row.name}','${row.user}')" title="Reassign">
+                  <i data-lucide="shuffle" size="10"></i>
+                </button>
+                <button class="btn btn-xs btn-secondary" title="View Details">
+                  <i data-lucide="eye" size="10"></i>
+                </button>
+              </div>`
+          }
+        ],
+        rows: gen(50, i => {
+          const categories = ['IT Hardware', 'Fleet/Vehicles', 'Office Furniture', 'Networking', 'Security'];
+          const cats = categories[i % categories.length];
+          const price = randInt(2000, 850000);
+          
+          return {
+            id: `AST-${2000 + i}`,
+            name: i % 4 === 0 ? 'MacBook Pro M3' : i % 4 === 1 ? 'Toyota Hilux Pickup' : i % 4 === 2 ? 'Executive Desk Pro' : 'Cisco Firewall X1',
+            cat: b('neutral', cats),
+            val: `ETB ${price.toLocaleString()}`,
+            user: names[i % names.length],
+            war: `202${randInt(6, 8)}-12-31`,
+            gua: i % 3 === 0 ? b('success', 'Full Cover') : b('info', 'Limited') 
+          };
+        })
+      });
+      break;
     case 'document-vault':initVaultMatrix();break;
     case 'job-vacancies':buildTable('tbl-vacancies',{columns:[ {key:'title',label:'Position'},{key:'dept',label:'Department'},{key:'branch',label:'Branch'},{key:'type',label:'Type'},{key:'posted',label:'Posted'},{key:'deadline',label:'Deadline'},ac],rows:gen(23,i=>({ title:['Senior Dev','Sales Rep','HR Coordinator','Finance Analyst','UX Designer','DevOps','QA Engineer','Data Analyst','Legal Counsel','Support Specialist'][i%10],dept:rand(depts),branch:['Remote','New York','Hybrid','Atlanta','London'][i%5],type:['Full-Time','Contract','Part-Time'][i%3],posted:`Mar ${randInt(1,18)}, 2026`,deadline:`Apr ${randInt(5,30)}, 2026`}))});break;
     case 'candidates':buildTable('tbl-candidates',{columns:[ {key:'name',label:'Candidate'},{key:'position',label:'Applied For'},{key:'applied',label:'Applied'},{key:'stage',label:'Stage'},ac],rows:gen(45,i=>({ name:names[i%names.length],position:['Senior Dev','Sales Rep','HR Coordinator','Finance Analyst'][i%4],applied:`Mar ${randInt(1,18)}, 2026`,stage:['Applied','Screening','Interview','Assessment','Offer','Hired'][i%6]}))});break;
