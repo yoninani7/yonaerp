@@ -30,7 +30,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .nav-trigger:hover,.nav-trigger.parent-active{background:var(--primary-light)!important;color:var(--primary)!important}
 .nav-trigger.open{background:transparent;color:var(--text)}
 .nav-trigger-left{display:flex;align-items:center;gap:8px;overflow:hidden}
-.nav-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:var(--muted);flex-shrink:0;transition:all .15s}
+.nav-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#f1f5f900;color:var(--muted);flex-shrink:0;transition:all .15s}
 .nav-trigger.open .nav-icon{background:#f1f5f9;color:var(--muted)}
 .nav-trigger:hover .nav-icon,.nav-active .nav-icon,.nav-trigger.parent-active .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
 .chevron{transition:transform .2s;color:#94a3b8;flex-shrink:0}
@@ -50,7 +50,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sidebar.collapsed .sidebar-brand{background:#fff!important;border-bottom:1px solid #1e293b!important}
 .sidebar.collapsed .sidebar-scroll{background:var(--surface)!important;overflow-y:auto!important;overflow-x:hidden!important;height:calc(100vh - var(--header-h))}
 .sidebar.collapsed .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
-.sidebar.collapsed .nav-icon{background:#f1f5f9!important;color:var(--muted)!important;margin:0 auto}
+.sidebar.collapsed .nav-icon{background:#f1f5f900!important;color:var(--muted)!important;margin:0 auto}
 .sidebar.collapsed .nav-trigger:hover .nav-icon,.sidebar.collapsed .dash-link:hover .nav-icon{background:var(--primary-light)!important;color:var(--primary)!important}
 .sidebar.collapsed .nav-trigger,.sidebar.collapsed .dash-link{margin:4px 8px;padding:10px 0;justify-content:flex-start}
 .sidebar.collapsed .nav-trigger-left{gap:0}
@@ -615,6 +615,85 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
 #perm-grid tr td { padding: 10px 16px !important; }
 #perm-grid tr:hover td { background: #fcfdfe; }
 #perm-grid tr[style="background: #f8fafc"] td { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+/* Professional Vault Detail Refinement */
+.vault-docs-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.doc-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 180px; /* Strict Column Control */
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.doc-row:hover {
+    background: var(--primary-light);
+}
+
+.doc-row:last-child {
+    border-bottom: none;
+}
+
+/* Icon Styling */
+.doc-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.doc-icon-box.uploaded { background: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+.doc-icon-box.missing {   background-color: #fff5f5;   color: #b71c1c; border: 2px dashed #e57373;  border-radius: 8px; padding: 10px;}
+/* Meta Info */
+.doc-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.doc-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.doc-cat {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Action Group Styling */
+.doc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* Specific button fix for "Add Document" to make it look standard */
+.btn-upload-pro {
+    background: var(--primary);
+    color: white;
+    font-size: 11px !important;
+    padding: 8px 14px !important;
+    border-radius: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-upload-pro:hover {
+    background: var(--primary-dark);
+}
 </style>
 </head>
 <body>
@@ -863,8 +942,7 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
   </div>
 </div>
 
-<!-- COMPANY PROFILE -->
-<!-- COMPANY PROFILE - RESTORED STRIP EDITION -->
+<!-- COMPANY PROFILE --> 
 <div class="page" id="p-company-profile">
   <div class="master-profile-wrapper">
     
@@ -1270,6 +1348,64 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
     <div id="vault-matrix-container"></div>
   </div>
 </div>
+
+<!-- EMPLOYEE SPECIFIC VAULT DETAIL (Enterprise Theme) -->
+<div class="page" id="p-employee-vault">
+  <div class="master-profile-wrapper">
+    
+    <!-- Hero Header -->
+    <header class="db-hero-banner" style="padding:16px 28px; min-height:auto; position:relative; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:20px;">
+        <button class="sidebar-toggle" onclick="goPage('document-vault')" style="background:rgba(255,255,255,0.2); border:none; color:white;">
+          <i data-lucide="arrow-left" size="18"></i>
+        </button>
+        <div class="db-hero-content">
+          <h1 class="db-hero-title" style="font-size:1.5rem;" id="v-emp-name">Employee Name</h1>
+          <p class="db-hero-sub" id="v-emp-id">EMP-0000 • Personnel Archive</p>
+        </div>
+      </div>
+      <div class="flex-row" style="gap:12px;">
+        <div style="text-align:right; color:white; margin-right:15px;">
+          <div style="font-size:0.6rem; font-weight:800; text-transform:uppercase; opacity:0.8;">Compliance Score</div>
+          <div style="font-size:1.2rem; font-weight:800;" id="v-compliance-percent">85%</div>
+        </div>
+        <button class="btn-glass-pro-slim"><i data-lucide="download" size="14"></i><span>Download Zip</span></button>
+      </div>
+    </header>
+
+    <div class="profile-main-grid" style="grid-template-columns: 320px 1fr; gap:20px;">
+      
+      <!-- Side Info -->
+      <div class="flex-col" style="gap:20px;">
+        <div class="data-card">
+          <div class="card-label-strip"><i data-lucide="info" size="14"></i><span>Fulfillment Summary</span></div>
+          <div class="card-content">
+            <div class="data-entry"><span class="de-label">Total Required</span><span class="de-value">12 Files</span></div>
+            <div class="data-entry"><span class="de-label">Uploaded</span><span class="de-value" style="color:var(--success)" id="v-count-upload">0</span></div>
+            <div class="data-entry"><span class="de-label">Missing</span><span class="de-value" style="color:var(--danger)" id="v-count-missing">0</span></div>
+            <div class="data-entry"><span class="de-label">Last Audit</span><span class="de-value">Just now</span></div>
+          </div>
+        </div>
+  
+      </div>
+
+      <!-- Main Document List -->
+      <div class="data-card">
+        <div class="card-label-strip">
+          <i data-lucide="folder-open" size="14"></i>
+          <span>Mandatory Personnel Documents</span>
+        </div>
+        <div class="card-content" id="vault-docs-list">
+            <!-- Dynamic rows will be injected here -->
+        </div>
+      </div>
+      
+      <br>
+
+    </div>
+  </div>
+</div>
+
 <!-- ASSET TRACKING   -->
 <div class="page" id="p-asset-tracking">
   <div class="page-header">
@@ -1967,7 +2103,7 @@ function goPage(id, el) {
 }
 
 // ── PAGINATED TABLE BUILDER ──
- window.changePg=(id,dir)=>{const c=document.getElementById(id);const np=c._page()+dir;const tp=Math.ceil(c._rows.length/c._perPage);if(np>=1&&np<=tp)c._setPage(np);};
+window.changePg=(id,dir)=>{const c=document.getElementById(id);const np=c._page()+dir;const tp=Math.ceil(c._rows.length/c._perPage);if(np>=1&&np<=tp)c._setPage(np);};
 window.setPg=(id,p)=>document.getElementById(id)._setPage(p);
 
 // ── MOCK DATA ──
@@ -2007,7 +2143,20 @@ function initVaultMatrix(){
   const cols=[{key:'emp',label:'Employee'}];
   companyRequiredDocs.forEach(doc=>cols.push({key:doc.id,label:doc.short,render:val=>val==='filled'?`<div class="vault-slot filled" title="Uploaded"><i data-lucide="check" size="10"></i></div>`:`<div class="vault-slot expired" title="Expired"><i data-lucide="alert-circle" size="10"></i></div>`}));
   cols.push({key:'progress',label:'Fulfillment',render:v=>`<span style="font-size:.7rem;font-weight:800;color:var(--primary);">${v}%</span>`});
-  cols.push({key:'_',label:'Actions',render:()=>`<button class="btn btn-xs btn-secondary">Open Folder</button>`});
+  // Inside initVaultMatrix function:
+  cols.push({
+  key: '_',
+  label: 'Actions',
+  render: (v, row) => {
+    // This extracts the clean name and ID from the HTML string
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = row.emp;
+    const cleanName = tempDiv.querySelector('b').innerText;
+    const cleanId = tempDiv.querySelector('small').innerText;
+    
+    return `<button class="btn btn-xs btn-secondary" onclick="openEmployeeVault('${cleanName}', '${cleanId}')">Open Folder</button>`;
+  }
+});
   const rows=gen(25,i=>{const row={emp:`<b>${names[i%names.length]}</b><br><small style="color:var(--muted)">E-${1000+i}</small>`,progress:randInt(40,100)};companyRequiredDocs.forEach(doc=>{row[doc.id]=Math.random()>0.4?'filled':'expired';});return row;});
   const wrapper=document.createElement('div');
   wrapper.id='tbl-vault-matrix-final';
@@ -2015,8 +2164,7 @@ function initVaultMatrix(){
   buildTable('tbl-vault-matrix-final',{columns:cols,rows,perPage:12});
 }
 
-// ── DASHBOARD CHART (single definition) ──
-// ── REPLACEMENT DASHBOARD INITIALIZATION ──
+// ── DASHBOARD CHART  ── 
 function initDashboard() {
   // Use a unique key to prevent re-initialization
   if (inited.has('dashboard-main-chart')) return;
@@ -2121,7 +2269,6 @@ function saveBranch(){const name=document.getElementById('branch-name').value.tr
 
 // ── ASSET DROPDOWNS ──
 function showAsDrop(id){const d=document.getElementById(id);if(!d.innerHTML.trim())populateAsDrop(id);d.classList.add('active');}
-function populateAsDrop(id){const d=document.getElementById(id),inputId=id.replace('as-drop-','as-input-');d.innerHTML=names.map(n=>`<div class="as-res-item" onclick="selectAsItem('${inputId}','${id}','${n}')">${n}</div>`).join('');}
 function filterAsDrop(inputId,dropId){const val=document.getElementById(inputId).value.toLowerCase(),d=document.getElementById(dropId);if(!d.innerHTML.trim())populateAsDrop(dropId);d.querySelectorAll('.as-res-item').forEach(item=>{item.style.display=item.textContent.toLowerCase().includes(val)?'block':'none';});d.classList.add('active');}
 function selectAsItem(inputId,dropId,name){document.getElementById(inputId).value=name;document.getElementById(dropId).classList.remove('active');}
 window.addEventListener('mousedown',e=>{if(!e.target.closest('.as-combo-container'))document.querySelectorAll('.as-combo-results').forEach(d=>d.classList.remove('active'));},{passive:true});
@@ -2262,42 +2409,7 @@ const departmentsForChart = [
   { name: 'HR', headcount: 82, manager: 'Sarah Lee' }, 
   { name: 'IT', headcount: 16, manager: 'Kevin Vark' }
 ];
-function renderOrgChartDepartments() {
-  const container = document.getElementById('dept-tree-container');
-  if (!container) return;
-  
-  let html = '';
-  departmentsForChart.forEach(dept => {
-    html += `
-      <li>
-        <div class="oc-node oc-mgr">
-          <div class="oc-node-header">
-            <span class="oc-id">${dept.name.toUpperCase()}</span>
-            <span class="badge badge-primary" style="font-size:8px;">${dept.headcount} EMP</span>
-          </div>
-          <div class="oc-node-body">
-            <div class="oc-node-avatar" style="background:var(--primary-light);color:var(--primary);">
-              <i data-lucide="users" size="20"></i>
-            </div>
-            <div class="oc-node-info">
-              <div class="oc-node-name">${dept.name}</div>
-              <div class="oc-node-role">Department</div>
-            </div>
-          </div>
-          <div class="oc-node-footer">
-            ${dept.headcount} Personnel
-          </div>
-        </div>
-      </li>
-    `;
-  });
-  container.innerHTML = html;
-  
-  // Refresh icons
-  setTimeout(() => {
-    if (typeof lcIcons === 'function') lcIcons(container);
-  }, 50);
-}
+ 
 function renderOrgChartDepartments() {
   const container = document.getElementById('dept-tree-container');
   if (!container) return;
@@ -2933,6 +3045,87 @@ function cycleStatus(el) {
   parent.classList.add('st-' + next);
   el.textContent = next;
 }
+
+// 1. Define the mandatory document list
+const VAULT_SCHEMA = [
+  { id: 'contract', name: 'Signed Employment Contract', cat: 'Legal' },
+  { id: 'cv', name: 'Curriculum Vitae (CV)', cat: 'Identity' },
+  { id: 'academic', name: 'Academic Credentials', cat: 'Education' },
+  { id: 'clearance', name: 'Clearance / Release Letter', cat: 'History' },
+  { id: 'experience', name: 'Experience Letters', cat: 'History' },
+  { id: 'coc', name: 'Certificate of Competence (COC)', cat: 'Professional' },
+  { id: 'guarantor', name: 'Guarantor Form & ID', cat: 'Legal' },
+  { id: 'nda', name: 'Confidentiality / NDA Agreement', cat: 'Compliance' },
+  { id: 'handbook', name: 'Acknowledgments', cat: 'Compliance' },
+  { id: 'national_id', name: 'National ID / Passport Copy', cat: 'Identity' },
+  { id: 'tin', name: 'TIN Certification Document', cat: 'Tax' },
+  { id: 'medical', name: 'Health & Fitness Clearance', cat: 'Compliance' }
+];
+
+// 2. Modified open function (Update your initVaultMatrix button to call this)
+function openEmployeeVault(name, id) {
+    goPage('employee-vault');
+    document.getElementById('v-emp-name').textContent = name;
+    document.getElementById('v-emp-id').textContent = id + " • Personnel Archive";
+    
+    const listContainer = document.getElementById('vault-docs-list');
+    listContainer.innerHTML = '';
+
+    let uploadCount = 0;
+
+    VAULT_SCHEMA.forEach(doc => {
+        const isUploaded = Math.random() > 0.4; // Mocking data
+        if(isUploaded) uploadCount++;
+
+        const row = document.createElement('div');
+        row.className = 'doc-row';
+        
+        row.innerHTML = `
+            <!-- COLUMN 1: ICON -->
+            <div class="doc-icon-box ${isUploaded ? 'uploaded' : 'missing'}">
+                <i data-lucide="${isUploaded ? 'file-check' : 'file-question-mark'}" size="18"></i>
+            </div>
+
+            <!-- COLUMN 2: TITLE & CATEGORY -->
+            <div class="doc-meta">
+                <div class="doc-name">${doc.name}</div>
+                <div class="doc-cat">${doc.cat}</div>
+            </div>
+
+            <!-- COLUMN 3: STATUS BADGE -->
+            <div class="doc-status">
+                ${isUploaded ? 
+                    '<span class="badge badge-success" style="font-size:10px">Verified</span>' : 
+                    '<span class="badge badge-neutral" style="font-size:10px; opacity:0.7;">Pending</span>'}
+            </div>
+
+            <!-- COLUMN 4: ACTIONS -->
+            <div class="doc-actions">
+                ${isUploaded ? `
+                    <button class="btn btn-secondary btn-xs" title="View" onclick="showNotification('Vault','Opening file...','info')">
+                        <i data-lucide="eye" size="14"></i> View
+                    </button>
+                    <button class="btn btn-secondary btn-xs" title="Update" style="min-width:34px;">
+                        <i data-lucide="refresh-cw" size="14"></i>
+                    </button>
+                ` : `
+                    <button class="btn btn-primary btn-xs btn-upload-pro" onclick="showNotification('Vault','Ready for upload','info')">
+                        <i data-lucide="plus" size="14"></i> Add Document
+                    </button>
+                `}
+            </div>
+        `;
+        listContainer.appendChild(row);
+    });
+
+    // Update Stats in side-card
+    const total = VAULT_SCHEMA.length;
+    document.getElementById('v-count-upload').textContent = uploadCount;
+    document.getElementById('v-count-missing').textContent = total - uploadCount;
+    document.getElementById('v-compliance-percent').textContent = Math.round((uploadCount/total)*100) + "%";
+
+    lcIcons(listContainer);
+}
 function showNotification(title, message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -2968,6 +3161,7 @@ function showNotification(title, message, type = 'success') {
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
+
 </script>
 <!-- Toast Notification Container -->
 <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;"></div>
