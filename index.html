@@ -3139,25 +3139,30 @@ function selectUserForPerms(name) {
     renderPermissionGrid(false); // Passing 'false' makes checkboxes active/changeable
 }
 
-// Updated Grid Renderer
 function renderPermissionGrid(isSuperAdmin) {
     const grid = document.getElementById('perm-grid');
     let html = '';
 
     mods.forEach(m => {
+        // Parent row
         html += `
           <tr style="background: #f8fafc;">
             <td style="text-align:center; color:var(--primary)"><i data-lucide="${m.i}" size="14"></i></td>
             <td colspan="2"><b style="font-size:.75rem; text-transform:uppercase; letter-spacing:0.05em;">${m.n}</b></td>
             <td style="text-align:center">
               <label class="switch">
-                <input type="checkbox" ${isSuperAdmin ? 'checked disabled' : 'checked'}>
+                <input type="checkbox" 
+                       class="parent-check" 
+                       data-module-id="${m.id}"
+                       onchange="toggleModuleGroup('${m.id}', this.checked)"
+                       ${isSuperAdmin ? 'checked disabled' : 'checked'}>
                 <span class="slider"></span>
               </label>
             </td>
           </tr>
         `;
 
+        // Submodule rows
         m.subs.forEach(sub => {
             html += `
               <tr>
@@ -3171,7 +3176,11 @@ function renderPermissionGrid(isSuperAdmin) {
                 <td style="font-size:.65rem; color:var(--muted)">Access to ${sub} interface.</td>
                 <td style="text-align:center">
                   <label class="switch">
-                    <input type="checkbox" ${isSuperAdmin ? 'checked disabled' : 'checked'}>
+                    <input type="checkbox" 
+                           class="child-check" 
+                           data-parent-ref="${m.id}"
+                           onchange="checkParentStatus('${m.id}')"
+                           ${isSuperAdmin ? 'checked disabled' : 'checked'}>
                     <span class="slider"></span>
                   </label>
                 </td>
@@ -3184,6 +3193,26 @@ function renderPermissionGrid(isSuperAdmin) {
     lcIcons(grid);
 }
 
+// Function to toggle all sub-modules when parent is clicked
+function toggleModuleGroup(moduleId, isChecked) {
+    const children = document.querySelectorAll(`input[data-parent-ref="${moduleId}"]`);
+    children.forEach(child => {
+        child.checked = isChecked;
+    });
+}
+
+// Optional: If you click a child ON, ensure the parent is also ON
+// If you click all children OFF, the parent stays as is or you can auto-toggle it
+function checkParentStatus(moduleId) {
+    const parent = document.querySelector(`input[data-module-id="${moduleId}"]`);
+    const children = document.querySelectorAll(`input[data-parent-ref="${moduleId}"]`);
+    const anyChecked = Array.from(children).some(c => c.checked);
+    
+    // If at least one child is checked, the parent module should technically be active
+    if (anyChecked && !parent.checked) {
+        parent.checked = true;
+    }
+}
 // Modify your existing selRole to call the new renderer
 function selRole(el, name) {
     document.querySelectorAll('#side-role-list .role-pill-v2').forEach(p => p.classList.remove('active'));
@@ -3211,7 +3240,7 @@ function savePermissionChanges() {
         btn.innerHTML = originalHtml;
         lcIcons(btn);
         indicator.style.display = 'flex';
-        showNotification("Governance Update", `Access schema for ${target} has been updated.`, "success");
+        showNotification("Role Updated", `Access schema for ${target} has been updated.`, "success");
         setTimeout(() => { indicator.style.display = 'none'; }, 3000);
     }, 1000);
 }
