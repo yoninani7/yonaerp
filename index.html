@@ -1379,10 +1379,10 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
         <div class="data-card">
           <div class="card-label-strip"><i data-lucide="info" size="14"></i><span>Fulfillment Summary</span></div>
           <div class="card-content">
-            <div class="data-entry"><span class="de-label">Total Required</span><span class="de-value">12 Files</span></div>
             <div class="data-entry"><span class="de-label">Uploaded</span><span class="de-value" style="color:var(--success)" id="v-count-upload">0</span></div>
             <div class="data-entry"><span class="de-label">Missing</span><span class="de-value" style="color:var(--danger)" id="v-count-missing">0</span></div>
-            <div class="data-entry"><span class="de-label">Last Audit</span><span class="de-value">Just now</span></div>
+            <div class="data-entry"><span class="de-label">Total Required</span><span class="de-value">12 Files</span></div>
+            
           </div>
         </div>
   
@@ -3125,6 +3125,7 @@ function openEmployeeVault(name, id) {
 
     lcIcons(listContainer);
 }
+
 function showNotification(title, message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
