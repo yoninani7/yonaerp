@@ -1,6 +1,6 @@
 <?php 
 declare(strict_types=1);
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../config.php';
 
 // Remove remember-me token from DB if it exists
 if (!empty($_COOKIE['remember_token'])) {
