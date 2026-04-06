@@ -1,17 +1,4 @@
-<?php
-/**
- * login.php — BGT Enterprise Secure Login
- *
- * Security features:
- *  • PDO prepared statements (SQL injection proof)
- *  • CSRF token validation
- *  • password_verify() against bcrypt/argon2 hash
- *  • Session fixation protection (session_regenerate_id)
- *  • Per-account rate-limiting & lockout stored in DB
- *  • No information leakage (identical error for bad user / bad pass)
- *  • "Remember me" via a secure, HTTPOnly cookie
- */
-
+<?php 
 declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 
