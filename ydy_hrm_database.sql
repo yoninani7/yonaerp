@@ -57,44 +57,7 @@ CREATE TABLE company_profile (
     CONSTRAINT pk_company       PRIMARY KEY (id),
     CONSTRAINT chk_single_row   CHECK (id = 1)          -- Enforce exactly one company record
 );
-
--- Seed the single company row immediately
--- (Update these values to match the real company later)
-INSERT INTO company_profile (
-    id, legal_name, trading_name, ceo_name,
-    head_office_address, entity_type, establishment_date,
-    registration_number, tin, vat_number, trade_license_number,
-    work_week_description, probation_days, retirement_age,
-    main_bank, bank_account_primary, base_currency,
-    fiscal_year_start_month, website_url, helpdesk_email,
-    corporate_phone, linkedin_handle, telegram_handle, facebook_handle
-) VALUES (
-    1,
-    'YDY HRM Enterprise Ltd.',
-    'YDY Systems',
-    'YDY Systems',
-    'Mexico, Lideta, Addis Ababa',
-    'Private Ltd. Co',
-    '2010-10-12',
-    'MT/AA/14/667/09',
-    '0019283746',
-    '9928374-VAT-01',
-    '01/01/14/19283',
-    'Mon — Fri (40 hrs)  Sat (Half day)',
-    90,
-    60,
-    'CBE (Commercial Bank of Ethiopia)',
-    '1000192837465',
-    'ETB',
-    7,
-    'www.ydy-hrm.com',
-    'support@ydyhrm.com',
-    '+251 11 667 89',
-    '/ydy-systems',
-    '@YDY_Systems',
-    '/YDY.Enterprise'
-);
-
+ 
 
 -- ============================================================
 -- PAGE 2 ▸ BRANCH OFFICES
@@ -119,21 +82,19 @@ CREATE TABLE branches (
 
 -- ============================================================
 -- PAGE 3 ▸ DEPARTMENTS
--- Organisational units within the company.
--- head_emp_id FK is added after the employees table is created
--- to avoid a circular-reference problem.
 -- ============================================================
 CREATE TABLE departments (
     dept_id         SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
-    dept_name       VARCHAR(100)        NOT NULL,                     -- Which branch this dept sits in
-    head_emp_id     INT UNSIGNED,                               -- HOD (FK added via ALTER below)
+    dept_name       VARCHAR(100)        NOT NULL,
+    branch_id       SMALLINT UNSIGNED,                          -- <--- ADDED THIS LINE
+    head_emp_id     INT UNSIGNED,                               -- HOD (FK added via ALTER later)
     description     TEXT,
     status          ENUM('Active','Inactive') NOT NULL DEFAULT 'Active',
     created_at      TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (dept_id),
-    UNIQUE  KEY uk_dept_name        (dept_name),                -- No duplicate dept names
-    INDEX       idx_dept_branch     (branch_id),
+    UNIQUE  KEY uk_dept_name        (dept_name),                
+    INDEX       idx_dept_branch     (branch_id),                
     INDEX       idx_dept_status     (status),
 
     CONSTRAINT fk_dept_branch
@@ -156,14 +117,7 @@ CREATE TABLE employment_types (
     UNIQUE KEY uk_type_name (type_name)                         -- Prevent duplicate type names
 );
 
--- Seed standard employment types (matches the UI)
-INSERT INTO employment_types (type_name, description, has_benefits, is_permanent) VALUES
-('Permanent / Full-Time', 'Regular employee with full benefits',            'Yes',     1),
-('Fixed-Term Contract',   'Time-bound employment agreement',                'Partial', 0),
-('Part-Time',             'Less than 40 hours per week',                    'Partial', 0),
-('Internship',            'Student or graduate trainee',                    'No',      0),
-('Temporary / Casual',    'Short-term project-based',                       'No',      0);
-
+ 
 
 -- ============================================================
 -- PAGE 5 ▸ JOB POSITIONS
@@ -396,22 +350,7 @@ CREATE TABLE vault_document_types (
     PRIMARY KEY (doc_type_id),
     UNIQUE KEY uk_doctype_name (doc_name)
 );
-
--- Seed with the 12 mandatory docs visible in the UI
-INSERT INTO vault_document_types (doc_name, category) VALUES
-('Signed Employment Contract',          'Legal'),
-('Curriculum Vitae (CV)',               'Identity'),
-('Academic Credentials',                'Education'),
-('Clearance / Release Letter',          'History'),
-('Experience Letters',                  'History'),
-('Certificate of Competence (COC)',     'Professional'),
-('Guarantor Form & ID',                 'Legal'),
-('Confidentiality / NDA Agreement',     'Compliance'),
-('Acknowledgments',                     'Compliance'),
-('National ID / Passport Copy',         'Identity'),
-('TIN Certification Document',          'Tax'),
-('Health & Fitness Clearance',          'Compliance');
-
+ 
 
 -- ── 8b. employee_documents ───────────────────────────────────
 -- One row per employee–document combination.
@@ -459,10 +398,7 @@ CREATE TABLE asset_categories (
     PRIMARY KEY (cat_id),
     UNIQUE KEY uk_cat_name (cat_name)
 );
-
-INSERT INTO asset_categories (cat_name) VALUES
-('IT Hardware'), ('Fleet / Vehicles'), ('Office Furniture'),
-('Networking'), ('Security Equipment'), ('Other');
+ 
 
 
 -- ── 9b. assets ───────────────────────────────────────────────
@@ -767,18 +703,7 @@ CREATE TABLE leave_types (
     PRIMARY KEY (lt_id),
     UNIQUE KEY uk_lt_name (type_name)
 );
-
-INSERT INTO leave_types (type_name, days_per_year, carryover_days, is_paid, needs_approval) VALUES
-('Annual Leave',       20, 5, 1, 1),
-('Sick Leave',         10, 0, 1, 0),
-('Maternity Leave',    90, 0, 1, 1),
-('Paternity Leave',    14, 0, 1, 1),
-('Bereavement Leave',   5, 0, 1, 1),
-('Unpaid Leave',     NULL, 0, 0, 1),
-('Study / Exam Leave',  5, 0, 1, 1),
-('Public Holiday',     12, 0, 1, 0);
-
-
+  
 -- ── 16b. leave_entitlements ──────────────────────────────────
 -- Per-employee, per-year leave balance.
 -- One row per (employee × leave_type × year).
@@ -1267,13 +1192,7 @@ CREATE TABLE roles (
     PRIMARY KEY (role_id),
     UNIQUE KEY uk_role_name (role_name)
 );
-
-INSERT INTO roles (role_name, description, is_system_role) VALUES
-('Super Admin',        'Full system authority — all modules visible and editable', 1),
-('HRM User',           'Standard HR operations access',                            0),
-('Department Manager', 'Limited to own department data only',                      0);
-
-
+ 
 -- ── 24b. user_roles ──────────────────────────────────────────
 -- Links system_users to roles (Many-to-Many).
 CREATE TABLE user_roles (
@@ -1308,65 +1227,7 @@ CREATE TABLE modules (
     CONSTRAINT fk_mod_parent
         FOREIGN KEY (parent_id) REFERENCES modules(module_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
--- Seed modules (groups + their sub-pages)
-INSERT INTO modules (module_key, module_name, parent_id, sort_order) VALUES
--- Top-level groups
-('m-org',   'Company & Structure',  NULL, 1),
-('m-emp',   'Employees',            NULL, 2),
-('m-rec',   'Talent Acquisition',   NULL, 3),
-('m-move',  'Employee Movement',    NULL, 4),
-('m-att',   'Attendance',           NULL, 5),
-('m-leave', 'Leave Management',     NULL, 6),
-('m-ben',   'Benefits',             NULL, 7),
-('m-comp',  'Compliance & Exit',    NULL, 8),
-('m-train', 'Training & Dev',       NULL, 9),
-('m-perf',  'Performance',          NULL, 10),
-('m-rep',   'Reports & Analytics',  NULL, 11),
-('m-sys',   'System Admin',         NULL, 12);
-
--- Sub-pages inserted after we know parent IDs (use subquery to get parent_id)
-INSERT INTO modules (module_key, module_name, parent_id, sort_order)
-SELECT 'company-profile',    'Company Profile',          module_id, 1 FROM modules WHERE module_key='m-org' UNION ALL
-SELECT 'org-chart',          'Organization Chart',       module_id, 2 FROM modules WHERE module_key='m-org' UNION ALL
-SELECT 'departments',        'Departments',              module_id, 3 FROM modules WHERE module_key='m-org' UNION ALL
-SELECT 'job-positions',      'Job Positions',            module_id, 4 FROM modules WHERE module_key='m-org' UNION ALL
-SELECT 'branch-offices',     'Branch Offices',           module_id, 5 FROM modules WHERE module_key='m-org' UNION ALL
-SELECT 'employee-directory', 'Employee Profile',         module_id, 1 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'employment-types',   'Employment Types',         module_id, 2 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'probation-tracker',  'Probation Tracker',        module_id, 3 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'contract-renewals',  'Contract Renewals',        module_id, 4 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'document-vault',     'Attachment Vault',         module_id, 5 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'asset-tracking',     'Asset Tracking',           module_id, 6 FROM modules WHERE module_key='m-emp' UNION ALL
-SELECT 'job-vacancies',      'Add Job Vacancies',        module_id, 1 FROM modules WHERE module_key='m-rec' UNION ALL
-SELECT 'candidates',         'Job Applicant List',       module_id, 2 FROM modules WHERE module_key='m-rec' UNION ALL
-SELECT 'interview-tracker',  'Interview Tracker',        module_id, 3 FROM modules WHERE module_key='m-rec' UNION ALL
-SELECT 'internship',         'Internship Management',    module_id, 4 FROM modules WHERE module_key='m-rec' UNION ALL
-SELECT 'Promote/Demote',     'Promote / Demote',         module_id, 1 FROM modules WHERE module_key='m-move' UNION ALL
-SELECT 'transfers',          'Department Transfers',     module_id, 2 FROM modules WHERE module_key='m-move' UNION ALL
-SELECT 'attendance',         'Record Attendance',        module_id, 1 FROM modules WHERE module_key='m-att' UNION ALL
-SELECT 'daily-attendance',   'Daily Attendance',         module_id, 2 FROM modules WHERE module_key='m-att' UNION ALL
-SELECT 'attendance-reports', 'Attendance Reports',       module_id, 3 FROM modules WHERE module_key='m-att' UNION ALL
-SELECT 'leave-types',        'Leave Types',              module_id, 1 FROM modules WHERE module_key='m-leave' UNION ALL
-SELECT 'leave-requests',     'Leave Requests',           module_id, 2 FROM modules WHERE module_key='m-leave' UNION ALL
-SELECT 'leave-entitlement',  'Leave Entitlement',        module_id, 3 FROM modules WHERE module_key='m-leave' UNION ALL
-SELECT 'medical-claims',     'Medical Claims',           module_id, 1 FROM modules WHERE module_key='m-ben' UNION ALL
-SELECT 'overtime-requests',  'Overtime Requests',        module_id, 2 FROM modules WHERE module_key='m-ben' UNION ALL
-SELECT 'disciplinary-actions','Disciplinary Actions',    module_id, 1 FROM modules WHERE module_key='m-comp' UNION ALL
-SELECT 'resignations',       'Resignations',             module_id, 2 FROM modules WHERE module_key='m-comp' UNION ALL
-SELECT 'termination',        'Separation & Exit',        module_id, 3 FROM modules WHERE module_key='m-comp' UNION ALL
-SELECT 'exit-clearance',     'Exit Clearance',           module_id, 4 FROM modules WHERE module_key='m-comp' UNION ALL
-SELECT 'training-needs',     'Training Needs Analysis',  module_id, 1 FROM modules WHERE module_key='m-train' UNION ALL
-SELECT 'training-schedule',  'Training Schedule',        module_id, 2 FROM modules WHERE module_key='m-train' UNION ALL
-SELECT 'performance-reviews','Performance Reviews',      module_id, 1 FROM modules WHERE module_key='m-perf' UNION ALL
-SELECT '360-feedback',       '360° Feedback',            module_id, 2 FROM modules WHERE module_key='m-perf' UNION ALL
-SELECT 'hr-analytics',       'HR Analytics',             module_id, 1 FROM modules WHERE module_key='m-rep' UNION ALL
-SELECT 'custom-reports',     'Custom Reports',           module_id, 2 FROM modules WHERE module_key='m-rep' UNION ALL
-SELECT 'user-management',    'User Management',          module_id, 1 FROM modules WHERE module_key='m-sys' UNION ALL
-SELECT 'roles-permissions',  'Roles & Permissions',      module_id, 2 FROM modules WHERE module_key='m-sys' UNION ALL
-SELECT 'audit-logs',         'Audit Logs',               module_id, 3 FROM modules WHERE module_key='m-sys';
-
-
+ 
 -- ── 24d. role_permissions ────────────────────────────────────
 -- Defines which modules each ROLE can see (standard access control).
 CREATE TABLE role_permissions (
