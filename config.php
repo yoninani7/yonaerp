@@ -9,7 +9,7 @@ declare(strict_types=1);
 // ── Environment ──────────────────────────────────────────────────────────────
 define('DB_HOST', 'localhost');
 define('DB_PORT', '3306');
-define('DB_NAME', 'your_database_name');   // ← change
+define('DB_NAME', 'ydy_hrm');   // ← change
 define('DB_USER', 'root');         // ← change
 define('DB_PASS', '');     // ← change
 define('DB_CHARSET', 'utf8mb4');
@@ -31,7 +31,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
-        'secure'   => true,          // HTTPS only — set to false on local dev
+        // 'secure'   => true,          // HTTPS only — set to false on local dev
         'httponly' => true,          // JS cannot read the cookie
         'samesite' => 'Strict',
     ]);
