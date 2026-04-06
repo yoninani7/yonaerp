@@ -46,9 +46,9 @@ CREATE TABLE company_profile (
     logo_path               VARCHAR(255),
 
     -- ── Social Media ────────────────────────────────────
-    linkedin_handle         VARCHAR(100),
-    telegram_handle         VARCHAR(100),
-    facebook_handle         VARCHAR(100),
+    socialmedia1         VARCHAR(100),
+    socialmedia2         VARCHAR(100),
+    socialmedia3         VARCHAR(100),
 
     -- ── Audit ────────────────────────────────────────────
     updated_at              TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -86,21 +86,14 @@ CREATE TABLE branches (
 CREATE TABLE departments (
     dept_id         SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     dept_name       VARCHAR(100)        NOT NULL,
-    branch_id       SMALLINT UNSIGNED,                          -- <--- ADDED THIS LINE
-    head_emp_id     INT UNSIGNED,                               -- HOD (FK added via ALTER later)
+    head_emp_id     INT UNSIGNED,                               -- Global HOD
     description     TEXT,
     status          ENUM('Active','Inactive') NOT NULL DEFAULT 'Active',
     created_at      TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (dept_id),
     UNIQUE  KEY uk_dept_name        (dept_name),                
-    INDEX       idx_dept_branch     (branch_id),                
-    INDEX       idx_dept_status     (status),
-
-    CONSTRAINT fk_dept_branch
-        FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE
+    INDEX       idx_dept_status     (status) 
 );
 
 
@@ -127,9 +120,7 @@ CREATE TABLE employment_types (
 CREATE TABLE job_positions (
     position_id     SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     title           VARCHAR(150)        NOT NULL,
-    dept_id         SMALLINT UNSIGNED,
-    grade_level     VARCHAR(10),                    
-    is_active       TINYINT(1)          NOT NULL DEFAULT 1,
+    dept_id         SMALLINT UNSIGNED,            
     created_at      TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (position_id),
