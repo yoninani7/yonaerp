@@ -1223,7 +1223,7 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
             <div class="demo-grid-row">
               <div class="form-group"><label>Date of Birth *</label><input type="date" class="form-ctrl master-req" id="o-dob"></div>
               <div class="form-group"><label>Gender *</label><select class="form-ctrl master-req" id="o-gender"><option value="">Select...</option><option>Male</option><option>Female</option></select></div>
-              <div class="form-group"><label>Nationality *</label><input type="text" class="form-ctrl master-req" id="o-nat" value="Ethiopian"></div>
+              <div class="form-group"><label>Nationality *</label><input type="text" class="form-ctrl master-req" id="o-nat" value="Ethiopian" disabled></div>
             </div>
             <div class="demo-grid-row">
               <div class="form-group"><label>Marital Status</label><select class="form-ctrl" id="o-marital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
@@ -1243,18 +1243,52 @@ th.sticky-emp.sticky-head { z-index: 50; top: 0; left: 0; background: #f8fafc !i
           <div class="form-group"><label>Postal Code</label><input type="text" class="form-ctrl" id="o-zip" value="1000"></div>
         </div>
       </section>
-      <section id="ob-step-3" class="form-section-content">
-        <div class="input-group-label">Employment Placement</div>
-        <p class="input-group-sub">Mapping the position within the corporate structure.</p>
-        <div class="form-grid fg-3">
-          <div class="form-group"><label>Department *</label><select class="form-ctrl master-req" id="o-dept"><option value="">Select...</option><option>Engineering</option><option>Finance</option><option>HR</option></select></div>
-          <div class="form-group"><label>Job Position *</label><select class="form-ctrl master-req" id="o-pos"><option value="">Select...</option><option>Senior Dev</option><option>Analyst</option></select></div>
-          <div class="form-group"><label>Employment Type *</label><select class="form-ctrl master-req" id="o-etype"><option value="">Select...</option><option>Full-Time</option><option>Contract</option></select></div>
-          <div class="form-group"><label>Hiring Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
-          <div class="form-group"><label>Reporting To</label><input type="text" class="form-ctrl" placeholder="Search Manager..."></div>
-           
-        </div>
-      </section>
+      <!-- EMPLOYMENT PLACEMENT (DYNAMIC VERSION) -->
+<section id="ob-step-3" class="form-section-content">
+  <div class="form-header-pro">
+    <div class="input-group-label">Employment Placement</div>
+    <p class="input-group-sub">Mapping the position within the corporate structure based on contract type.</p>
+  </div>
+  
+  <div class="form-grid fg-3">
+    <div class="form-group">
+      <label>Department *</label>
+      <select class="form-ctrl master-req" id="o-dept">
+        <option value="">Select...</option>
+        <option>Engineering</option>
+        <option>Finance</option>
+        <option>HR</option>
+        <option>Sales</option>
+        <option>Marketing</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Job Position *</label>
+      <select class="form-ctrl master-req" id="o-pos">
+        <option value="">Select...</option>
+        <option>Senior Dev</option>
+        <option>Analyst</option>
+        <option>Marketing Specialist</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Employment Type *</label>
+      <select class="form-ctrl master-req" id="o-etype" onchange="updateEmploymentFields(this.value)">
+        <option value="">Select...</option>
+        <option value="full-time">Permanent / Full-Time</option>
+        <option value="contract">Fixed-Term Contract</option>
+        <option value="part-time">Part-Time</option>
+        <option value="internship">Internship</option>
+        <option value="temporary">Temporary / Casual</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Dynamic Container -->
+  <div id="dynamic-employment-fields" class="form-grid fg-3 mt-4" style="border-top: 1px dashed var(--border); padding-top: 20px; display: none;">
+    <!-- Content injected via JS -->
+  </div>
+</section>
       <section id="ob-step-4" class="form-section-content">
         <div class="input-group-label">Financial & Treasury</div>
         <p class="input-group-sub">Payroll disbursement and statutory tax records.</p>
@@ -3124,6 +3158,67 @@ function openEmployeeVault(name, id) {
     document.getElementById('v-compliance-percent').textContent = Math.round((uploadCount/total)*100) + "%";
 
     lcIcons(listContainer);
+}
+function updateEmploymentFields(type) {
+  const container = document.getElementById('dynamic-employment-fields');
+  if (!type) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'grid';
+  let html = '';
+
+  switch (type) {
+    case 'full-time':
+      html = `
+        <div class="form-group"><label>Hiring Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+        <div class="form-group" style="grid-column: span 2;"><label>Reporting To *</label><input type="text" class="form-ctrl master-req" id="o-reports" placeholder="Search Manager..."></div>
+      `;
+      break;
+
+    case 'contract':
+      html = `
+        <div class="form-group"><label>Contract Start Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+        <div class="form-group"><label>Contract End Date *</label><input type="date" class="form-ctrl master-req" id="o-end-date"></div>
+        <div class="form-group"><label>Reporting To *</label><input type="text" class="form-ctrl master-req" id="o-reports" placeholder="Search Manager..."></div>
+      `;
+      break;
+
+    case 'part-time':
+      html = `
+        <div class="form-group"><label>Hiring Date *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+        <div class="form-group"><label>Work Hours Per Week *</label><input type="number" class="form-ctrl master-req" id="o-hours" placeholder="e.g. 20"></div>
+        <div class="form-group"><label>Reporting To *</label><input type="text" class="form-ctrl master-req" id="o-reports" placeholder="Search Manager..."></div>
+      `;
+      break;
+
+    case 'internship':
+      html = `
+        <div class="form-group"><label>Internship Start *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+        <div class="form-group"><label>Internship End *</label><input type="date" class="form-ctrl master-req" id="o-end-date"></div>
+        <div class="form-group"><label>Assigned Mentor Name *</label><input type="text" class="form-ctrl master-req" id="o-reports" placeholder="Full name of Mentor"></div>
+      `;
+      break;
+
+    case 'temporary':
+      html = `
+        <div class="form-group"><label>Project Name *</label><input type="text" class="form-ctrl master-req" id="o-project" placeholder="e.g. Q3 Infrastructure Audit"></div>
+        <div class="form-group"><label>Assignment Start *</label><input type="date" class="form-ctrl master-req" id="o-hire"></div>
+        <div class="form-group"><label>Reporting To *</label><input type="text" class="form-ctrl master-req" id="o-reports" placeholder="Project Supervisor"></div>
+      `;
+      break;
+  }
+
+  container.innerHTML = html;
+  
+  // Re-run icons and validation listeners
+  lcIcons(container);
+  container.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', validateMasterRecord);
+  });
+  
+  // Update progress and check button states
+  validateMasterRecord();
 }
 
 function showNotification(title, message, type = 'success') {
