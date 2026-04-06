@@ -13,8 +13,7 @@ USE ydy_hrm;
 -- PAGE 1 ▸ COMPANY PROFILE
 -- The CHECK constraint enforces the single-row rule.
 -- ============================================================
-CREATE TABLE company_profile (
-    -- Hard-coded PK ensures only one row can ever exist
+CREATE TABLE company_profile ( 
     id                      TINYINT UNSIGNED    NOT NULL DEFAULT 1,
 
     -- ── Legal & Incorporation ─────────────────────────────
@@ -31,14 +30,14 @@ CREATE TABLE company_profile (
 
     -- ── Operational Policies ─────────────────────────────
     work_week_description   VARCHAR(150),                       -- 'Mon–Fri (40 hrs) Sat (Half day)'
-    probation_days          SMALLINT UNSIGNED   NOT NULL DEFAULT 90,
-    retirement_age          TINYINT UNSIGNED    NOT NULL DEFAULT 60,
+    probation_days          VARCHAR(150),
+    retirement_age          VARCHAR(150),
 
     -- ── Treasury / Finance ───────────────────────────────
     main_bank               VARCHAR(100),
-    bank_account_primary    VARCHAR(50),
-    base_currency           CHAR(3)             NOT NULL DEFAULT 'ETB',
-    fiscal_year_start_month TINYINT UNSIGNED    NOT NULL DEFAULT 7,  -- 7 = July (Ethiopian fiscal)
+    bank_account_primary    VARCHAR(100),
+    base_currency           VARCHAR(100),
+    fiscal_year_start_month VARCHAR(100),   
 
     -- ── Digital Identity ─────────────────────────────────
     website_url             VARCHAR(255),
@@ -99,15 +98,12 @@ INSERT INTO company_profile (
 
 -- ============================================================
 -- PAGE 2 ▸ BRANCH OFFICES
--- Each office location the company operates from.
--- Referenced by departments, employees, assets, vacancies, etc.
+-- Each office location the company operates from. 
 -- ============================================================
 CREATE TABLE branches (
     branch_id       SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
-    branch_name     VARCHAR(100)        NOT NULL,
-    city            VARCHAR(80),
-    country         VARCHAR(80)         NOT NULL DEFAULT 'Ethiopia',
-    address         TEXT,
+    branch_name     VARCHAR(100)        NOT NULL,  
+    location        TEXT,
     phone           VARCHAR(30),
     email           VARCHAR(150),
     -- manager is added via FK after employees table is created
@@ -129,8 +125,7 @@ CREATE TABLE branches (
 -- ============================================================
 CREATE TABLE departments (
     dept_id         SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
-    dept_name       VARCHAR(100)        NOT NULL,
-    branch_id       SMALLINT UNSIGNED,                          -- Which branch this dept sits in
+    dept_name       VARCHAR(100)        NOT NULL,                     -- Which branch this dept sits in
     head_emp_id     INT UNSIGNED,                               -- HOD (FK added via ALTER below)
     description     TEXT,
     status          ENUM('Active','Inactive') NOT NULL DEFAULT 'Active',
@@ -155,10 +150,7 @@ CREATE TABLE departments (
 CREATE TABLE employment_types (
     type_id         TINYINT UNSIGNED    NOT NULL AUTO_INCREMENT,
     type_name       VARCHAR(80)         NOT NULL,
-    description     TEXT,
-    has_benefits    ENUM('Yes','Partial','No') NOT NULL DEFAULT 'Yes',
-    is_permanent    TINYINT(1)          NOT NULL DEFAULT 0,     -- 1 = open-ended contract
-    is_active       TINYINT(1)          NOT NULL DEFAULT 1,
+    description     TEXT, 
 
     PRIMARY KEY (type_id),
     UNIQUE KEY uk_type_name (type_name)                         -- Prevent duplicate type names
@@ -182,10 +174,7 @@ CREATE TABLE job_positions (
     position_id     SMALLINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     title           VARCHAR(150)        NOT NULL,
     dept_id         SMALLINT UNSIGNED,
-    grade_level     VARCHAR(10),                                -- L1, L2, M1, S1 …
-    min_salary      DECIMAL(14,2),
-    max_salary      DECIMAL(14,2),
-    headcount_target SMALLINT UNSIGNED  DEFAULT 1,
+    grade_level     VARCHAR(10),                    
     is_active       TINYINT(1)          NOT NULL DEFAULT 1,
     created_at      TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
